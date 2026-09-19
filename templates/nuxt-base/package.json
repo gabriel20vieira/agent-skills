@@ -27,6 +27,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "drizzle-orm": "^0.45.2",
+        "h3": "^1.15.11",
         "mysql2": "^3.24.4",
         "nuxt": "^4.5.2",
         "reka-ui": "^2.10.4",
