@@ -2,21 +2,49 @@
 
 Claude Code plugin to build websites quickly on one consistent base.
 
-- `templates/nuxt-base/` — runnable Nuxt 4 app with the core (UI, i18n, DB, deploy; auth,
-  permissions and realtime arrive in the next plans).
+- `templates/nuxt-base/` — runnable Nuxt 4 app with the core: accounts with revocable
+  sessions, roles and a shared permission matrix, realtime over WebSocket, dialogs and
+  confirmations, themes, i18n (pt-PT/en-US), settings, audit log, MySQL migrations, Docker
+  and no-Docker deploy, unit and API tests.
 - `skills/` — skills that scaffold a project from the template and extend it.
-- `modules/` — optional features applied by skills.
+- `modules/` — optional features (assistant, PWA, tenancy, public site) applied by skills.
 - `docs/superpowers/` — design spec and implementation plans.
 
 ## Install
 
-    claude plugin marketplace add <path-or-git-url-of-this-repo>
-    claude plugin install web-foundation
+```bash
+claude plugin marketplace add <path-or-git-url-of-this-repo>
+claude plugin install web-foundation@claude-skills
+```
 
-## Work on the template
+Then ask Claude for what you want ("start a new site called parish-site", "add a
+products resource", "deploy this with Caddy"); the matching skill loads by itself.
 
-    cd templates/nuxt-base
-    npm install
-    npm run check
+## Skills
 
-See `templates/nuxt-base/README.md` for running it with and without Docker.
+| Skill | Use it to |
+|---|---|
+| `web-foundation` | learn the architecture and rules; routes to the other skills |
+| `web-new-project` | copy the template into a new project with fresh secrets |
+| `web-crud-resource` | add an entity end to end (table, API, permissions, page, tests) |
+| `web-realtime-event` | push a server change to open tabs |
+| `web-theme` | add a colour theme (tweakcn or any shadcn tokens) |
+| `web-deploy` | Docker or plain Node, proxy, backups, go-live checklist |
+| `web-audit` | security review before going live |
+| `web-assistant` / `web-assistant-tool` | chat assistant with permission-aware tools |
+| `web-pwa` | installable app with an offline page |
+| `web-tenancy` | organisations and per-organisation data |
+| `web-public-site` | public pages, SEO, sitemap, robots, llms.txt, cookie notice |
+
+## Work on this repo
+
+```bash
+cd templates/nuxt-base
+npm install
+docker compose up -d db
+npm run check          # lint + typecheck + unit tests
+npm run test:api       # builds and runs API/realtime tests against <db>_test
+```
+
+Skill scripts have their own tests: `node --test skills/web-new-project/scripts/new-project.test.mjs`.
+See `templates/nuxt-base/README.md` for running the template.

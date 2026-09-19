@@ -1,0 +1,16 @@
+{
+    "name": "claude-skills",
+    "owner": {
+        "name": "Gabriel Vieira"
+    },
+    "metadata": {
+        "description": "Website foundation for Claude Code: a Nuxt 4 template and the skills that build on it."
+    },
+    "plugins": [
+        {
+            "name": "web-foundation",
+            "source": "./",
+            "description": "Nuxt 4 website foundation: a runnable template plus skills to scaffold projects and add resources, realtime, assistant, PWA and deploy."
+        }
+    ]
+}
