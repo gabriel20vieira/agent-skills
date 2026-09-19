@@ -1,0 +1,33 @@
+{
+    "nav": { "organizations": "Organisations" },
+    "orgs": {
+        "title": "Organisations",
+        "description": "Organisations you belong to and their members.",
+        "none": "No organisation",
+        "manage": "Manage organisations",
+        "new": "New organisation",
+        "name": "Name",
+        "role": "Role",
+        "created": "Organisation created.",
+        "saved": "Change saved.",
+        "deleted": "Organisation deleted.",
+        "addMember": "Add member",
+        "addMemberHint": "The person needs an account. For someone without one, create an invite first.",
+        "memberAdded": "Member added.",
+        "roles": { "owner": "Owner", "admin": "Admin", "member": "Member" },
+        "empty": { "title": "You do not belong to any organisation yet", "description": "Create one or ask an admin to add you." },
+        "remove": { "title": "Remove member?", "body": "{name} will lose access to this organisation." },
+        "leave": { "title": "Leave organisation?", "body": "You will lose access to {org}.", "confirm": "Leave" },
+        "delete": { "title": "Delete organisation", "body": "{org} and all its data will be deleted. This cannot be undone." }
+    },
+    "errors": {
+        "orgs": {
+            "none_selected": "Pick an organisation first.",
+            "not_found": "Organisation not found.",
+            "user_not_found": "There is no account with that email.",
+            "already_member": "That person is already a member.",
+            "member_not_found": "Member not found.",
+            "last_owner": "The organisation needs at least one owner."
+        }
+    }
+}

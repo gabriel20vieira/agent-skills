@@ -1,0 +1,10 @@
+{
+    "pwa": {
+        "install": "Install app",
+        "offline": {
+            "title": "You are offline",
+            "body": "This page could not be loaded. Check your internet connection.",
+            "retry": "Try again"
+        }
+    }
+}

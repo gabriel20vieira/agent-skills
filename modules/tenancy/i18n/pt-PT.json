@@ -1,0 +1,33 @@
+{
+    "nav": { "organizations": "Organizações" },
+    "orgs": {
+        "title": "Organizações",
+        "description": "Organizações a que pertences e os seus membros.",
+        "none": "Sem organização",
+        "manage": "Gerir organizações",
+        "new": "Nova organização",
+        "name": "Nome",
+        "role": "Papel",
+        "created": "Organização criada.",
+        "saved": "Alteração guardada.",
+        "deleted": "Organização apagada.",
+        "addMember": "Adicionar membro",
+        "addMemberHint": "A pessoa tem de ter conta. Para quem ainda não tem, cria primeiro um convite.",
+        "memberAdded": "Membro adicionado.",
+        "roles": { "owner": "Dono", "admin": "Administrador", "member": "Membro" },
+        "empty": { "title": "Ainda não pertences a nenhuma organização", "description": "Cria uma ou pede a um administrador que te adicione." },
+        "remove": { "title": "Remover membro?", "body": "{name} deixa de ter acesso a esta organização." },
+        "leave": { "title": "Sair da organização?", "body": "Deixas de ter acesso a {org}.", "confirm": "Sair" },
+        "delete": { "title": "Apagar organização", "body": "{org} e todos os seus dados vão ser apagados. Não é possível desfazer." }
+    },
+    "errors": {
+        "orgs": {
+            "none_selected": "Escolhe primeiro uma organização.",
+            "not_found": "Organização não encontrada.",
+            "user_not_found": "Não existe nenhuma conta com esse email.",
+            "already_member": "Essa pessoa já é membro.",
+            "member_not_found": "Membro não encontrado.",
+            "last_owner": "A organização precisa de pelo menos um dono."
+        }
+    }
+}

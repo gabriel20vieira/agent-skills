@@ -1,0 +1,13 @@
+{
+    "about": {
+        "title": "Sobre",
+        "description": "Quem somos e como falar connosco.",
+        "body": "Substitui este texto pela apresentação do projeto."
+    },
+    "cookies": {
+        "label": "Aviso de cookies",
+        "notice": "Usamos apenas cookies essenciais: sessão, idioma e tema.",
+        "more": "Saber mais",
+        "ok": "Entendi"
+    }
+}

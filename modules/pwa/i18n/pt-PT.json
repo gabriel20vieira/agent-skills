@@ -1,0 +1,10 @@
+{
+    "pwa": {
+        "install": "Instalar app",
+        "offline": {
+            "title": "Sem ligação",
+            "body": "Não foi possível carregar esta página. Verifica a ligação à internet.",
+            "retry": "Tentar de novo"
+        }
+    }
+}

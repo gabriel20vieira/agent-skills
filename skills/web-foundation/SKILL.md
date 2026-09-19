@@ -75,6 +75,18 @@ test/unit, test/api
 | Organisations (multi-tenant) | `web-tenancy` |
 | Public pages, SEO, sitemap | `web-public-site` |
 
+## Modules
+
+Optional features live in `modules/<name>/` of the plugin. Each module skill starts with
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/skills/web-foundation/scripts/apply-module.mjs" <name> .
+```
+
+which copies the module's new files (never overwriting) and merges its i18n keys (never
+overwriting), then lists the few core edits to make by hand. Apply modules to a clean
+working tree so `git diff` shows exactly what each one changed.
+
 ## Out of scope
 
 Other stacks, other databases, payments, transactional email and OAuth are not in the

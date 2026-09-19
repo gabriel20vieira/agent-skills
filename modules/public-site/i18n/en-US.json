@@ -1,0 +1,13 @@
+{
+    "about": {
+        "title": "About",
+        "description": "Who we are and how to reach us.",
+        "body": "Replace this text with the project's introduction."
+    },
+    "cookies": {
+        "label": "Cookie notice",
+        "notice": "We only use essential cookies: session, language and theme.",
+        "more": "Learn more",
+        "ok": "Got it"
+    }
+}

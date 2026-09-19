@@ -25,6 +25,10 @@ routes are (`/app/produtos`).
    `created_at`/`updated_at` with `defaultNow()`/`onUpdateNow()`, foreign keys with an explicit
    `onDelete`, indexes for what the list sorts or filters by. Export it from
    `server/db/schema/index.ts`.
+   MySQL identifiers max out at 64 characters, and drizzle names a foreign key
+   `<table>_<column>_<ref table>_<ref column>_fk`: with long names, declare it in the table
+   extras as `foreignKey({ name: "<short>_fk", columns, foreignColumns }).onDelete(...)`
+   (see `modules/assistant/files/server/db/schema/assistant.ts`).
 2. **Migration**: `npm run db:generate -- --name products`, read the SQL in `drizzle/`,
    then `npm run db:migrate`. Never edit an applied migration; add a new one.
 3. **Schemas** `shared/schemas/products.ts` (copy `notes.ts`): `productCreateSchema`,

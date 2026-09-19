@@ -1,0 +1,48 @@
+{
+    "nav": { "assistant": "Assistente" },
+    "assistant": {
+        "title": "Assistente",
+        "description": "Pergunta sobre os dados da aplicação. As alterações só acontecem quando aceitas.",
+        "conversations": "Conversas",
+        "new": "Nova conversa",
+        "hint": "Escreve uma pergunta. O assistente pode consultar dados e propor alterações, que aparecem como cartões para aceitares ou recusares.",
+        "placeholder": "Escreve uma mensagem…",
+        "send": "Enviar",
+        "stop": "Parar",
+        "usingTool": "A consultar: {tool}…",
+        "disabled": { "title": "Assistente desligado", "body": "Um administrador pode ligá-lo nas definições." },
+        "delete": { "title": "Apagar conversa?", "body": "A conversa e as suas propostas vão ser apagadas." },
+        "proposal": {
+            "label": "Proposta do assistente",
+            "accept": "Aceitar",
+            "reject": "Recusar",
+            "done": "Alteração feita.",
+            "failed": "A alteração não foi feita.",
+            "states": { "pending": "Pendente", "claimed": "A aplicar…", "done": "Feito", "rejected": "Recusada", "failed": "Falhou" }
+        },
+        "settings": {
+            "title": "Assistente",
+            "description": "Modelo de linguagem usado pelo assistente. Desligado por defeito.",
+            "enabled": "Assistente ligado",
+            "provider": "Fornecedor",
+            "fake": "Simulado (testes)",
+            "baseUrl": "Endereço do Ollama",
+            "model": "Modelo",
+            "systemPrompt": "Instruções adicionais",
+            "systemPromptHint": "Juntadas às instruções base: tom, contexto do negócio, o que evitar."
+        }
+    },
+    "settings": { "tabs": { "assistant": "Assistente" } },
+    "errors": {
+        "assistant": {
+            "disabled": "O assistente está desligado.",
+            "not_found": "Conversa não encontrada.",
+            "proposal_not_found": "Proposta não encontrada.",
+            "proposal_handled": "Esta proposta já foi tratada.",
+            "provider_error": "O modelo de linguagem não respondeu.",
+            "timeout": "O assistente demorou demasiado. Tenta de novo.",
+            "too_many_steps": "O assistente precisou de demasiados passos. Reformula o pedido.",
+            "failed": "O assistente falhou. Tenta de novo."
+        }
+    }
+}
