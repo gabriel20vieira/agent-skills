@@ -1,1 +1,23 @@
-{}
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "close": "Close",
+        "loading": "Loading…",
+        "toggleDark": "Toggle dark mode"
+    },
+    "errors": {
+        "unknown": "Something went wrong.",
+        "notFound": "Page not found."
+    },
+    "network": {
+        "unreachable": "Cannot reach the server."
+    },
+    "home": {
+        "title": "Welcome",
+        "subtitle": "A foundation for Nuxt websites.",
+        "cta": "Get started"
+    }
+}

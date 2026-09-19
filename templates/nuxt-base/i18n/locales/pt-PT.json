@@ -1,1 +1,23 @@
-{}
+{
+    "common": {
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Apagar",
+        "confirm": "Confirmar",
+        "close": "Fechar",
+        "loading": "A carregar…",
+        "toggleDark": "Alternar modo escuro"
+    },
+    "errors": {
+        "unknown": "Ocorreu um erro inesperado.",
+        "notFound": "Página não encontrada."
+    },
+    "network": {
+        "unreachable": "Sem ligação ao servidor."
+    },
+    "home": {
+        "title": "Bem-vindo",
+        "subtitle": "Base para websites em Nuxt.",
+        "cta": "Começar"
+    }
+}
