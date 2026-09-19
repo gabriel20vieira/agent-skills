@@ -11,11 +11,12 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "typecheck": "nuxt typecheck",
-        "test": "vitest run",
-        "test:watch": "vitest",
+        "test": "vitest run --project unit",
+        "test:watch": "vitest --project unit",
         "check": "npm run lint && npm run typecheck && npm run test",
         "db:generate": "drizzle-kit generate",
-        "db:migrate": "node --env-file-if-exists=.env scripts/baseline-migrations.mjs && drizzle-kit migrate"
+        "db:migrate": "node --env-file-if-exists=.env scripts/baseline-migrations.mjs && drizzle-kit migrate",
+        "test:api": "vitest run --project api"
     },
     "dependencies": {
         "@adonisjs/hash": "^9.1.1",
@@ -40,6 +41,7 @@
     },
     "devDependencies": {
         "@nuxt/eslint": "^1.17.0",
+        "@nuxt/test-utils": "^4.3.2",
         "@tailwindcss/vite": "^4.3.3",
         "drizzle-kit": "^0.31.10",
         "eslint": "^9.39.0",
