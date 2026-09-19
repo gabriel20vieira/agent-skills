@@ -2,8 +2,17 @@
 const { t } = useI18n()
 const { loggedIn } = useSession()
 const { status } = useRealtime()
-// Only once a connection was attempted: nothing to say before the first connect.
-const offline = computed(() => loggedIn.value && (status.value === "closed" || status.value === "connecting"))
+const down = computed(() => loggedIn.value && (status.value === "closed" || status.value === "connecting"))
+
+// Only after 2 s down: the first connect on every page load must not flash the badge.
+const offline = ref(false)
+let timer: ReturnType<typeof setTimeout> | undefined
+watch(down, (value) => {
+    clearTimeout(timer)
+    if (!value) offline.value = false
+    else timer = setTimeout(() => (offline.value = true), 2000)
+}, { immediate: true })
+onScopeDispose(() => clearTimeout(timer))
 </script>
 
 <template>
