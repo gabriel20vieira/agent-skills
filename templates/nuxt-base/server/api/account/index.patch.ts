@@ -13,5 +13,7 @@ export default defineEventHandler(async (event) => {
     }).where(eq(users.id, user.id))
     const row = (await findUserById(user.id))!
     await refreshSession(event, row)
+    // The user's other tabs and devices refresh their copy.
+    realtime.publishToUser(user.id, "user.updated", { id: user.id })
     return toAuthUser(toSessionUser(row), user.mimicking ? user.effectiveRoles : undefined)
 })

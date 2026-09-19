@@ -10,5 +10,10 @@ export default defineEventHandler(async (event) => {
         db = "down"
     }
     if (db === "down") setResponseStatus(event, 503)
-    return { status: db === "ok" ? "ok" : "degraded", version: appVersion, db }
+    return {
+        status: db === "ok" ? "ok" : "degraded",
+        version: appVersion,
+        db,
+        realtime: { peers: realtime.stats().peers },
+    }
 })

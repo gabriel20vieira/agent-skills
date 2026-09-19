@@ -1,4 +1,13 @@
-import { url } from "@nuxt/test-utils/e2e"
+let baseUrl = ""
+
+/** Each test file points the clients at the server it started (see server.ts). */
+export function setBaseUrl(url: string) {
+    baseUrl = url
+}
+
+export function url(path: string) {
+    return baseUrl + path
+}
 
 export interface ApiResponse<T = any> {
     status: number

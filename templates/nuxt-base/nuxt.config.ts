@@ -31,7 +31,11 @@ export default defineNuxtConfig({
         },
     },
     compatibilityDate: "2026-09-01",
-    nitro: { preset: "node-server" },
+    nitro: {
+        preset: "node-server",
+        // WebSocket on the same port (server/routes/_ws.ts); no second port to proxy.
+        experimental: { websocket: true },
+    },
     vite: { plugins: [tailwindcss()] },
     eslint: {
         config: {

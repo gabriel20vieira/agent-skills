@@ -80,6 +80,7 @@ export async function createUser(ctx: ServiceContext, input: z.infer<typeof user
         throw error
     }
     await audit(ctx.event, { action: "users.create", resource: "users", resourceId: id, meta: { roles: input.roles } })
+    realtime.publish(resourceTopic("users"), "users.created", { id })
     return { user: toPublicUser((await findUserById(id))!), generatedPassword }
 }
 
@@ -102,6 +103,8 @@ export async function updateUser(ctx: ServiceContext, id: number, patch: z.infer
     await useDb().update(users).set({ name: patch.name ?? target.name, ...next }).where(eq(users.id, id))
     if (!next.active) await revokeUserSessions(id)
     await audit(ctx.event, { action: "users.update", resource: "users", resourceId: id, meta: { ...patch } })
+    await syncUserRealtime(id)
+    realtime.publish(resourceTopic("users"), "users.updated", { id })
     return toPublicUser((await findUserById(id))!)
 }
 
@@ -116,6 +119,7 @@ export async function resetUserPassword(ctx: ServiceContext, id: number) {
     }).where(eq(users.id, id))
     await revokeUserSessions(id)
     await audit(ctx.event, { action: "users.reset_password", resource: "users", resourceId: id })
+    realtime.publish(resourceTopic("users"), "users.updated", { id })
     return { password }
 }
 
@@ -125,4 +129,6 @@ export async function deleteUser(ctx: ServiceContext, id: number) {
     await guardAdminChange(ctx, target, "delete")
     await useDb().delete(users).where(eq(users.id, id))
     await audit(ctx.event, { action: "users.delete", resource: "users", resourceId: id, meta: { email: target.email } })
+    realtime.refreshUser(id, null)
+    realtime.publish(resourceTopic("users"), "users.deleted", { id })
 }

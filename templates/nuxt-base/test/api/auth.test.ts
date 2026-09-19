@@ -1,21 +1,14 @@
-import { fileURLToPath } from "node:url"
-import { setup } from "@nuxt/test-utils/e2e"
-import { describe, expect, inject, it } from "vitest"
-import { createClient } from "./helpers"
+import { afterAll, describe, expect, it } from "vitest"
+import { TEST_ENV } from "./database"
+import { createClient, setBaseUrl } from "./helpers"
+import { startApp } from "./server"
 
-const SETUP_CODE = "TEST-SETUP-CODE"
+const SETUP_CODE = TEST_ENV.NUXT_SETUP_CODE
 const ADMIN = { name: "Admin", email: "admin@example.test", password: "admin-password-123" }
 
-await setup({
-    rootDir: fileURLToPath(new URL("../..", import.meta.url)),
-    server: true,
-    build: true,
-    env: {
-        DATABASE_URL: inject("databaseUrl"),
-        NUXT_SESSION_PASSWORD: "test-session-secret-0123456789-abcdefghijklmnopqrstuvwxyz",
-        NUXT_SETUP_CODE: SETUP_CODE,
-    },
-})
+const app = await startApp("auth")
+setBaseUrl(app.baseUrl)
+afterAll(() => app.stop())
 
 // The cases build on each other (setup -> users -> sessions), so they run in order.
 describe("auth, users and settings", () => {

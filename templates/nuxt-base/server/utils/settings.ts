@@ -50,6 +50,8 @@ export async function setSetting(key: SettingKey, value: unknown): Promise<unkno
         .values({ key, value: parsed.data })
         .onDuplicateKeyUpdate({ set: { value: parsed.data } })
     invalidateSettings()
+    if (SETTINGS[key].public) realtime.publish(SYSTEM_TOPIC, "settings.updated", { key })
+    if (key === "maintenance.enabled") realtime.publish(SYSTEM_TOPIC, "system.maintenance", { enabled: parsed.data })
     return parsed.data
 }
 

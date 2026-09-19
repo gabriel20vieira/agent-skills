@@ -66,6 +66,22 @@ applied) when its tables match, and refuses otherwise.
   `/api/admin/settings/<key>`; login/API rate limits, maintenance, default theme, forced locale.
 - **Audit**: `audit(event, { action, resource, ... })` → `/api/admin/audit`.
 
+## Realtime (WebSocket)
+
+One endpoint, `/_ws`, on the app's own port; the session cookie authenticates it.
+
+- Every socket follows `user:<id>` and `system`. Others are requested and authorised with
+  the permission matrix: `res:<resource>` / `res:<resource>:<id>` need `read`.
+- Services publish **after** the change is committed, with ids only:
+  `realtime.publish(resourceTopic("notes"), "notes.updated", { id })`. Clients refetch
+  through the REST API, so realtime never bypasses field-level permissions.
+- Core events: `session.revoked` (socket closes, tab signs out), `user.updated`,
+  `settings.updated`, `system.maintenance`.
+- Client: `useLiveResource("notes", refresh)` keeps a list fresh (and refetches after a
+  reconnect); `useRealtimeEvent(name, handler)` for anything else; `<RealtimeIndicator/>`.
+- Behind a proxy the upgrade must pass through (see `deploy/`); single instance only
+  (the hub is in memory; several instances would need a Redis adapter).
+
 ## Checks
 
 - `npm run check` = lint + typecheck + unit tests.

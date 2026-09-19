@@ -67,12 +67,17 @@ export async function refreshSession(event: H3Event, row: UserRow, patch: Pick<U
     })
 }
 
+/** Revokes the row and closes that session's open sockets (after the update). */
 export async function revokeSession(id: string) {
     await useDb().update(sessions).set({ revokedAt: new Date() }).where(eq(sessions.id, id))
+    realtime.disconnectSessions([id])
 }
 
 export async function revokeUserSessions(userId: number, exceptSid?: string) {
     const conditions = [eq(sessions.userId, userId), isNull(sessions.revokedAt)]
     if (exceptSid) conditions.push(ne(sessions.id, exceptSid))
+    const rows = await useDb().select({ id: sessions.id }).from(sessions).where(and(...conditions))
+    if (!rows.length) return
     await useDb().update(sessions).set({ revokedAt: new Date() }).where(and(...conditions))
+    realtime.disconnectSessions(rows.map(row => row.id))
 }

@@ -14,8 +14,8 @@ export default defineConfig({
                 },
             },
             {
-                // Builds the app and runs it against a fresh MySQL database (<db>_test).
-                // Needs the compose db: `docker compose up -d db`.
+                // Builds once (globalSetup), then each file starts the built server on its own
+                // fresh MySQL database. Needs the compose db: `docker compose up -d db`.
                 test: {
                     name: "api",
                     include: ["test/api/**/*.test.ts"],
@@ -23,7 +23,7 @@ export default defineConfig({
                     globalSetup: ["test/api/globalSetup.ts"],
                     fileParallelism: false,
                     testTimeout: 30_000,
-                    hookTimeout: 600_000,
+                    hookTimeout: 60_000,
                 },
             },
         ],

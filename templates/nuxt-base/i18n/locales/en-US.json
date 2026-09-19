@@ -48,6 +48,9 @@
         "system": {
             "maintenance": "The app is under maintenance.",
             "rate_limited": "Too many attempts. Try again shortly."
+        },
+        "realtime": {
+            "bad_message": "Invalid message."
         }
     },
     "network": {
@@ -107,5 +110,8 @@
         "title": "Home",
         "welcome": "Hello, {name}",
         "roles": "Roles"
+    },
+    "realtime": {
+        "reconnecting": "Reconnecting…"
     }
 }

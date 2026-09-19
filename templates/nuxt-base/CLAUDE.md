@@ -21,6 +21,8 @@
 - Errors: `throw fail(status, "domain.code")`; every code needs `errors.<domain>.<code>` in
   BOTH locales. Client: `useErrorMessage()(error)` or `useSubmit()`.
 - Runtime-editable config goes in `shared/utils/settings.ts` (schema + default + public flag).
+- Realtime: services call `realtime.publish(resourceTopic(r), "<r>.created|updated|deleted", { id })`
+  after the write; pages use `useLiveResource(r, refresh)`. Payloads are ids only.
 - User-facing text only via i18n keys, added to BOTH `i18n/locales/*.json` (a test checks parity).
 - Style: 4 spaces, double quotes, no semicolons (`npm run lint:fix`).
 - Never `drizzle-kit push` on a real database. Never commit `.env` or `backups/`.

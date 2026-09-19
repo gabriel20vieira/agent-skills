@@ -48,6 +48,9 @@
         "system": {
             "maintenance": "A aplicação está em manutenção.",
             "rate_limited": "Demasiadas tentativas. Tenta daqui a pouco."
+        },
+        "realtime": {
+            "bad_message": "Mensagem inválida."
         }
     },
     "network": {
@@ -107,5 +110,8 @@
         "title": "Início",
         "welcome": "Olá, {name}",
         "roles": "Papéis"
+    },
+    "realtime": {
+        "reconnecting": "A reconectar…"
     }
 }
