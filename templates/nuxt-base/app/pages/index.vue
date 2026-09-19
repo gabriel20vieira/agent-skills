@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { MoonIcon, SunIcon } from "@lucide/vue"
 
-definePageMeta({ layout: "public" })
+definePageMeta({ layout: "public", auth: false })
 
 const { t, locale, locales, setLocale } = useI18n()
 const colorMode = useColorMode()
