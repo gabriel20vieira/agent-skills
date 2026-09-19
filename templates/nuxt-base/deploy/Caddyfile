@@ -1,0 +1,8 @@
+# HTTPS is automatic. WebSocket upgrades are proxied by default.
+example.com {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:3000 {
+        # Streaming responses (assistant SSE) must not be buffered.
+        flush_interval -1
+    }
+}
