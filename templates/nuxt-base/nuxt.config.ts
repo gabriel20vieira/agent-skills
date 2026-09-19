@@ -2,7 +2,7 @@ import tailwindcss from "@tailwindcss/vite"
 import pkg from "./package.json" with { type: "json" }
 
 export default defineNuxtConfig({
-    modules: ["@nuxt/eslint", "shadcn-nuxt", "@nuxtjs/color-mode", "@nuxtjs/i18n"],
+    modules: ["@nuxt/eslint", "shadcn-nuxt", "@nuxtjs/color-mode", "@nuxtjs/i18n", "nuxt-auth-utils"],
     devtools: { enabled: true },
     css: ["~/assets/css/main.css"],
     colorMode: {
@@ -13,6 +13,16 @@ export default defineNuxtConfig({
         storage: "cookie",
     },
     runtimeConfig: {
+        // NUXT_SESSION_PASSWORD seals the cookie. maxAge is the ceiling; each login picks
+        // 30 days (remember me) or 1 day, enforced by the sessions table.
+        session: {
+            maxAge: 60 * 60 * 24 * 30,
+            cookie: { sameSite: "lax" },
+        },
+        // NUXT_SETUP_CODE gates the first-admin screen. Empty = setup disabled (fail closed).
+        setupCode: "",
+        // NUXT_TRUST_PROXY: honour X-Forwarded-For. Only behind a proxy you control.
+        trustProxy: false,
         public: {
             // NUXT_PUBLIC_APP_NAME
             appName: "Nuxt Base",
