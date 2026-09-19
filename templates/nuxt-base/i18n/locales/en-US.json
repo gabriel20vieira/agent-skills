@@ -51,6 +51,9 @@
         },
         "realtime": {
             "bad_message": "Invalid message."
+        },
+        "notes": {
+            "not_found": "Note not found."
         }
     },
     "network": {

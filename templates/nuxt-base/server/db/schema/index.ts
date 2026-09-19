@@ -1,5 +1,6 @@
 export * from "./audit"
 export * from "./invites"
+export * from "./notes"
 export * from "./sessions"
 export * from "./settings"
 export * from "./users"
