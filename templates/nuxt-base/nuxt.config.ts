@@ -29,6 +29,8 @@ export default defineNuxtConfig({
         },
     },
     i18n: {
+        // Absolute site URL for SEO links; override with NUXT_PUBLIC_I18N_BASE_URL.
+        baseUrl: "http://localhost:3000",
         defaultLocale: "pt-PT",
         strategy: "no_prefix",
         locales: [
