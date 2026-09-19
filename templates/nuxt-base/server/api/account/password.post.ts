@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { users } from "../../db/schema"
 import { findUserById } from "../../services/users"
-import { changePasswordSchema } from "../../../shared/schemas/account"
+import { changePasswordSchema } from "#shared/schemas/account"
 
 /** Changing the password signs out every other device (passwordVersion + revocation). */
 export default defineEventHandler(async (event) => {

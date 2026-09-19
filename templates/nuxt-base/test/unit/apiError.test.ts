@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { extractApiError } from "../../shared/utils/apiError"
+import { extractApiError } from "#shared/utils/apiError"
 
 describe("extractApiError", () => {
     it("reads status, code and message from an ofetch error", () => {

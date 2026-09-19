@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { users } from "../../db/schema"
 import { findUserByEmail } from "../../services/users"
-import { loginSchema } from "../../../shared/schemas/auth"
+import { loginSchema } from "#shared/schemas/auth"
 
 export default defineEventHandler(async (event) => {
     await enforceCredentialLimit(event, "login")

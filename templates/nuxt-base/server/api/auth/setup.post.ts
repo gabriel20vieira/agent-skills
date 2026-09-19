@@ -1,6 +1,6 @@
 import { users } from "../../db/schema"
 import { countUsers, findUserById } from "../../services/users"
-import { setupSchema } from "../../../shared/schemas/auth"
+import { setupSchema } from "#shared/schemas/auth"
 
 /** Creates the first admin. Only while there are no users, and only with NUXT_SETUP_CODE. */
 export default defineEventHandler(async (event) => {

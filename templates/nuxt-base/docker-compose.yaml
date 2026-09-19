@@ -10,6 +10,10 @@ services:
             NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?run scripts/gen-secrets}
             NUXT_SETUP_CODE: ${NUXT_SETUP_CODE:-}
             NUXT_PUBLIC_APP_NAME: ${NUXT_PUBLIC_APP_NAME:-Nuxt Base}
+            NUXT_TRUST_PROXY: ${NUXT_TRUST_PROXY:-false}
+            SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-}
+            SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+            SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-}
         depends_on:
             db:
                 condition: service_healthy

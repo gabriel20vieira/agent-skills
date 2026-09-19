@@ -1,5 +1,5 @@
 import { char, int, json, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core"
-import type { Role } from "../../../shared/utils/permissions"
+import type { Role } from "#shared/utils/permissions"
 import { users } from "./users"
 
 export const invites = mysqlTable("invites", {

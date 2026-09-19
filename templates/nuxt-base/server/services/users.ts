@@ -1,7 +1,7 @@
 import type { H3Event } from "h3"
 import { and, asc, count, eq, sql } from "drizzle-orm"
 import type { z } from "zod"
-import type { userCreateSchema, userUpdateSchema } from "../../shared/schemas/users"
+import type { userCreateSchema, userUpdateSchema } from "#shared/schemas/users"
 import { users } from "../db/schema"
 import type { UserRow } from "../db/schema"
 import { checkAdminInvariant } from "../utils/adminInvariant"

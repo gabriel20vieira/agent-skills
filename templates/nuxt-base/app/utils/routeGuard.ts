@@ -1,6 +1,6 @@
-import type { AuthUser } from "../../shared/types/auth"
-import type { Action, Resource } from "../../shared/utils/permissions"
-import { can } from "../../shared/utils/permissions"
+import type { AuthUser } from "#shared/types/auth"
+import type { Action, Resource } from "#shared/utils/permissions"
+import { can } from "#shared/utils/permissions"
 
 export interface GuardState {
     needsSetup: boolean

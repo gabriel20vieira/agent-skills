@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { can, PERMISSIONS, RESOURCES, ROLES } from "../../shared/utils/permissions"
+import { can, PERMISSIONS, RESOURCES, ROLES } from "#shared/utils/permissions"
 
 describe("can", () => {
     it("lets admin do everything on every resource", () => {

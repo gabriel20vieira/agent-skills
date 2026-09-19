@@ -1,5 +1,5 @@
 import { boolean, int, json, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core"
-import type { Role } from "../../../shared/utils/permissions"
+import type { Role } from "#shared/utils/permissions"
 
 export const users = mysqlTable("users", {
     id: int("id").autoincrement().primaryKey(),

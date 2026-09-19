@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { resolveRoute } from "../../app/utils/routeGuard"
 import type { GuardState } from "../../app/utils/routeGuard"
-import type { AuthUser } from "../../shared/types/auth"
+import type { AuthUser } from "#shared/types/auth"
 
 function user(overrides: Partial<AuthUser> = {}): AuthUser {
     return {

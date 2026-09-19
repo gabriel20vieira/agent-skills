@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { loginSchema } from "../../shared/schemas/auth"
-import { passwordSchema } from "../../shared/schemas/password"
-import { userCreateSchema } from "../../shared/schemas/users"
-import { SETTINGS } from "../../shared/utils/settings"
+import { loginSchema } from "#shared/schemas/auth"
+import { passwordSchema } from "#shared/schemas/password"
+import { userCreateSchema } from "#shared/schemas/users"
+import { SETTINGS } from "#shared/utils/settings"
 
 describe("schemas", () => {
     it("requires 12+ character passwords", () => {

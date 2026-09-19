@@ -10,7 +10,45 @@
     },
     "errors": {
         "unknown": "Something went wrong.",
-        "notFound": "Page not found."
+        "notFound": "Page not found.",
+        "auth": {
+            "unauthenticated": "Your session ended. Please sign in again.",
+            "forbidden": "You are not allowed to do this.",
+            "password_change_required": "You must change your password before continuing.",
+            "invalid_credentials": "Wrong email or password.",
+            "inactive": "This account is disabled.",
+            "setup_disabled": "Initial setup is disabled (NUXT_SETUP_CODE).",
+            "setup_code_invalid": "Invalid setup code.",
+            "setup_done": "Initial setup is already done."
+        },
+        "account": {
+            "wrong_password": "The current password is wrong."
+        },
+        "users": {
+            "not_found": "User not found.",
+            "email_taken": "An account with this email already exists.",
+            "last_admin": "There must be at least one active admin.",
+            "self_lockout": "You cannot remove your own admin access."
+        },
+        "invites": {
+            "invalid": "This invite is no longer valid.",
+            "email_mismatch": "This invite is for a different email.",
+            "not_found": "Invite not found."
+        },
+        "settings": {
+            "unknown": "Unknown setting.",
+            "invalid": "Invalid value for this setting."
+        },
+        "sessions": {
+            "not_found": "Session not found."
+        },
+        "validation": {
+            "invalid": "Please check the form fields."
+        },
+        "system": {
+            "maintenance": "The app is under maintenance.",
+            "rate_limited": "Too many attempts. Try again shortly."
+        }
     },
     "network": {
         "unreachable": "Cannot reach the server."
@@ -19,5 +57,55 @@
         "title": "Welcome",
         "subtitle": "A foundation for Nuxt websites.",
         "cta": "Get started"
+    },
+    "roles": {
+        "admin": "Administrator",
+        "editor": "Editor",
+        "user": "User"
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Password",
+        "name": "Name",
+        "signIn": {
+            "title": "Sign in",
+            "description": "Use your email and password.",
+            "remember": "Keep me signed in",
+            "submit": "Sign in"
+        },
+        "setup": {
+            "title": "Initial setup",
+            "description": "Create the administrator account.",
+            "code": "Setup code",
+            "submit": "Create administrator"
+        },
+        "invite": {
+            "title": "Accept invite",
+            "description": "Create your account.",
+            "invalid": "This invite has expired or was already used.",
+            "submit": "Create account"
+        },
+        "signOut": "Sign out"
+    },
+    "account": {
+        "password": {
+            "title": "Change password",
+            "forced": "For security, set a new password.",
+            "current": "Current password",
+            "next": "New password",
+            "confirm": "Confirm new password",
+            "mismatch": "Passwords do not match.",
+            "hint": "At least {min} characters.",
+            "submit": "Save password"
+        }
+    },
+    "maintenance": {
+        "title": "Under maintenance",
+        "body": "We will be back soon."
+    },
+    "dashboard": {
+        "title": "Home",
+        "welcome": "Hello, {name}",
+        "roles": "Roles"
     }
 }

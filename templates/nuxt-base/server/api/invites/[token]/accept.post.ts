@@ -1,5 +1,5 @@
 import { acceptInvite } from "../../../services/invites"
-import { inviteAcceptSchema } from "../../../../shared/schemas/invites"
+import { inviteAcceptSchema } from "#shared/schemas/invites"
 
 export default defineEventHandler(async (event) => {
     await enforceCredentialLimit(event, "invite")

@@ -10,7 +10,45 @@
     },
     "errors": {
         "unknown": "Ocorreu um erro inesperado.",
-        "notFound": "Página não encontrada."
+        "notFound": "Página não encontrada.",
+        "auth": {
+            "unauthenticated": "Sessão terminada. Entra de novo.",
+            "forbidden": "Não tens permissão para isto.",
+            "password_change_required": "Tens de mudar a password antes de continuar.",
+            "invalid_credentials": "Email ou password incorretos.",
+            "inactive": "Esta conta está desativada.",
+            "setup_disabled": "A configuração inicial está desativada (NUXT_SETUP_CODE).",
+            "setup_code_invalid": "Código de configuração inválido.",
+            "setup_done": "A configuração inicial já foi feita."
+        },
+        "account": {
+            "wrong_password": "A password atual está errada."
+        },
+        "users": {
+            "not_found": "Utilizador não encontrado.",
+            "email_taken": "Já existe uma conta com este email.",
+            "last_admin": "Tem de existir pelo menos um administrador ativo.",
+            "self_lockout": "Não podes retirar o teu próprio acesso de administrador."
+        },
+        "invites": {
+            "invalid": "Este convite já não é válido.",
+            "email_mismatch": "Este convite é para outro email.",
+            "not_found": "Convite não encontrado."
+        },
+        "settings": {
+            "unknown": "Definição desconhecida.",
+            "invalid": "Valor inválido para esta definição."
+        },
+        "sessions": {
+            "not_found": "Sessão não encontrada."
+        },
+        "validation": {
+            "invalid": "Verifica os campos do formulário."
+        },
+        "system": {
+            "maintenance": "A aplicação está em manutenção.",
+            "rate_limited": "Demasiadas tentativas. Tenta daqui a pouco."
+        }
     },
     "network": {
         "unreachable": "Sem ligação ao servidor."
@@ -19,5 +57,55 @@
         "title": "Bem-vindo",
         "subtitle": "Base para websites em Nuxt.",
         "cta": "Começar"
+    },
+    "roles": {
+        "admin": "Administrador",
+        "editor": "Editor",
+        "user": "Utilizador"
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Password",
+        "name": "Nome",
+        "signIn": {
+            "title": "Entrar",
+            "description": "Usa o teu email e password.",
+            "remember": "Manter sessão iniciada",
+            "submit": "Entrar"
+        },
+        "setup": {
+            "title": "Configuração inicial",
+            "description": "Cria a conta de administrador.",
+            "code": "Código de configuração",
+            "submit": "Criar administrador"
+        },
+        "invite": {
+            "title": "Aceitar convite",
+            "description": "Cria a tua conta.",
+            "invalid": "Este convite expirou ou já foi usado.",
+            "submit": "Criar conta"
+        },
+        "signOut": "Sair"
+    },
+    "account": {
+        "password": {
+            "title": "Mudar password",
+            "forced": "Por segurança, define uma password nova.",
+            "current": "Password atual",
+            "next": "Password nova",
+            "confirm": "Confirmar password nova",
+            "mismatch": "As passwords não coincidem.",
+            "hint": "Mínimo de {min} caracteres.",
+            "submit": "Guardar password"
+        }
+    },
+    "maintenance": {
+        "title": "Em manutenção",
+        "body": "Voltamos em breve."
+    },
+    "dashboard": {
+        "title": "Início",
+        "welcome": "Olá, {name}",
+        "roles": "Papéis"
     }
 }

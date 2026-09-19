@@ -1,4 +1,4 @@
-import type { Role } from "../../shared/utils/permissions"
+import type { Role } from "#shared/utils/permissions"
 
 export interface AdminInvariantInput {
     actorId: number

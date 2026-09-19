@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { users } from "../../db/schema"
 import { findUserById } from "../../services/users"
-import { profileSchema } from "../../../shared/schemas/account"
+import { profileSchema } from "#shared/schemas/account"
 
 export default defineEventHandler(async (event) => {
     const user = requireUser(event)

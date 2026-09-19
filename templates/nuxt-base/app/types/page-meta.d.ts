@@ -1,4 +1,4 @@
-import type { Action, Resource } from "../../shared/utils/permissions"
+import type { Action, Resource } from "#shared/utils/permissions"
 
 declare module "#app" {
     interface PageMeta {

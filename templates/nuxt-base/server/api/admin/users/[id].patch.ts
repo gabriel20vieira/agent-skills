@@ -1,5 +1,5 @@
 import { updateUser } from "../../../services/users"
-import { userUpdateSchema } from "../../../../shared/schemas/users"
+import { userUpdateSchema } from "#shared/schemas/users"
 
 export default defineEventHandler(async (event) => {
     const actor = requireUser(event)

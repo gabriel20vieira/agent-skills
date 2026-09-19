@@ -207,3 +207,22 @@ definePageMeta({ auth: false | "guest", permission: [Resource, Action] })
 ### Task 10: Documentação e seed
 - `entrypoint.sh` corre `scripts/seed.mjs` depois do migrate. O script cria o primeiro admin quando `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` estão definidos e a tabela `users` está vazia. O hash usa `@adonisjs/hash` (driver Scrypt), a mesma biblioteca e os mesmos defaults do `hashPassword` do nuxt-auth-utils; o `@adonisjs/hash` passa a ser dependência direta. Um teste unitário verifica que um hash feito pelo script é aceite pelo `Hash.verify` com os defaults.
 - Atualizar o README e o CLAUDE.md do template com o modelo de auth, a matriz, as rotas e os comandos `test:api`.
+
+## Desvios na execução (2026-09-19)
+
+- **Localização dos ficheiros partilhados:**
+  - A matriz e os settings vivem em `shared/utils/` (auto-importados nos dois lados), não em `shared/`.
+  - As tipagens de sessão vivem em `shared/types/session.d.ts`, porque um `auth.d.ts` na raiz não entra no tsconfig do servidor.
+- **Imports de `shared`:** sempre via `#shared/...`. Um import relativo a partir de `app/` resolvia-se com um nível a mais no build SSR em Linux (Docker).
+- **Chamadas à API nas páginas:** usam `useApi()` em vez de `$fetch`, por causa do "Excessive stack depth" das rotas tipadas.
+- **Validação:** `readBodyWith`/`readQueryWith` em vez de `readValidatedBody`, para o erro sair no envelope `validation.invalid` com `issues`. O `fail()` ganhou um parâmetro `extra`.
+- **`setResponseHeader("Retry-After", n)`** recebe um número (tipagem do h3).
+- **`$api`** passou de plugin a composable (`useApi`). Também foram acrescentados `useSubmit` e `usePublicSettings`.
+- **Scripts de teste:** `test` passou a ser só o projeto unit; o `test:api` constrói a app e corre 20 cenários contra uma DB MySQL recriada.
+- **Seed:** `scripts/lib/password.mjs` usa `@adonisjs/hash`, com um teste que prova a compatibilidade com o nuxt-auth-utils. Verificado em Docker com um projeto compose isolado.
+- **Verificado no browser:**
+  - setup → `/app`;
+  - login falhado com mensagem traduzida;
+  - password gerada → troca obrigatória → `/app`;
+  - manutenção ligada (redirect) e desligada.
+- **Observado, não corrigido:** um submit feito antes da hidratação faz um GET nativo sem dados. Os inputs não têm `name`, por isso nada vaza. Fica para o plano 4 (forms com vee-validate).

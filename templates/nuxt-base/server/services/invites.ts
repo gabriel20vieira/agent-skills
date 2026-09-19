@@ -1,7 +1,7 @@
 import type { H3Event } from "h3"
 import { and, desc, eq, gt, isNull } from "drizzle-orm"
 import type { z } from "zod"
-import type { inviteAcceptSchema, inviteCreateSchema } from "../../shared/schemas/invites"
+import type { inviteAcceptSchema, inviteCreateSchema } from "#shared/schemas/invites"
 import { invites, users } from "../db/schema"
 import type { InviteRow } from "../db/schema"
 import { hashToken, newToken } from "../utils/tokens"

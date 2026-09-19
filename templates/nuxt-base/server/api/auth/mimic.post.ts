@@ -1,5 +1,5 @@
 import { findUserById } from "../../services/users"
-import { mimicSchema } from "../../../shared/schemas/auth"
+import { mimicSchema } from "#shared/schemas/auth"
 
 /** Lets a real admin view the app as other roles, to check what they see. */
 export default defineEventHandler(async (event) => {
