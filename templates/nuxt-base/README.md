@@ -82,6 +82,28 @@ One endpoint, `/_ws`, on the app's own port; the session cookie authenticates it
 - Behind a proxy the upgrade must pass through (see `deploy/`); single instance only
   (the hub is in memory; several instances would need a Redis adapter).
 
+## UI building blocks
+
+Registered globally without a prefix (`app/components/app/`):
+
+- **Page shell**: `<PageHeader title description>` (slot `actions`), `<EmptyState>`,
+  `<StatCard>`, `<FormField label error hint for>`.
+- **Tables**: `<DataTable :rows :columns :search-keys>` sorts, searches (accent-insensitive)
+  and paginates in the browser; pass `:total` and listen to `@update:query` for server paging.
+  Slots `cell-<key>`, `row-actions`, `empty`.
+- **Dialogs**: `<ResponsiveDialog v-model:open>` is a dialog on desktop and a bottom sheet on
+  mobile. `await useConfirm()({ title, destructive, typeToConfirm, action })` resolves `true`
+  once confirmed (with `action`, it stays open and shows the error if the action fails).
+  `useSecretDialog()` shows a password or link once, with a copy button.
+- **Forms**: `useZodForm(schema, initial)` validates with the same `#shared/schemas` the API
+  uses and maps server `validation.invalid` issues back to the fields.
+- **Toasts**: `useNotify().success("notes.created")`, `.error(error)`.
+- **Themes**: `app/assets/css/themes/<name>.css` (`:root[data-theme="<name>"]` overriding the
+  tokens) + an entry in `shared/utils/themes.ts`. The theme is a cookie applied during SSR, so
+  there is no flash; the admin sets the default and whether users may choose.
+- **Navigation**: `app/utils/navigation.ts` lists the sidebar entries with their permission;
+  entries the user cannot reach are hidden.
+
 ## Checks
 
 - `npm run check` = lint + typecheck + unit tests.

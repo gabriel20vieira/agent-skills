@@ -6,7 +6,7 @@
         "confirm": "Confirm",
         "close": "Close",
         "loading": "Loading…",
-        "toggleDark": "Toggle dark mode"
+        "edit": "Edit"
     },
     "errors": {
         "unknown": "Something went wrong.",
@@ -102,7 +102,20 @@
             "confirm": "Confirm new password",
             "mismatch": "Passwords do not match.",
             "hint": "At least {min} characters.",
-            "submit": "Save password"
+            "submit": "Save password",
+            "changed": "Password changed."
+        },
+        "title": "Account",
+        "profile": "Profile",
+        "preferences": "Preferences",
+        "saved": "Profile saved.",
+        "sessions": {
+            "title": "Active sessions",
+            "description": "Devices signed in to this account.",
+            "current": "This session",
+            "revoke": "Sign out",
+            "revokeTitle": "Sign out this session?",
+            "unknownDevice": "Unknown device"
         }
     },
     "maintenance": {
@@ -112,9 +125,196 @@
     "dashboard": {
         "title": "Home",
         "welcome": "Hello, {name}",
-        "roles": "Roles"
+        "roles": "Roles",
+        "subtitle": "App overview."
     },
     "realtime": {
         "reconnecting": "Reconnecting…"
+    },
+    "confirm": {
+        "typeToConfirm": "Type \"{text}\" to confirm"
+    },
+    "secret": {
+        "shownOnce": "This is only shown now. Keep it somewhere safe.",
+        "copy": "Copy"
+    },
+    "validation": {
+        "invalid_field": "Invalid value.",
+        "too_small": "Too short or missing.",
+        "too_big": "Too long.",
+        "invalid_format": "Invalid format.",
+        "invalid_type": "Missing or invalid value.",
+        "invalid_value": "Invalid option."
+    },
+    "table": {
+        "search": "Search…",
+        "actions": "Actions",
+        "empty": "No results.",
+        "pageOf": "Page {page} of {pages} ({total})",
+        "previous": "Previous",
+        "next": "Next"
+    },
+    "theme": {
+        "mode": "Mode",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System",
+        "colour": "Colour theme",
+        "names": {
+            "default": "Neutral",
+            "ocean": "Ocean",
+            "amber": "Amber"
+        }
+    },
+    "nav": {
+        "groups": {
+            "main": "App",
+            "admin": "Administration"
+        },
+        "dashboard": "Home",
+        "notes": "Notes",
+        "users": "Users",
+        "settings": "Settings",
+        "audit": "Audit log",
+        "account": "Account",
+        "openApp": "Open app"
+    },
+    "mimic": {
+        "viewAs": "View as",
+        "banner": "You are viewing the app as: {roles}",
+        "stop": "Back to admin"
+    },
+    "locale": {
+        "choose": "Language"
+    },
+    "notes": {
+        "title": "Notes",
+        "description": "Example resource: list, create, edit and delete, live.",
+        "new": "New note",
+        "edit": "Edit note",
+        "created": "Note created.",
+        "updated": "Note saved.",
+        "deleted": "Note deleted.",
+        "fields": {
+            "title": "Title",
+            "body": "Text",
+            "author": "Author",
+            "updatedAt": "Updated"
+        },
+        "delete": {
+            "title": "Delete note?",
+            "body": "\"{title}\" will be deleted. This cannot be undone."
+        },
+        "empty": {
+            "title": "No notes yet",
+            "description": "Notes you create show up here, in other tabs too."
+        }
+    },
+    "users": {
+        "title": "Users",
+        "description": "Accounts, roles and invites.",
+        "new": "New user",
+        "newHint": "A temporary password is generated and must be changed at first sign-in.",
+        "create": "Create",
+        "roles": "Roles",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "lastLogin": "Last sign-in",
+        "createdTitle": "User created",
+        "createdBody": "Hand this password to the user. It is only shown now.",
+        "saved": "User saved.",
+        "deleted": "User deleted.",
+        "reset": {
+            "title": "Reset password",
+            "body": "A new password is generated for {name} and all their sessions are signed out.",
+            "confirm": "Reset",
+            "done": "New password"
+        },
+        "delete": {
+            "title": "Delete user?",
+            "body": "{name}'s account will be deleted. This cannot be undone."
+        },
+        "invites": {
+            "new": "Invite",
+            "hint": "Creates an invite link with the chosen roles.",
+            "email": "Email (optional)",
+            "emailHint": "Empty = any email can use the invite.",
+            "create": "Create invite",
+            "link": "Invite link",
+            "pending": "Pending invites",
+            "anyEmail": "Any email",
+            "expires": "expires {date}",
+            "revokeTitle": "Revoke invite?"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "App configuration. Every change is audited.",
+        "saved": "Setting saved.",
+        "tabs": {
+            "security": "Security",
+            "appearance": "Appearance",
+            "language": "Language",
+            "maintenance": "Maintenance"
+        },
+        "login": {
+            "title": "Sign-in attempts",
+            "description": "Per-IP limit for sign-in, setup and invites.",
+            "limit": "Attempts",
+            "window": "Window (minutes)"
+        },
+        "api": {
+            "title": "API rate limit",
+            "description": "Requests per IP to the API.",
+            "limit": "Requests",
+            "window": "Window (seconds)"
+        },
+        "appearance": {
+            "title": "Appearance",
+            "defaultTheme": "Default theme",
+            "userThemes": "Let each user pick their own theme"
+        },
+        "language": {
+            "title": "Forced language",
+            "description": "Makes everyone use one language.",
+            "none": "Do not force"
+        },
+        "maintenance": {
+            "title": "Maintenance mode",
+            "description": "Only admins can use the app while it is on.",
+            "message": "Message",
+            "saveMessage": "Save message",
+            "enabled": "Maintenance on"
+        }
+    },
+    "audit": {
+        "title": "Audit log",
+        "description": "Who did what. Search by action prefix (e.g. users.).",
+        "when": "When",
+        "who": "Who",
+        "action": "Action",
+        "target": "Target"
+    },
+    "privacy": {
+        "title": "Privacy",
+        "intro": "This app keeps only the data it needs to work.",
+        "cookiesTitle": "Cookies",
+        "cookies": "We use essential cookies only: session, language and theme. No advertising cookies."
+    },
+    "errorPage": {
+        "403": {
+            "title": "No access",
+            "body": "You are not allowed to see this page."
+        },
+        "404": {
+            "title": "Page not found",
+            "body": "This address does not exist or was removed."
+        },
+        "500": {
+            "title": "Something went wrong",
+            "body": "An unexpected error happened. Please try again."
+        },
+        "home": "Back to home"
     }
 }

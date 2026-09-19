@@ -1,4 +1,4 @@
-import { count, desc, eq } from "drizzle-orm"
+import { count, desc, eq, like } from "drizzle-orm"
 import { z } from "zod"
 import { auditLog, users } from "../../db/schema"
 
@@ -11,7 +11,8 @@ const querySchema = z.object({
 export default defineEventHandler(async (event) => {
     assertPermission(requireUser(event), "audit", "read")
     const query = readQueryWith(event, querySchema)
-    const where = query.action ? eq(auditLog.action, query.action) : undefined
+    // Prefix match: "users." lists every users.* action.
+    const where = query.action ? like(auditLog.action, `${query.action.replace(/[%_\\]/g, "\\$&")}%`) : undefined
     const db = useDb()
     const [items, [total]] = await Promise.all([
         db.select({

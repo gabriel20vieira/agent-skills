@@ -3,8 +3,10 @@ import pkg from "./package.json" with { type: "json" }
 
 export default defineNuxtConfig({
     modules: ["@nuxt/eslint", "shadcn-nuxt", "@nuxtjs/color-mode", "@nuxtjs/i18n", "nuxt-auth-utils"],
+    // Foundation components are used as <PageHeader>, <DataTable>, ... (no "App" prefix).
+    components: [{ path: "~/components/app", pathPrefix: false }, "~/components"],
     devtools: { enabled: true },
-    css: ["~/assets/css/main.css"],
+    css: ["~/assets/css/main.css", "vue-sonner/style.css"],
     colorMode: {
         classSuffix: "",
         preference: "system",

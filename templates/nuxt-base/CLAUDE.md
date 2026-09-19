@@ -23,6 +23,10 @@
 - Runtime-editable config goes in `shared/utils/settings.ts` (schema + default + public flag).
 - Realtime: services call `realtime.publish(resourceTopic(r), "<r>.created|updated|deleted", { id })`
   after the write; pages use `useLiveResource(r, refresh)`. Payloads are ids only.
+- UI: a new resource page copies `app/pages/app/notes.vue` (DataTable + ResponsiveDialog +
+  useZodForm + useConfirm + useLiveResource) and gets an entry in `app/utils/navigation.ts`.
+  Destructive actions always go through `useConfirm()`; secrets shown once through `useSecretDialog()`.
+- Pages have a single root element (lint rule); foundation components need no import.
 - User-facing text only via i18n keys, added to BOTH `i18n/locales/*.json` (a test checks parity).
 - Style: 4 spaces, double quotes, no semicolons (`npm run lint:fix`).
 - Never `drizzle-kit push` on a real database. Never commit `.env` or `backups/`.

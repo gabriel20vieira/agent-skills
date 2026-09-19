@@ -1,0 +1,20 @@
+/* Amber: warm primary with dark ink (light text on amber fails contrast). */
+:root[data-theme="amber"] {
+    --primary: oklch(0.72 0.16 65);
+    --primary-foreground: oklch(0.25 0.05 65);
+    --ring: oklch(0.72 0.16 65);
+    --chart-1: oklch(0.72 0.16 65);
+    --sidebar-primary: oklch(0.72 0.16 65);
+    --sidebar-primary-foreground: oklch(0.25 0.05 65);
+    --sidebar-ring: oklch(0.72 0.16 65);
+}
+
+:root[data-theme="amber"].dark {
+    --primary: oklch(0.78 0.15 70);
+    --primary-foreground: oklch(0.22 0.04 65);
+    --ring: oklch(0.78 0.15 70);
+    --chart-1: oklch(0.78 0.15 70);
+    --sidebar-primary: oklch(0.78 0.15 70);
+    --sidebar-primary-foreground: oklch(0.22 0.04 65);
+    --sidebar-ring: oklch(0.78 0.15 70);
+}

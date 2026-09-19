@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { THEMES } from "./themes"
 
 interface SettingDefinition<T> {
     schema: z.ZodType<T>
@@ -24,7 +25,7 @@ export const SETTINGS = {
         z.object({ limit: z.number().int().min(10).max(100000), windowSeconds: z.number().int().min(1).max(3600) }),
         { limit: 300, windowSeconds: 60 },
     ),
-    "appearance.defaultTheme": define(z.string().min(1).max(32), "default", true),
+    "appearance.defaultTheme": define(z.enum(THEMES.map(theme => theme.name) as [string, ...string[]]), "default", true),
     "appearance.userThemes": define(z.boolean(), true, true),
     "i18n.forcedLocale": define(z.enum(["pt-PT", "en-US"]).nullable(), null, true),
     "maintenance.enabled": define(z.boolean(), false, true),

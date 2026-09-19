@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
+@import "./themes/ocean.css";
+@import "./themes/amber.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -15,7 +17,7 @@
 @custom-variant data-unchecked (&:is([data-state="unchecked"], [data-unchecked]:not([data-unchecked="false"])));
 @custom-variant data-active (&:is([data-state="active"], [data-active]:not([data-active="false"])));
 
-/* Default theme (shadcn neutral). Extra themes live in themes/*.css as [data-theme="x"]. */
+/* Default theme (shadcn neutral). Extra themes live in themes/*.css as :root[data-theme="x"] (more specific than :root). */
 :root {
     --radius: 0.625rem;
     --background: oklch(1 0 0);

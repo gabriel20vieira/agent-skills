@@ -14,4 +14,11 @@ useHead(() => ({
     <NuxtLayout>
         <NuxtPage />
     </NuxtLayout>
+    <!-- Global hosts: one dialog/toast outlet for the whole app. -->
+    <ConfirmHost />
+    <SecretHost />
+    <Toaster
+        rich-colors
+        position="top-center"
+    />
 </template>

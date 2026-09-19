@@ -6,7 +6,7 @@
         "confirm": "Confirmar",
         "close": "Fechar",
         "loading": "A carregar…",
-        "toggleDark": "Alternar modo escuro"
+        "edit": "Editar"
     },
     "errors": {
         "unknown": "Ocorreu um erro inesperado.",
@@ -102,7 +102,20 @@
             "confirm": "Confirmar password nova",
             "mismatch": "As passwords não coincidem.",
             "hint": "Mínimo de {min} caracteres.",
-            "submit": "Guardar password"
+            "submit": "Guardar password",
+            "changed": "Password alterada."
+        },
+        "title": "Conta",
+        "profile": "Perfil",
+        "preferences": "Preferências",
+        "saved": "Perfil guardado.",
+        "sessions": {
+            "title": "Sessões ativas",
+            "description": "Dispositivos com sessão iniciada nesta conta.",
+            "current": "Esta sessão",
+            "revoke": "Terminar",
+            "revokeTitle": "Terminar esta sessão?",
+            "unknownDevice": "Dispositivo desconhecido"
         }
     },
     "maintenance": {
@@ -112,9 +125,196 @@
     "dashboard": {
         "title": "Início",
         "welcome": "Olá, {name}",
-        "roles": "Papéis"
+        "roles": "Papéis",
+        "subtitle": "Resumo da aplicação."
     },
     "realtime": {
         "reconnecting": "A reconectar…"
+    },
+    "confirm": {
+        "typeToConfirm": "Escreve \"{text}\" para confirmar"
+    },
+    "secret": {
+        "shownOnce": "Isto só é mostrado agora. Guarda-o num sítio seguro.",
+        "copy": "Copiar"
+    },
+    "validation": {
+        "invalid_field": "Valor inválido.",
+        "too_small": "Demasiado curto ou em falta.",
+        "too_big": "Demasiado longo.",
+        "invalid_format": "Formato inválido.",
+        "invalid_type": "Valor em falta ou inválido.",
+        "invalid_value": "Opção inválida."
+    },
+    "table": {
+        "search": "Pesquisar…",
+        "actions": "Ações",
+        "empty": "Sem resultados.",
+        "pageOf": "Página {page} de {pages} ({total})",
+        "previous": "Anterior",
+        "next": "Seguinte"
+    },
+    "theme": {
+        "mode": "Modo",
+        "light": "Claro",
+        "dark": "Escuro",
+        "system": "Sistema",
+        "colour": "Tema de cor",
+        "names": {
+            "default": "Neutro",
+            "ocean": "Oceano",
+            "amber": "Âmbar"
+        }
+    },
+    "nav": {
+        "groups": {
+            "main": "Aplicação",
+            "admin": "Administração"
+        },
+        "dashboard": "Início",
+        "notes": "Notas",
+        "users": "Utilizadores",
+        "settings": "Definições",
+        "audit": "Auditoria",
+        "account": "Conta",
+        "openApp": "Abrir aplicação"
+    },
+    "mimic": {
+        "viewAs": "Ver como",
+        "banner": "Estás a ver a aplicação como: {roles}",
+        "stop": "Voltar a administrador"
+    },
+    "locale": {
+        "choose": "Idioma"
+    },
+    "notes": {
+        "title": "Notas",
+        "description": "Recurso de exemplo: lista, criação, edição e remoção em tempo real.",
+        "new": "Nova nota",
+        "edit": "Editar nota",
+        "created": "Nota criada.",
+        "updated": "Nota guardada.",
+        "deleted": "Nota apagada.",
+        "fields": {
+            "title": "Título",
+            "body": "Texto",
+            "author": "Autor",
+            "updatedAt": "Atualizada"
+        },
+        "delete": {
+            "title": "Apagar nota?",
+            "body": "\"{title}\" vai ser apagada. Não é possível desfazer."
+        },
+        "empty": {
+            "title": "Ainda não há notas",
+            "description": "As notas criadas aparecem aqui, também noutras abas."
+        }
+    },
+    "users": {
+        "title": "Utilizadores",
+        "description": "Contas, papéis e convites.",
+        "new": "Novo utilizador",
+        "newHint": "É gerada uma password temporária, que tem de ser mudada no primeiro acesso.",
+        "create": "Criar",
+        "roles": "Papéis",
+        "status": "Estado",
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "lastLogin": "Último acesso",
+        "createdTitle": "Utilizador criado",
+        "createdBody": "Entrega esta password ao utilizador. Só é mostrada agora.",
+        "saved": "Utilizador guardado.",
+        "deleted": "Utilizador apagado.",
+        "reset": {
+            "title": "Repor password",
+            "body": "É gerada uma password nova para {name} e todas as sessões dele são terminadas.",
+            "confirm": "Repor",
+            "done": "Nova password"
+        },
+        "delete": {
+            "title": "Apagar utilizador?",
+            "body": "A conta de {name} vai ser apagada. Não é possível desfazer."
+        },
+        "invites": {
+            "new": "Convidar",
+            "hint": "Cria um link de convite com os papéis escolhidos.",
+            "email": "Email (opcional)",
+            "emailHint": "Vazio = qualquer email pode usar o convite.",
+            "create": "Criar convite",
+            "link": "Link de convite",
+            "pending": "Convites pendentes",
+            "anyEmail": "Qualquer email",
+            "expires": "expira {date}",
+            "revokeTitle": "Anular convite?"
+        }
+    },
+    "settings": {
+        "title": "Definições",
+        "description": "Configuração da aplicação. Cada alteração fica na auditoria.",
+        "saved": "Definição guardada.",
+        "tabs": {
+            "security": "Segurança",
+            "appearance": "Aparência",
+            "language": "Idioma",
+            "maintenance": "Manutenção"
+        },
+        "login": {
+            "title": "Tentativas de login",
+            "description": "Limite por IP para login, configuração inicial e convites.",
+            "limit": "Tentativas",
+            "window": "Janela (minutos)"
+        },
+        "api": {
+            "title": "Limite da API",
+            "description": "Pedidos por IP à API.",
+            "limit": "Pedidos",
+            "window": "Janela (segundos)"
+        },
+        "appearance": {
+            "title": "Aparência",
+            "defaultTheme": "Tema por defeito",
+            "userThemes": "Permitir que cada utilizador escolha o seu tema"
+        },
+        "language": {
+            "title": "Idioma forçado",
+            "description": "Obriga todos a usar um idioma.",
+            "none": "Não forçar"
+        },
+        "maintenance": {
+            "title": "Modo de manutenção",
+            "description": "Só administradores usam a aplicação enquanto estiver ativo.",
+            "message": "Mensagem",
+            "saveMessage": "Guardar mensagem",
+            "enabled": "Manutenção ativa"
+        }
+    },
+    "audit": {
+        "title": "Auditoria",
+        "description": "Quem fez o quê. Pesquisa por prefixo da ação (ex.: users.).",
+        "when": "Quando",
+        "who": "Quem",
+        "action": "Ação",
+        "target": "Alvo"
+    },
+    "privacy": {
+        "title": "Privacidade",
+        "intro": "Esta aplicação guarda apenas os dados necessários para funcionar.",
+        "cookiesTitle": "Cookies",
+        "cookies": "Usamos cookies essenciais: a sessão, o idioma e o tema. Não usamos cookies de publicidade."
+    },
+    "errorPage": {
+        "403": {
+            "title": "Sem acesso",
+            "body": "Não tens permissão para ver esta página."
+        },
+        "404": {
+            "title": "Página não encontrada",
+            "body": "O endereço não existe ou foi removido."
+        },
+        "500": {
+            "title": "Algo correu mal",
+            "body": "Ocorreu um erro inesperado. Tenta de novo."
+        },
+        "home": "Voltar ao início"
     }
 }

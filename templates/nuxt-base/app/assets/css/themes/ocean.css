@@ -1,0 +1,20 @@
+/* Ocean: blue primary. Only the tokens that differ from main.css are overridden. */
+:root[data-theme="ocean"] {
+    --primary: oklch(0.55 0.17 250);
+    --primary-foreground: oklch(0.985 0 0);
+    --ring: oklch(0.55 0.17 250);
+    --chart-1: oklch(0.55 0.17 250);
+    --sidebar-primary: oklch(0.55 0.17 250);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-ring: oklch(0.55 0.17 250);
+}
+
+:root[data-theme="ocean"].dark {
+    --primary: oklch(0.7 0.14 245);
+    --primary-foreground: oklch(0.18 0.03 250);
+    --ring: oklch(0.7 0.14 245);
+    --chart-1: oklch(0.7 0.14 245);
+    --sidebar-primary: oklch(0.7 0.14 245);
+    --sidebar-primary-foreground: oklch(0.18 0.03 250);
+    --sidebar-ring: oklch(0.7 0.14 245);
+}
