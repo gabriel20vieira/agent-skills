@@ -2056,3 +2056,19 @@ git commit -m "docs(template): add README and CLAUDE.md"
   §5–§10 e §15 ficam para os planos 2–6.
 - **Placeholders:** nenhum. Os valores `example.com` nos exemplos de proxy são intencionais.
 - **Consistência de nomes:** `useDb`/`Db`, `fail`, `extractApiError`, `isWeakSecret`, `decideBaseline` e `normalizeText` têm os mesmos nomes em todas as tasks.
+
+## Desvios na execução (2026-09-19)
+
+- **`vue-router ^5.3.1`** em vez de `^4.6.4`: o Nuxt 4.5 depende do v5, e um v4 na raiz parte o `nuxt typecheck` (`vue-router/volar/sfc-route-blocks`).
+- **`h3 ^1.15.11`** adicionado como dependência direta. O `@nuxt/eslint` traz o h3 v2 (rc), que ficava na raiz por cima do v1 do Nitro e partia os tipos do servidor.
+- **`layouts/blank.vue`** envolve o `<slot />` num `<div>`, porque a regra `vue/no-multiple-template-root` rejeita um slot na raiz.
+- **Teste do `cn`** usa uma variável `boolean`, porque `false && "x"` literal viola `no-constant-binary-expression`.
+- **Ícone do modo escuro** alterna por CSS (`dark:hidden` / `hidden dark:block`) e não por `v-if` sobre `colorMode.value`. O `v-if` causava um erro de hidratação.
+- **i18n:**
+  - `useLocaleHead({ seo: false })`;
+  - `baseUrl: "http://localhost:3000"` na config, que se sobrepõe com `NUXT_PUBLIC_I18N_BASE_URL`;
+  - sem estas duas mudanças, o aviso "I18n baseUrl is required" aparecia sempre.
+- **`templates/nuxt-base/.gitattributes`** fixa LF também em `drizzle/**/*.sql`, para o hash das migrações ser igual em todos os sistemas.
+- **`gen-secrets.ps1`** escreve o comentário em stderr (`[Console]::Error`). Quando chamado a partir de outra shell, o `Write-Host` ia parar ao stdout e ao `.env`.
+- **npm 11:** `npm approve-scripts esbuild unrs-resolver vue-demi`, com o `allowScripts` commitado.
+- **Verificação extra:** testado o caminho `record` do baseline (histórico apagado e reinício), que adota a base.
