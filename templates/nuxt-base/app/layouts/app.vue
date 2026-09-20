@@ -10,10 +10,11 @@ const title = computed(() => (route.meta.titleKey ? t(route.meta.titleKey) : "")
         <SidebarInset>
             <MimicBanner />
             <header class="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur">
-                <SidebarTrigger class="-ml-1" />
+                <!-- Only on mobile: on desktop the trigger is in the sidebar itself. -->
+                <SidebarTrigger class="-ml-1 md:hidden" />
                 <Separator
                     orientation="vertical"
-                    class="mr-1 h-4"
+                    class="mr-1 h-4 md:hidden"
                 />
                 <span class="truncate text-sm font-medium">{{ title }}</span>
                 <div class="ml-auto flex items-center gap-1">

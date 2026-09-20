@@ -101,7 +101,8 @@ Registered globally without a prefix (`app/components/app/`):
   uses and maps server `validation.invalid` issues back to the fields.
 - **Toasts**: `useNotify().success("notes.created")`, `.error(error)`.
 - **Themes**: `app/assets/css/themes/<name>.css` (`:root[data-theme="<name>"]` overriding the
-  tokens) + an entry in `shared/utils/themes.ts`. The theme is a cookie applied during SSR, so
+  tokens) + an entry in `shared/utils/themes.ts`. Colours, radius, fonts, spacing, tracking
+  and shadows are all variables, so a tweakcn export drops in as-is. The theme is a cookie applied during SSR, so
   there is no flash; the admin sets the default and whether users may choose.
 - **Navigation**: `app/utils/navigation.ts` lists the sidebar entries with their permission;
   entries the user cannot reach are hidden.

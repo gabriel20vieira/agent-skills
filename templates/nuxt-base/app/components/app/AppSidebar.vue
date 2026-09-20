@@ -12,12 +12,17 @@ function active(to: string) {
 <template>
     <Sidebar collapsible="icon">
         <SidebarHeader>
-            <NuxtLink
-                to="/app"
-                class="flex h-8 items-center px-2 font-semibold tracking-tight group-data-[collapsible=icon]:hidden"
-            >
-                {{ config.public.appName }}
-            </NuxtLink>
+            <!-- The collapse button lives in the sidebar; the layout header only has one on
+                 mobile, where the sidebar itself is off screen. -->
+            <div class="flex h-8 items-center gap-1">
+                <NuxtLink
+                    to="/app"
+                    class="min-w-0 flex-1 truncate px-2 font-semibold tracking-tight group-data-[collapsible=icon]:hidden"
+                >
+                    {{ config.public.appName }}
+                </NuxtLink>
+                <SidebarTrigger class="shrink-0" />
+            </div>
         </SidebarHeader>
         <SidebarContent>
             <SidebarGroup
@@ -47,5 +52,7 @@ function active(to: string) {
         <SidebarFooter>
             <UserMenu />
         </SidebarFooter>
+        <!-- Drag/click the edge to collapse (desktop). -->
+        <SidebarRail />
     </Sidebar>
 </template>
