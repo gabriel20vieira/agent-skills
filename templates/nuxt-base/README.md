@@ -49,6 +49,8 @@ applied) when its tables match, and refuses otherwise.
 - Clean this project's Docker resources: `pwsh ./scripts/docker-clean.ps1 [-Images] [-Volumes] [-All]`.
 - Reverse proxy examples: `deploy/Caddyfile`, `deploy/nginx.conf`.
 - Public URL for SEO links: `NUXT_PUBLIC_I18N_BASE_URL=https://example.com`.
+- Dates are shown in `NUXT_PUBLIC_TIMEZONE` (default `Europe/Lisbon`) for everyone, so the
+  server and the browser always render the same time.
 
 ## Accounts and permissions
 

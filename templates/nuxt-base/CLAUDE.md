@@ -40,6 +40,9 @@
 - Session typings (`#auth-utils`, `H3EventContext.auth`) are in `shared/types/session.d.ts`;
   a root `auth.d.ts` is not picked up by the server tsconfig.
 - `.sh` and migration `.sql` files must stay LF (see `.gitattributes`).
+- Dates: always `d(new Date(x), "long")` with the i18n formats, which pin
+  `NUXT_PUBLIC_TIMEZONE`. Never `toLocaleString()` in a template: the server's zone is not
+  the visitor's and hydration breaks.
 - Never render from `colorMode.value` in a template: the server cannot know it and
   hydration mismatches. Style with the `dark:` variant; read the mode only in handlers.
 - `h3` is pinned to ^1 at the root on purpose: `@nuxt/eslint` pulls h3 v2, which would

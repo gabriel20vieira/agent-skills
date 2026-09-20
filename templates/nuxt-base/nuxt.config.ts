@@ -30,6 +30,9 @@ export default defineNuxtConfig({
             appName: "Nuxt Base",
             // Baked at build time; shown by /api/health.
             appVersion: pkg.version,
+            // NUXT_PUBLIC_TIMEZONE: the zone every date is formatted in, on both sides.
+            // A per-visitor zone would make SSR and the browser disagree (hydration).
+            timezone: "Europe/Lisbon",
         },
     },
     compatibilityDate: "2026-09-01",
