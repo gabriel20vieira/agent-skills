@@ -1,6 +1,19 @@
-# claude-skills — website foundation
+# claude-skills
 
-Claude Code plugin to build websites quickly on one consistent base.
+A Claude Code plugin marketplace with two plugins, installed separately:
+
+| Plugin | What it is |
+|---|---|
+| `web-foundation` | Build websites quickly on one consistent Nuxt 4 base (this page) |
+| `dev-crew` | A crew of subagents (Opus coordinates, Sonnet develops, Haiku checks) with a live dashboard; see `plugins/dev-crew/README.md` |
+
+```bash
+claude plugin marketplace add <path-or-git-url-of-this-repo>
+claude plugin install web-foundation@claude-skills
+claude plugin install dev-crew@claude-skills
+```
+
+## web-foundation
 
 - `templates/nuxt-base/` — runnable Nuxt 4 app with the core: accounts with revocable
   sessions, roles and a shared permission matrix, realtime over WebSocket, dialogs and
@@ -8,16 +21,9 @@ Claude Code plugin to build websites quickly on one consistent base.
   and no-Docker deploy, unit and API tests.
 - `skills/` — skills that scaffold a project from the template and extend it.
 - `modules/` — optional features (assistant, PWA, tenancy, public site) applied by skills.
-- `docs/superpowers/` — design spec and implementation plans.
+- `docs/superpowers/` — design specs and implementation plans (both plugins).
 
-## Install
-
-```bash
-claude plugin marketplace add <path-or-git-url-of-this-repo>
-claude plugin install web-foundation@claude-skills
-```
-
-Then ask Claude for what you want ("start a new site called parish-site", "add a
+After installing, ask Claude for what you want ("start a new site called parish-site", "add a
 products resource", "deploy this with Caddy"); the matching skill loads by itself.
 
 ## Skills
@@ -46,5 +52,9 @@ npm run check          # lint + typecheck + unit tests
 npm run test:api       # builds and runs API/realtime tests against <db>_test
 ```
 
-Skill scripts have their own tests: `node --test skills/web-new-project/scripts/new-project.test.mjs`.
+Skill scripts have their own tests (both plugins):
+
+```bash
+node --test skills/*/scripts/*.test.mjs plugins/*/skills/*/scripts/*.test.mjs plugins/*/dashboard/*.test.mjs
+```
 See `templates/nuxt-base/README.md` for running the template.
