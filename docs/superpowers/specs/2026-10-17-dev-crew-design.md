@@ -326,3 +326,11 @@ O `web-foundation` continua na raiz, sem alterações.
   - Recusa se o branch ainda não estiver integrado.
 - **Trabalho por integrar:** nunca se apaga. Isto inclui branches com commits que não estão no
   destino e worktrees com ficheiros por guardar.
+- **Mais definições (pedido do utilizador).** Foram acrescentadas quatro definições à tabela:
+  - `git.baseBranch`: a crew avisa se a corrida não parte deste branch.
+  - `checks.beforeCommit`: os comandos de verificação por omissão de cada área.
+  - `crew.limits`: escrito em `config/limits` no início de cada corrida.
+  - `crew.dashboardUrl`: uma dashboard partilhada pelo projeto. Se estiver vazia, cada pessoa
+    usa a sua, em `.claude/dev-crew.local.json`, e a crew nunca pergunta.
+
+  Do lado da web-foundation, `apply-module.mjs` mantém `modules.installed` atualizado.

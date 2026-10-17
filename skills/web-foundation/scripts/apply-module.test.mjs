@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 import { after, test } from "node:test"
-import { applyModule, mergeMissing } from "./apply-module.mjs"
+import { applyModule, mergeMissing, recordModule } from "./apply-module.mjs"
 
 const root = mkdtempSync(join(tmpdir(), "apply-module-"))
 after(() => rmSync(root, { recursive: true, force: true }))
@@ -44,4 +44,36 @@ test("applyModule copies new files, keeps existing ones and merges i18n", () => 
 test("applyModule rejects unknown modules and non-project folders", () => {
     assert.throws(() => applyModule("nope", root, { modulesDir: join(root, "modules") }), /Unknown module/)
     assert.throws(() => applyModule("demo", join(root, "modules"), { modulesDir: join(root, "modules") }), /Not a project/)
+})
+
+test("recordModule adds the module to modules.installed in docs/settings.md", () => {
+    const table = [
+        "| Setting | Value | Options | What it decides |",
+        "| --- | --- | --- | --- |",
+        "| `git.baseBranch` | `main` | branch name | Base. |",
+        "| `modules.installed` | `none` | module names | Modules applied. |",
+        "",
+    ].join("\n")
+    assert.equal(
+        recordModule(table, "pwa"),
+        table.replace("| `modules.installed` | `none` |", "| `modules.installed` | `pwa` |"),
+    )
+    const once = recordModule(table, "pwa")
+    assert.equal(recordModule(once, "pwa"), once)
+    assert.match(recordModule(once, "assistant"), /\| `modules\.installed` \| `assistant`, `pwa` \|/)
+    assert.equal(recordModule("no table here\n", "pwa"), null)
+})
+
+test("applyModule updates docs/settings.md when the project has one", () => {
+    const modules = join(root, "modules-rec")
+    write(join(modules, "demo", "files", "x.txt"), "x\n")
+    const project = join(root, "project-rec")
+    write(join(project, "package.json"), { name: "p" })
+    write(join(project, "docs", "settings.md"), "| `modules.installed` | | module names | Modules applied. |\n")
+    const result = applyModule("demo", project, { modulesDir: modules })
+    assert.equal(result.settings, "docs/settings.md")
+    assert.equal(readFileSync(join(project, "docs", "settings.md"), "utf8"), "| `modules.installed` | `demo` | module names | Modules applied. |\n")
+    const bare = join(root, "project-bare")
+    write(join(bare, "package.json"), { name: "p" })
+    assert.equal(applyModule("demo", bare, { modulesDir: modules }).settings, null)
 })

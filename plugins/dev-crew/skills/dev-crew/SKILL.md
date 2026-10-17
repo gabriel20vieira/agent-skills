@@ -36,18 +36,22 @@ file under `docs/decisions/` yourself).
 ## Flow
 
 1. **Clean tree.** Run `git status --porcelain`. If anything is uncommitted, stop and ask the
-   user to commit or stash it; worktrees would not see it.
+   user to commit or stash it; worktrees would not see it. The run starts from the current
+   branch: if `git.baseBranch` in `docs/settings.md` is set and you are on another branch,
+   ask the user before going on.
 2. **Context.** Read `CLAUDE.md`, the README and the project's specs, plans and earlier
    decisions under `docs/` (`references/docs.md`). Specs and docs come first: they say what
    was already decided. Then choose the skills from this session's skills and plugins that
    matter for the task, and the docs each area must read. Note whether `CLAUDE.md` is missing.
    Read `docs/settings.md` (project settings, `references/docs.md`). For each setting the
-   run will use (`git.deleteMergedBranches`, `docs.language`) that is empty or missing, ask
-   the user now, in one question, and have the first scribe write the answers there.
+   run will use (`git.deleteMergedBranches`, `docs.language`, `crew.limits`,
+   `checks.beforeCommit`) that is empty or missing, ask the user now, in one question, and
+   have the first scribe write the answers there. `crew.dashboardUrl` is never asked: empty
+   means each person's own dashboard.
 3. **Plan.** Write a short plan if there is none: areas and their tasks, the skills and docs
    chosen, and the decisions it makes. Two areas never touch the same files. Each area lists
-   the files it may touch and its check commands (from the project: `package.json` scripts,
-   the README, `CLAUDE.md`). Pick `runId` as `<yyyymmdd>-<hhmm>-<slug>` (lowercase, digits
+   the files it may touch and its check commands (`checks.beforeCommit` first, then the
+   project's `package.json` scripts, the README, `CLAUDE.md`). Pick `runId` as `<yyyymmdd>-<hhmm>-<slug>` (lowercase, digits
    and dashes only).
 4. **Worktrees.** From anywhere in the repo:
    `node "$CREW" start <runId> <area...> --install "<install command, e.g. npm ci>"`.
@@ -55,7 +59,9 @@ file under `docs/decisions/` yourself).
    (`runPath`), and one worktree path and branch per area (`<repo>-crew/<runId>/<area>`, next
    to the repo); use the paths exactly as printed. It refuses a dirty tree, a reused run id
    and unsafe names, and leaves nothing behind when it fails.
-5. **Dashboard.** Open or reuse the project's dashboard (`references/dashboard.md`). If the
+5. **Dashboard.** Open or reuse the project's dashboard (`references/dashboard.md`; a set
+   `crew.dashboardUrl` wins over the local file). When `crew.limits` is set, write it to
+   `config/limits`. If the
    Artifact tools are not available, run without it and keep the state in your replies.
    Close stale rows from earlier runs, then create `runs/<runId>` with status `running` and
    your own row `main`.

@@ -4,7 +4,8 @@
 //   node apply-module.mjs <module> [project-dir]     (project defaults to the current folder)
 //
 // Never overwrites: an existing file or i18n key is reported and left alone. Edits to core
-// files (permissions, settings, navigation, ...) are listed in the module's skill.
+// files (permissions, settings, navigation, ...) are listed in the module's skill. When the
+// project has docs/settings.md, the module is added to its `modules.installed` row.
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs"
 import { dirname, join, relative, resolve } from "node:path"
 import { fileURLToPath, pathToFileURL } from "node:url"
@@ -44,6 +45,18 @@ export function mergeMissing(target, source, prefix = "") {
     return skipped
 }
 
+const INSTALLED_ROW = /^(\|\s*`modules\.installed`\s*\|)([^|]*)(\|.*)$/m
+
+/** Adds `name` to the `modules.installed` row of a settings table; null when there is no such row. */
+export function recordModule(text, name) {
+    const match = text.match(INSTALLED_ROW)
+    if (!match) return null
+    const names = new Set([...match[2].matchAll(/`([^`]+)`/g)].map(found => found[1]).filter(found => found !== "none"))
+    names.add(name)
+    const value = [...names].sort().map(found => "`" + found + "`").join(", ")
+    return text.replace(INSTALLED_ROW, (_, start, _value, end) => `${start} ${value} ${end}`)
+}
+
 export function applyModule(name, project, { modulesDir = MODULES_DIR } = {}) {
     const moduleDir = join(modulesDir, name)
     if (!existsSync(moduleDir)) {
@@ -52,7 +65,7 @@ export function applyModule(name, project, { modulesDir = MODULES_DIR } = {}) {
     }
     if (!existsSync(join(project, "package.json"))) throw new Error(`Not a project folder: ${project}`)
 
-    const result = { copied: [], existing: [], i18nSkipped: [] }
+    const result = { copied: [], existing: [], i18nSkipped: [], settings: null }
     const filesDir = join(moduleDir, "files")
     for (const source of listFiles(filesDir)) {
         const rel = relative(filesDir, source)
@@ -74,6 +87,15 @@ export function applyModule(name, project, { modulesDir = MODULES_DIR } = {}) {
         writeFileSync(locale, JSON.stringify(current, null, 4) + "\n")
         result.i18nSkipped.push(...skipped.map(key => `${relative(project, locale)}: ${key}`))
     }
+
+    const settings = join(project, "docs", "settings.md")
+    if (existsSync(settings)) {
+        const updated = recordModule(readFileSync(settings, "utf8"), name)
+        if (updated !== null) {
+            writeFileSync(settings, updated)
+            result.settings = "docs/settings.md"
+        }
+    }
     return result
 }
 
@@ -85,6 +107,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
         for (const file of result.copied) console.log(`+ ${file}`)
         for (const file of result.existing) console.log(`= ${file} (exists, left alone)`)
         for (const key of result.i18nSkipped) console.log(`! ${key} (already set, left alone)`)
+        if (result.settings) console.log(`~ ${result.settings} (modules.installed)`)
         console.log(`Applied ${name}. Now make the core edits listed in the web-${name} skill.`)
     }
     catch (error) {

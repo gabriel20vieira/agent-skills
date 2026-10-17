@@ -56,6 +56,10 @@ value is followed without asking. The crew uses:
 | --- | --- | --- |
 | `git.deleteMergedBranches` | `yes`, `no`, `ask` | steps 13 and 15: delete merged branches locally and on `origin` |
 | `docs.language` | `en-US`, `pt-PT`, ... | language of the docs the scribe writes |
+| `git.baseBranch` | branch name | step 1: the run should start from it |
+| `checks.beforeCommit` | commands | step 3: default check commands of each area |
+| `crew.limits` | `opus N, sonnet N, haiku N` | step 5: written to the dashboard's `config/limits` |
+| `crew.dashboardUrl` | artifact URL; empty = own dashboard | step 5: a dashboard shared by the project (never asked) |
 
 If the file does not exist, the first scribe creates it with these rows (plus any the
 project's template already defines) and the answers given. Rows the crew does not use are

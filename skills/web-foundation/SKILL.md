@@ -58,13 +58,17 @@ test/unit, test/api
 - **Imports**: shared code as `#shared/...`; in pages call the API with `useApi()`.
 - **Database**: change `server/db/schema`, then `npm run db:generate -- --name x` and review
   the SQL. Never `drizzle-kit push` on a real database.
-- `npm run check` must pass before every commit; `npm run test:api` when server code changed.
+- **Checks**: the commands in `checks.beforeCommit` must pass before every commit (template
+  default: `npm run check`, plus `npm run test:api` when server code changed).
 - **Project settings**: `docs/settings.md` holds the working preferences (a table of
   setting, value, options). Read it before acting on any of them. An empty value means
   nobody decided yet: ask the user once (AskUserQuestion with the listed options), write the
   answer in the table and commit it with the work. `ask` means ask every time. A project
-  without the file gets it from `templates/nuxt-base/docs/settings.md`.
-- **Git**: when a branch is merged (PR or local), follow `git.deleteMergedBranches`. With
+  without the file gets it from `templates/nuxt-base/docs/settings.md`. Settings:
+  `git.baseBranch`, `git.deleteMergedBranches`, `git.mergeMethod`, `git.pushAndPr`,
+  `checks.beforeCommit`, `docs.language`, `modules.installed`, `crew.limits`,
+  `crew.dashboardUrl`.
+- **Git**: start work from `git.baseBranch` and target it with PRs. When a branch is merged (PR or local), follow `git.deleteMergedBranches`. With
   `yes`, delete it locally and on `origin` (`git branch -d`, `git push origin --delete`, or
   `gh pr merge --delete-branch`) and remove its worktree (`git worktree remove`, then
   `git fetch --prune`). With `no`, keep them. Empty or `ask`: ask. Never delete a branch
@@ -95,7 +99,9 @@ node "${CLAUDE_PLUGIN_ROOT}/skills/web-foundation/scripts/apply-module.mjs" <nam
 ```
 
 which copies the module's new files (never overwriting) and merges its i18n keys (never
-overwriting), then lists the few core edits to make by hand. Apply modules to a clean
+overwriting), adds the module to `modules.installed` in `docs/settings.md`, then lists the
+few core edits to make by hand. Read `modules.installed` before applying one, to see what
+the project already has. Apply modules to a clean
 working tree so `git diff` shows exactly what each one changed.
 
 ## Out of scope

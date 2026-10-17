@@ -2,7 +2,7 @@
 
 ## Commands
 - `npm run dev` — dev server (loads .env)
-- `npm run check` — lint + typecheck + unit tests; must pass before commit
+- `npm run check` — lint + typecheck + unit tests; must pass before commit (`checks.beforeCommit`)
 - `npm run test:api` — API tests against a fresh MySQL `<db>_test` (needs `docker compose up -d db`)
 - `npm run db:generate -- --name x` — new migration from schema; review the SQL
 - `npm run db:migrate` — apply migrations (baseline-aware)
@@ -14,7 +14,8 @@
 - `shared/` pure code used by both sides (tested in `test/unit`); import it as `#shared/...`
 
 ## Rules
-- Working preferences (git cleanup, merge method, who pushes, docs language) are in
+- Working preferences (base branch, git cleanup, merge method, who pushes, checks before
+  commit, docs language, installed modules, dev-crew limits and dashboard) are in
   `docs/settings.md`. Follow them; when a value is empty, ask once and write the answer there.
 - Handler order: `requireUser(event)` → `assertPermission(user, resource, action)` →
   `readBodyWith(event, schema)` → service → `audit(event, ...)`.
