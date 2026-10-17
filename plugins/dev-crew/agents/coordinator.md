@@ -26,7 +26,7 @@ your own agent id. Work only inside that worktree: start every shell command wit
 4. Before each launch, read `config/limits` and count the `running`/`fixing` rows of this run
    for that model (rows whose `updatedAt` is older than 10 minutes do not count). At the limit,
    wait for one of your agents to finish. If the brief gave you a fixed quota instead, use it.
-5. Create the child's row as `queued` before launching it. When its completion notification
+5. Create the child's row as `queued` before launching it. Ids: `developer-<area>-<n>` (count n yourself) and `checker-<area>-0-<k>` for your own checkers. When its completion notification
    arrives, write its `tokens` from the notification and close the row if it is still open.
 6. When a developer finishes, review its diff (`git -C "<worktree>" diff`) and its last check:
    - Good: commit only that task's files on the area branch with a message

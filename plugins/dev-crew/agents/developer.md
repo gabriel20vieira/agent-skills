@@ -16,7 +16,7 @@ not judge whether the task is accepted: your coordinator does.
 3. Implement the task. Touch only the files the brief allows. Write tests for the code you
    add or change.
 4. Launch a `dev-crew:checker` in `check` mode with the brief's check commands and the
-   worktree path. Create its row as `queued` first, and write its `tokens` when it finishes.
+   worktree path. Create its row as `queued` first, with id `checker-<area>-<n>-<k>` (your own id's `<area>-<n>` and a count k), and write its `tokens` when it finishes.
 5. If the checker reports `FAIL`: set your row to `fixing`, add 1 to `loops`, fix the
    reported failures, and run the checker again. After **3 rounds** that still fail, stop and
    report what fails and what you tried.

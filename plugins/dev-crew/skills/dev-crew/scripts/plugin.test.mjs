@@ -1,6 +1,6 @@
 // node --test plugins/dev-crew/skills/dev-crew/scripts/plugin.test.mjs
 import assert from "node:assert/strict"
-import { readFileSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { dirname, join, resolve } from "node:path"
 import { test } from "node:test"
 import { fileURLToPath } from "node:url"
@@ -66,4 +66,24 @@ test("coordinator does not write code", () => {
     const fields = frontmatter(join(pluginRoot, "agents", "coordinator.md"))
     const denied = list(fields.disallowedTools)
     for (const tool of ["Edit", "Write", "NotebookEdit"]) assert.ok(denied.includes(tool), tool)
+})
+
+const skillDir = join(pluginRoot, "skills", "dev-crew")
+
+test("skill frontmatter", () => {
+    const fields = frontmatter(join(skillDir, "SKILL.md"))
+    assert.equal(fields.name, "dev-crew")
+    assert.match(fields.description, /^Use when/)
+})
+
+test("skill references exist", () => {
+    const text = readFileSync(join(skillDir, "SKILL.md"), "utf8")
+    const cited = [...text.matchAll(/(references\/[\w-]+\.md|scripts\/[\w-]+\.mjs)/g)].map((match) => match[1])
+    assert.ok(cited.length >= 3, "SKILL.md should cite its references and scripts")
+    for (const path of new Set(cited)) assert.ok(existsSync(join(skillDir, path)), path)
+})
+
+test("skill names every agent", () => {
+    const text = readFileSync(join(skillDir, "SKILL.md"), "utf8")
+    for (const agent of ["dev-crew:coordinator", "dev-crew:developer", "dev-crew:checker"]) assert.ok(text.includes(agent), agent)
 })
