@@ -41,13 +41,15 @@ tests"); the `dev-crew` skill loads by itself.
 - **Limits:** set per model on the dashboard (defaults: 2 Opus, 4 Sonnet, 6 Haiku at once).
   Claude Code caps concurrent subagents at 20 (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`), and
   nesting at 3 levels (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`), which the crew needs.
-- **Never:** push, open PRs, merge into your branch or delete branches. A run ends on
+- **Never:** push code, open PRs or merge into your branch. A run ends on
   `crew/<runId>/run` for you to review.
+- **Always cleans up:** merged area branches and every worktree when the run ends, and the run
+  branch (local and `origin`) with `worktrees.mjs finish <runId>` once you merged it.
 
 ## Layout
 
 - `skills/dev-crew/`: the skill, its references (`brief.md`, `dashboard.md`,
-  `docs.md`) and `scripts/worktrees.mjs` (start, merge and clean up a run's worktrees).
+  `docs.md`) and `scripts/worktrees.mjs` (start, merge, clean up and finish a run).
 - `agents/`: the four crew agents, with the model and effort pinned in the frontmatter.
 - `dashboard/`: the page (`index.html`) and its pure logic (`logic.js`).
 

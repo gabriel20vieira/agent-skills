@@ -4,12 +4,15 @@
 //   node worktrees.mjs start <runId> <area...> [--install "<cmd>"]
 //   node worktrees.mjs merge <runId>
 //   node worktrees.mjs cleanup <runId>
+//   node worktrees.mjs finish <runId>
 //
 // Runs in the repo of the current folder and prints JSON. Branches: crew/<runId>/<area> per
 // area and crew/<runId>/run for the merged result. Worktrees live next to the repo, in
 // <repo>-crew/<runId>/<area> and <repo>-crew/<runId>/run. The run worktree exists from the
-// start so docs and decisions can be committed on the run branch while the areas work. Never
-// pushes, never touches the user's checkout, never deletes branches.
+// start so docs and decisions can be committed on the run branch while the areas work.
+// cleanup removes the worktrees and every area branch already in the run branch. finish, after
+// the user merged the run branch into the current branch, deletes it locally and on origin.
+// Never pushes code, never touches the user's checkout, never deletes unmerged work.
 import { execFileSync, execSync } from "node:child_process"
 import { existsSync, readdirSync, rmdirSync } from "node:fs"
 import { basename, dirname, join, resolve } from "node:path"
@@ -46,6 +49,15 @@ export function crewRoot(repo) {
 }
 
 /** Removes the run folder and then the crew root when they are empty. */
+function isAncestor(repo, ref, target) {
+    try {
+        git(repo, "merge-base", "--is-ancestor", ref, target)
+        return true
+    } catch {
+        return false
+    }
+}
+
 function removeEmptyFolders(repo, runId) {
     const root = crewRoot(repo)
     for (const path of [join(root, runId), root]) {
@@ -136,12 +148,44 @@ export function cleanupRun({ repo, runId }) {
     // Drops the records of worktrees whose folder was deleted by hand.
     git(repo, "worktree", "prune")
     removeEmptyFolders(repo, runId)
-    return { removed }
+    const deleted = []
+    const kept = []
+    const runBranch = `crew/${runId}/${RUN}`
+    const hasRun = git(repo, "for-each-ref", `refs/heads/${runBranch}`) !== ""
+    for (const branch of areaBranches(repo, runId)) {
+        if (!hasRun || !isAncestor(repo, branch, runBranch)) {
+            kept.push(branch)
+            continue
+        }
+        git(repo, "branch", "-D", branch)
+        deleted.push(branch)
+    }
+    return { removed, deleted, kept }
+}
+
+export function finishRun({ repo, runId }) {
+    checkId(runId)
+    const runBranch = `crew/${runId}/${RUN}`
+    if (git(repo, "for-each-ref", `refs/heads/${runBranch}`) === "") throw new Error(`Run ${runId} not found`)
+    if (existsSync(join(crewRoot(repo), runId)) || areaBranches(repo, runId).length > 0) {
+        throw new Error(`Run ${runId} still has worktrees or area branches: run cleanup ${runId} first`)
+    }
+    const current = git(repo, "branch", "--show-current")
+    if (!isAncestor(repo, runBranch, "HEAD")) throw new Error(`${runBranch} is not merged into ${current || "HEAD"}`)
+    git(repo, "branch", "-D", runBranch)
+    const remote = []
+    let remotes = ""
+    try { remotes = git(repo, "remote") } catch { remotes = "" }
+    if (remotes.split("\n").includes("origin") && git(repo, "ls-remote", "--heads", "origin", runBranch) !== "") {
+        git(repo, "push", "-q", "origin", "--delete", runBranch)
+        remote.push(runBranch)
+    }
+    return { deleted: [runBranch], remote }
 }
 
 function main(argv) {
     const [command, runId, ...rest] = argv
-    const usage = "Usage: worktrees.mjs start <runId> <area...> [--install \"<cmd>\"] | merge <runId> | cleanup <runId>"
+    const usage = "Usage: worktrees.mjs start <runId> <area...> [--install \"<cmd>\"] | merge <runId> | cleanup <runId> | finish <runId>"
     const repo = resolve(git(process.cwd(), "rev-parse", "--show-toplevel"))
     if (command === "start") {
         const at = rest.indexOf("--install")
@@ -152,6 +196,7 @@ function main(argv) {
     }
     if (command === "merge") return mergeRun({ repo, runId })
     if (command === "cleanup") return cleanupRun({ repo, runId })
+    if (command === "finish") return finishRun({ repo, runId })
     throw new Error(usage)
 }
 
