@@ -41,7 +41,11 @@ using Grep, Glob and Read. If nothing matches, answer `none`.
 When the brief has a dashboard, set your own row (collection `runs/<runId>/agents`, document
 id = your agent id) with `ArtifactData`: `running` when you start, then `passed` or `failed`
 with `lastCheck: {ok, failures[{file,line,message}]}` in check mode, or `done` in locate mode.
-Refresh `updatedAt` each time, and pass `if_version` from your last write. Load the tool with
+Refresh `updatedAt` each time.
+Before your first write to a row, read it (`get`) and pass its `version` as `if_version`; then
+pass the `version` each write returns. If a pinned write is refused, read the row again and
+redo the write. Refresh your own `updatedAt` at least every 5 minutes while you work, even if
+your status has not changed: a silent row shows as "no signal" after 10 minutes. Load the tool with
 ToolSearch `select:ArtifactData` if needed.
 
 ## Your final message

@@ -33,7 +33,11 @@ not judge whether the task is accepted: your coordinator does.
 
 The collection is `runs/<runId>/agents` and the document id is the agent id. Use
 `ArtifactData` (load it with ToolSearch `select:ArtifactData` if needed). Update only your own
-row and your checkers' rows. Pass `if_version` from your last write. Copy the checker's result
+row and your checkers' rows.
+Before your first write to a row, read it (`get`) and pass its `version` as `if_version`; then
+pass the `version` each write returns. If a pinned write is refused, read the row again and
+redo the write. Refresh your own `updatedAt` at least every 5 minutes while you work, even if
+your status has not changed: a silent row shows as "no signal" after 10 minutes. Copy the checker's result
 into your `lastCheck` as `{ok, failures[{file,line,message}]}`. Refresh `updatedAt` on every
 status change. If the brief has no dashboard, skip these steps.
 

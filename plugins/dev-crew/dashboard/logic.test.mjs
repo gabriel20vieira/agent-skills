@@ -46,3 +46,11 @@ test("estimateCost prices tokens at output rates", () => {
     assert.equal(estimateCost([{ model: "opus", tokens: 1e6 }, { model: "haiku", tokens: 2e6 }]), 21)
     assert.equal(estimateCost([{ model: "sonnet" }]), 0)
 })
+
+test("countRunning leaves the main session out of the limits", () => {
+    const agents = [
+        { role: "main", model: "opus", status: "running", updatedAt: ago(1000) },
+        { role: "coordinator", model: "opus", status: "running", updatedAt: ago(1000) },
+    ]
+    assert.deepEqual(countRunning(agents, now), { opus: 1, sonnet: 0, haiku: 0 })
+})

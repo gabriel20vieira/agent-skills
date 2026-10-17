@@ -24,12 +24,14 @@ your own agent id. Work only inside that worktree: start every shell command wit
    background. Tasks that touch the same files run one after another; tasks on different files
    may run at the same time.
 4. Before each launch, read `config/limits` and count the `running`/`fixing` rows of this run
-   for that model (rows whose `updatedAt` is older than 10 minutes do not count). At the limit,
+   for that model (rows whose `updatedAt` is older than 10 minutes and the `main` row do not count). At the limit,
    wait for one of your agents to finish. If the brief gave you a fixed quota instead, use it.
 5. Create the child's row as `queued` before launching it. Ids: `developer-<area>-<n>` (count n yourself) and `checker-<area>-0-<k>` for your own checkers. When its completion notification
    arrives, write its `tokens` from the notification and close the row if it is still open.
-6. When a developer finishes, review its diff (`git -C "<worktree>" diff`) and its last check:
-   - Good: commit only that task's files on the area branch with a message
+6. When a developer finishes, review its diff (`git -C "<worktree>" diff -- <task files>`) and
+   its last check. Other developers may be editing other files in the same worktree, so always
+   name the task's files:
+   - Good: `git -C "<worktree>" add -- <task files>`, then commit with a message
      `<type>(<area>): <task>`, and set the developer's row `accepted` with a one-line verdict.
    - Not good: set its row `rejected` with the reason, then launch a new developer with the
      same brief plus your concrete corrections. A task can be sent back at most **2 times**; on
@@ -59,8 +61,11 @@ Dashboard: <url>, run <runId>, your agent id <agentId>, parent <yourAgentId>
 
 The collection is `runs/<runId>/agents` and the document id is the agent id. Use the
 `ArtifactData` tool (load it with ToolSearch `select:ArtifactData` if it is not loaded).
-Update only your own row and the rows of agents you launched. Pass `if_version` with the
-version from your last write. Fields: `parentId, model, role, area, task, status, loops,
+Update only your own row and the rows of agents you launched.
+Before your first write to a row, read it (`get`) and pass its `version` as `if_version`; then
+pass the `version` each write returns. If a pinned write is refused, read the row again and
+redo the write. Refresh your own `updatedAt` at least every 5 minutes while you work, even if
+your status has not changed: a silent row shows as "no signal" after 10 minutes. Fields: `parentId, model, role, area, task, status, loops,
 lastCheck {ok, failures[{file,line,message}]}, verdict, summary, tokens, startedAt,
 updatedAt` (ISO dates). Refresh `updatedAt` whenever you change your status. If the brief has no
 dashboard, skip all dashboard steps.

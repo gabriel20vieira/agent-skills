@@ -12,8 +12,9 @@ table of agents in the chat.
 ## Open or reuse
 
 The project keeps `{ "url": "...", "version": "<plugin version>" }` in
-`.claude/dev-crew.local.json`. Make sure `.claude/dev-crew.local.json` is in the project's
-`.gitignore`.
+`.claude/dev-crew.local.json`. Keep it out of git without touching tracked files: add the
+line `.claude/dev-crew.local.json` to `.git/info/exclude` (create the file if needed) before
+writing it, so the next run still starts from a clean tree.
 
 - **No file:** publish (below), then write the file.
 - **File present, same version as `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`:** reuse
@@ -37,8 +38,10 @@ Give the user the link once, and tell them it is private to their account.
 
 All writes go through the `ArtifactData` tool with the dashboard `url`. Load it with
 ToolSearch `select:ArtifactData` if it is not loaded. Writes to an existing document need
-`if_version`: keep the `version` each write returns and pass it on the next write. If a pinned
-write is refused because the document changed, read it and redo the write.
+`if_version`. Read a row (`get`) before your first write to it and pass its `version`; then
+pass the `version` each write returns. Rows change under you (a parent creates a child's row,
+the child updates it, the parent writes `tokens` at the end), so when a pinned write is
+refused, read the row again and redo the write.
 
 | Collection | Document | Fields |
 |---|---|---|
@@ -48,7 +51,9 @@ write is refused because the document changed, read it and redo the write.
 
 Agent statuses: `queued`, `running`, `fixing`, `passed`, `failed`, `accepted`, `rejected`,
 `done`. Dates are ISO strings. An active row (`running` or `fixing`) whose `updatedAt` is older
-than 10 minutes shows as "no signal" and does not count against the limits.
+than 10 minutes shows as "no signal" and does not count against the limits. Every agent
+therefore refreshes its own `updatedAt` at least every 5 minutes while it works, even when its
+status has not changed.
 
 Examples:
 
@@ -65,7 +70,8 @@ ArtifactData list   collection "runs/<runId>/agents"
 ## Limits
 
 Before launching an agent, read `config/limits` (missing means the defaults) and count the
-rows of the current run with that model and an active status that are not "no signal". At the
+rows of the current run with that model and an active status that are not "no signal". The
+`main` row never counts: the main session is outside the limits. At the
 limit, wait for one of your own agents to finish. Two launchers can overshoot by one at the
 same moment; that is accepted.
 

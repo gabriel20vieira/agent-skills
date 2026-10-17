@@ -20,6 +20,12 @@ function git(cwd, ...args) {
     return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim()
 }
 
+/** Appends git's or the command's stderr to an execFileSync/execSync error. */
+function withStderr(error) {
+    const detail = error.stderr ? String(error.stderr).trim() : ""
+    return new Error(detail ? `${error.message.split("\n")[0]}\n${detail}` : error.message)
+}
+
 function checkId(value) {
     if (typeof value !== "string" || !ID.test(value)) {
         throw new Error(`Invalid id "${value}": use lowercase letters, digits and dashes`)
@@ -52,14 +58,28 @@ export function startRun({ repo, runId, areas, install }) {
     }
     const base = git(repo, "rev-parse", "HEAD")
     const runBranch = `crew/${runId}/${RUN}`
-    git(repo, "branch", runBranch, base)
-    const worktrees = areas.map((area) => {
-        const branch = `crew/${runId}/${area}`
-        const path = join(crewRoot(repo), `${runId}-${area}`)
-        git(repo, "worktree", "add", "-q", "-b", branch, path, base)
-        if (install) execSync(install, { cwd: path, stdio: "pipe" })
-        return { area, branch, path }
-    })
+    const worktrees = []
+    try {
+        git(repo, "branch", runBranch, base)
+        for (const area of areas) {
+            const branch = `crew/${runId}/${area}`
+            const path = join(crewRoot(repo), `${runId}-${area}`)
+            git(repo, "worktree", "add", "-q", "-b", branch, path, base)
+            worktrees.push({ area, branch, path })
+            if (install) execSync(install, { cwd: path, stdio: "pipe" })
+        }
+    } catch (error) {
+        // Roll back so the same run id can be retried: nothing of this call survives.
+        for (const tree of worktrees) {
+            try { git(repo, "worktree", "remove", "--force", tree.path) } catch {}
+        }
+        for (const branch of [runBranch, ...worktrees.map((tree) => tree.branch)]) {
+            try { git(repo, "branch", "-D", branch) } catch {}
+        }
+        const root = crewRoot(repo)
+        if (existsSync(root) && readdirSync(root).length === 0) rmdirSync(root)
+        throw withStderr(error)
+    }
     return { base, runBranch, worktrees }
 }
 
@@ -67,6 +87,8 @@ export function mergeRun({ repo, runId }) {
     checkId(runId)
     const path = join(crewRoot(repo), runId)
     if (!existsSync(path)) git(repo, "worktree", "add", "-q", path, `crew/${runId}/${RUN}`)
+    const dirty = git(path, "status", "--porcelain")
+    if (dirty !== "") throw new Error(`Run worktree ${path} has uncommitted changes: commit or discard them first\n${dirty}`)
     const merged = []
     const conflicts = []
     for (const branch of areaBranches(repo, runId)) {
@@ -74,7 +96,10 @@ export function mergeRun({ repo, runId }) {
         try {
             git(path, "merge", "--no-ff", "-m", `merge ${branch}`, branch)
             merged.push(area)
-        } catch {
+        } catch (error) {
+            let merging = true
+            try { git(path, "rev-parse", "-q", "--verify", "MERGE_HEAD") } catch { merging = false }
+            if (!merging) throw withStderr(error)
             git(path, "merge", "--abort")
             conflicts.push(area)
         }
@@ -101,7 +126,7 @@ export function cleanupRun({ repo, runId }) {
 
 function main(argv) {
     const [command, runId, ...rest] = argv
-    const repo = process.cwd()
+    const repo = resolve(git(process.cwd(), "rev-parse", "--show-toplevel"))
     if (command === "start") {
         const at = rest.indexOf("--install")
         const install = at >= 0 ? rest[at + 1] : undefined

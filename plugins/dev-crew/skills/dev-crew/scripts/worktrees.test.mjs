@@ -7,6 +7,8 @@ import { join } from "node:path"
 import { after, test } from "node:test"
 import { cleanupRun, crewRoot, mergeRun, startRun } from "./worktrees.mjs"
 
+const cli = join(import.meta.dirname, "worktrees.mjs")
+
 const root = mkdtempSync(join(tmpdir(), "crew-worktrees-"))
 after(() => rmSync(root, { recursive: true, force: true }))
 
@@ -120,4 +122,32 @@ test("cleanupRun removes worktrees and keeps branches", () => {
     for (const tree of run.worktrees) assert.ok(!existsSync(tree.path))
     assert.ok(!existsSync(merged.path))
     assert.deepEqual(branches(repo), ["crew/r1/api", "crew/r1/run", "crew/r1/ui", "main"])
+})
+
+test("startRun rolls back when install fails and reports its stderr", () => {
+    const repo = makeRepo()
+    const install = "node -e \"if (process.cwd().endsWith('-ui')) { console.error('boom-ui'); process.exit(3) }\""
+    assert.throws(() => startRun({ repo, runId: "r1", areas: ["api", "ui"], install }), /boom-ui/)
+    assert.deepEqual(branches(repo), ["main"])
+    assert.ok(!existsSync(join(crewRoot(repo), "r1-api")))
+    assert.ok(!existsSync(crewRoot(repo)))
+    startRun({ repo, runId: "r1", areas: ["api"] })
+})
+
+test("mergeRun refuses a dirty run worktree with a clear message", () => {
+    const repo = makeRepo()
+    const run = startRun({ repo, runId: "r1", areas: ["api"] })
+    commitIn(run.worktrees[0].path, "shared.txt", "api\n")
+    const first = mergeRun({ repo, runId: "r1" })
+    writeFileSync(join(first.path, "shared.txt"), "half-done\n")
+    assert.throws(() => mergeRun({ repo, runId: "r1" }), /Run worktree .* has uncommitted changes/)
+})
+
+test("cli resolves the repo root from a subfolder", () => {
+    const repo = makeRepo()
+    const sub = join(repo, "packages", "web")
+    mkdirSync(sub, { recursive: true })
+    const out = JSON.parse(execFileSync("node", [cli, "start", "r1", "api"], { cwd: sub, encoding: "utf8" }))
+    assert.equal(out.worktrees[0].path, join(crewRoot(repo), "r1-api"))
+    assert.equal(git(repo, "status", "--porcelain"), "")
 })
