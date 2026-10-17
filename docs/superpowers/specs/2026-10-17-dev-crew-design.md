@@ -136,7 +136,7 @@ junta e verifica. Push e PR ficam sempre com o utilizador.
 - **Ponto de partida:** a corrida parte do `HEAD` atual. Se houver alterações por commitar, a
   sessão principal para e pergunta ao utilizador (commit ou stash) antes de começar, porque as
   worktrees não as veriam.
-- **Branches:** um branch de corrida `crew/<runId>`, criado a partir do commit de partida, e um
+- **Branches:** um branch de corrida `crew/<runId>/run`, criado a partir do commit de partida, e um
   branch por área `crew/<runId>/<area>`, com a sua worktree fora do repositório (por exemplo
   `../<repo>-crew/<runId>-<area>`).
 - **Preparar a worktree:** a sessão principal corre o comando de instalação do projeto em cada
@@ -146,7 +146,7 @@ junta e verifica. Push e PR ficam sempre com o utilizador.
   Os checks por task correm na worktree da área.
 - **Commits:** o coordenador faz um commit por task aceite, no branch da área. Os developers e
   os checkers nunca fazem commit.
-- **Juntar:** no fim, a sessão principal faz merge de cada branch de área no branch da corrida,
+- **Juntar:** no fim, a sessão principal faz merge de cada branch de área no branch da corrida (`crew/<runId>/run`, numa worktree própria),
   corre o check completo nesse branch (através de um checker) e revê o diff contra o commit de
   partida. Como as áreas não partilham ficheiros, não se esperam conflitos. Se houver algum, a
   sessão principal resolve-o se for trivial, ou pergunta.
