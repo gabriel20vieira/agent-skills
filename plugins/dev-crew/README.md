@@ -1,0 +1,54 @@
+# dev-crew
+
+A crew of Claude Code subagents that develops, monitors, verifies and documents a coding task,
+each model doing what it is good at:
+
+| Level | Agent | Model | Job |
+|---|---|---|---|
+| 0 | main session (the `dev-crew` skill) | Opus | read docs, pick skills, plan, split into areas, merge, final check and review |
+| 1 | `dev-crew:scribe` | Opus | writes every decision and the run log to `docs/*.md`; creates `CLAUDE.md` if missing |
+| 1 | `dev-crew:coordinator` | Opus | briefs, reviews each task, commits on the area branch |
+| 2 | `dev-crew:developer` | Sonnet | code and tests, fixes until the check passes |
+| 3 | `dev-crew:checker` | Haiku | runs checks or locates code, reports facts only |
+
+Before planning, the main session reads `CLAUDE.md`, the README and the project's specs and
+decisions, and picks the installed skills that matter; every brief names the skills and docs
+its agent must load. Each area works in its own git worktree and branch (`crew/<runId>/<area>`). At the end, the
+main session merges them into `crew/<runId>/run`, runs the full check and reviews the diff.
+A live claude.ai page shows agents running per model against editable limits, and the crew
+tree with each agent's status and checks.
+
+Design: `docs/superpowers/specs/2026-10-17-dev-crew-design.md`.
+
+## Install
+
+```bash
+claude plugin marketplace add <path-or-git-url-of-this-repo>
+claude plugin install dev-crew@claude-skills
+```
+
+Then ask for a task that splits into areas ("add CSV export to notes, API and UI, with
+tests"); the `dev-crew` skill loads by itself.
+
+## Good to know
+
+- **Dashboard:** needs Claude Code signed in to claude.ai (the Artifact tools). Without it the
+  crew still runs and reports in the chat. Its URL is kept in `.claude/dev-crew.local.json`,
+  which stays out of git.
+- **Permissions:** agents write their dashboard rows with `ArtifactData`. If your permission
+  mode asks before those writes, allow `ArtifactData` in your settings so background agents do
+  not stall.
+- **Limits:** set per model on the dashboard (defaults: 2 Opus, 4 Sonnet, 6 Haiku at once).
+  Claude Code caps concurrent subagents at 20 (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`), and
+  nesting at 3 levels (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`), which the crew needs.
+- **Never:** push, open PRs, merge into your branch or delete branches. A run ends on
+  `crew/<runId>/run` for you to review.
+
+## Layout
+
+- `skills/dev-crew/`: the skill, its references (`brief.md`, `dashboard.md`,
+  `docs.md`) and `scripts/worktrees.mjs` (start, merge and clean up a run's worktrees).
+- `agents/`: the four crew agents, with the model and effort pinned in the frontmatter.
+- `dashboard/`: the page (`index.html`) and its pure logic (`logic.js`).
+
+Tests: `node --test plugins/dev-crew/skills/*/scripts/*.test.mjs plugins/dev-crew/dashboard/*.test.mjs`.

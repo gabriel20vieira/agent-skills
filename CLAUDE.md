@@ -1,6 +1,10 @@
 # claude-skills
 
-Plugin repo: a Nuxt 4 template (`templates/nuxt-base`) plus skills that use it.
+Plugin marketplace with two plugins:
+- `web-foundation` (repo root): a Nuxt 4 template (`templates/nuxt-base`) plus skills that use it.
+- `dev-crew` (`plugins/dev-crew`): subagent crew (Opus/Sonnet/Haiku), worktree script, dashboard page.
+
+The template, module and i18n rules below apply to `web-foundation` only.
 
 ## Rules
 - The template is the source of truth. Skills point at its files; they never copy code.
@@ -14,4 +18,7 @@ Plugin repo: a Nuxt 4 template (`templates/nuxt-base`) plus skills that use it.
   `skills/web-foundation/scripts/apply-module.mjs`; their core edits live in the module's skill.
   After changing a module, verify it in a throwaway project: `new-project.mjs` + every module +
   the skills' edits + `npm run db:generate`, then `npm run check` and `npm run test:api` there.
-- Skill scripts: `node --test skills/*/scripts/*.test.mjs`.
+- Skill scripts and dashboard logic:
+  `node --test skills/*/scripts/*.test.mjs plugins/*/skills/*/scripts/*.test.mjs plugins/*/dashboard/*.test.mjs`.
+- `dev-crew`: agent model/effort are pinned in `agents/*.md` frontmatter and checked by
+  `plugin.test.mjs`; the dashboard page is published as is, never generated per project.

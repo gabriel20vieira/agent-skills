@@ -4,13 +4,18 @@
         "name": "Gabriel Vieira"
     },
     "metadata": {
-        "description": "Website foundation for Claude Code: a Nuxt 4 template and the skills that build on it."
+        "description": "Claude Code plugins: a Nuxt 4 website foundation and a model-tiered dev crew."
     },
     "plugins": [
         {
             "name": "web-foundation",
             "source": "./",
             "description": "Nuxt 4 website foundation: a runnable template plus skills to scaffold projects and add resources, realtime, assistant, PWA and deploy."
+        },
+        {
+            "name": "dev-crew",
+            "source": "./plugins/dev-crew",
+            "description": "A dev crew of subagents: Opus coordinates, reviews and documents decisions, Sonnet develops, Haiku runs checks, with git worktrees per area and a live claude.ai dashboard."
         }
     ]
 }
