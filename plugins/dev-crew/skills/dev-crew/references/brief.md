@@ -39,7 +39,7 @@ Main session to a coordinator:
 
 ```
 Task: Area "api" - add CSV export of notes
-Worktree: D:/work/notes-app-crew/20261017-1405-notes-export-api
+Worktree: D:/work/notes-app-crew/20261017-1405-notes-export/api
 Branch: crew/20261017-1405-notes-export/api
 Tasks:
   1. GET /api/notes/export returns the user's notes as CSV
@@ -56,7 +56,7 @@ Coordinator to a developer:
 
 ```
 Task: GET /api/notes/export returns the user's notes as CSV (id, title, updatedAt)
-Worktree: D:/work/notes-app-crew/20261017-1405-notes-export-api
+Worktree: D:/work/notes-app-crew/20261017-1405-notes-export/api
 Files you may touch: server/api/notes/export.get.ts, server/services/notes.ts
 Files you must not touch: all others
 Done when: route returns text/csv with a header row; 403 without notes.read
@@ -69,7 +69,7 @@ Developer to a checker:
 
 ```
 Mode: check
-Worktree: D:/work/notes-app-crew/20261017-1405-notes-export-api
+Worktree: D:/work/notes-app-crew/20261017-1405-notes-export/api
 Check: npm run check
 Return: PASS, or FAIL with file:line: message lines
 Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id checker-api-1-1, parent developer-api-1

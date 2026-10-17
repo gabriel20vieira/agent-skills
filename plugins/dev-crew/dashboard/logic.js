@@ -16,10 +16,11 @@ export function normalizeLimits(doc) {
     return limits
 }
 
-/** An active agent that has not updated its row for over STALE_MS ("no signal"). */
+/** An active agent that has not updated its row for over STALE_MS, or never did ("no signal"). */
 export function isStale(agent, now) {
     if (!ACTIVE.includes(agent.status)) return false
-    return now - Date.parse(agent.updatedAt) > STALE_MS
+    const updated = Date.parse(agent.updatedAt)
+    return Number.isNaN(updated) || now - updated > STALE_MS
 }
 
 /** Active agents per model; the main session is outside the limits. */

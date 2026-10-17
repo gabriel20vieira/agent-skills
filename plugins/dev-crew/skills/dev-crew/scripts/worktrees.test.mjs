@@ -52,7 +52,7 @@ test("startRun creates run and area branches with worktrees", () => {
     assert.deepEqual(run.worktrees.map((tree) => tree.area), ["api", "ui"])
     for (const tree of run.worktrees) {
         assert.equal(tree.branch, `crew/r1/${tree.area}`)
-        assert.equal(tree.path, join(crewRoot(repo), `r1-${tree.area}`))
+        assert.equal(tree.path, join(crewRoot(repo), "r1", tree.area))
         assert.ok(existsSync(join(tree.path, "shared.txt")))
     }
 })
@@ -96,7 +96,7 @@ test("mergeRun merges every area", () => {
     const result = mergeRun({ repo, runId: "r1" })
     assert.deepEqual(result.merged, ["api", "ui"])
     assert.deepEqual(result.conflicts, [])
-    assert.equal(result.path, join(crewRoot(repo), "r1"))
+    assert.equal(result.path, join(crewRoot(repo), "r1", "run"))
     assert.ok(existsSync(join(result.path, "api.txt")))
     assert.ok(existsSync(join(result.path, "ui.txt")))
     assert.equal(git(repo, "rev-parse", "--abbrev-ref", "HEAD"), "main")
@@ -121,15 +121,16 @@ test("cleanupRun removes worktrees and keeps branches", () => {
     assert.equal(result.removed.length, 3)
     for (const tree of run.worktrees) assert.ok(!existsSync(tree.path))
     assert.ok(!existsSync(merged.path))
+    assert.ok(!existsSync(crewRoot(repo)))
     assert.deepEqual(branches(repo), ["crew/r1/api", "crew/r1/run", "crew/r1/ui", "main"])
 })
 
 test("startRun rolls back when install fails and reports its stderr", () => {
     const repo = makeRepo()
-    const install = "node -e \"if (process.cwd().endsWith('-ui')) { console.error('boom-ui'); process.exit(3) }\""
+    const install = "node -e \"if (require('path').basename(process.cwd()) === 'ui') { console.error('boom-ui'); process.exit(3) }\""
     assert.throws(() => startRun({ repo, runId: "r1", areas: ["api", "ui"], install }), /boom-ui/)
     assert.deepEqual(branches(repo), ["main"])
-    assert.ok(!existsSync(join(crewRoot(repo), "r1-api")))
+    assert.ok(!existsSync(join(crewRoot(repo), "r1", "api")))
     assert.ok(!existsSync(crewRoot(repo)))
     startRun({ repo, runId: "r1", areas: ["api"] })
 })
@@ -148,6 +149,42 @@ test("cli resolves the repo root from a subfolder", () => {
     const sub = join(repo, "packages", "web")
     mkdirSync(sub, { recursive: true })
     const out = JSON.parse(execFileSync("node", [cli, "start", "r1", "api"], { cwd: sub, encoding: "utf8" }))
-    assert.equal(out.worktrees[0].path, join(crewRoot(repo), "r1-api"))
+    assert.equal(out.worktrees[0].path, join(crewRoot(repo), "r1", "api"))
     assert.equal(git(repo, "status", "--porcelain"), "")
+})
+
+test("runs whose ids and areas join to the same name get separate worktrees", () => {
+    const repo = makeRepo()
+    const first = startRun({ repo, runId: "a", areas: ["b-c"] })
+    const second = startRun({ repo, runId: "a-b", areas: ["c"] })
+    assert.notEqual(first.worktrees[0].path, second.worktrees[0].path)
+    cleanupRun({ repo, runId: "a" })
+    assert.ok(existsSync(second.worktrees[0].path))
+})
+
+test("mergeRun on a missing run says it was not found", () => {
+    const repo = makeRepo()
+    assert.throws(() => mergeRun({ repo, runId: "nope" }), /Run nope not found/)
+    assert.ok(!existsSync(crewRoot(repo)))
+})
+
+test("cleanupRun prunes worktrees whose folder is already gone", () => {
+    const repo = makeRepo()
+    const run = startRun({ repo, runId: "r1", areas: ["api", "ui"] })
+    rmSync(run.worktrees[0].path, { recursive: true, force: true })
+    cleanupRun({ repo, runId: "r1" })
+    const listed = git(repo, "worktree", "list", "--porcelain")
+    assert.equal(listed.split("\n").filter((line) => line.startsWith("worktree ")).length, 1, listed)
+})
+
+test("cli rejects --install without a command", () => {
+    const repo = makeRepo()
+    for (const args of [["start", "r1", "api", "--install"], ["start", "r1", "--install", "--x", "api"]]) {
+        assert.throws(
+            () => execFileSync("node", [cli, ...args], { cwd: repo, encoding: "utf8", stdio: "pipe" }),
+            (error) => /Usage: worktrees\.mjs/.test(error.stderr),
+            args.join(" "),
+        )
+    }
+    assert.deepEqual(branches(repo), ["main"])
 })

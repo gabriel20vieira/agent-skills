@@ -57,7 +57,7 @@ test("agents pin model and effort", () => {
     }
 })
 
-test("checker cannot edit", () => {
+test("checker tool list has no edit tools", () => {
     const fields = frontmatter(join(pluginRoot, "agents", "checker.md"))
     assert.deepEqual(list(fields.tools), ["Read", "Grep", "Glob", "Bash", "ToolSearch", "ArtifactData"])
 })

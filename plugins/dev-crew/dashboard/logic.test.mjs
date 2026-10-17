@@ -1,7 +1,7 @@
 // node --test plugins/dev-crew/dashboard/logic.test.mjs
 import assert from "node:assert/strict"
 import { test } from "node:test"
-import { buildTree, countRunning, estimateCost, isStale, normalizeLimits } from "./logic.js"
+import { buildTree, countRunning, estimateCost, isStale, normalizeLimits, OUTPUT_PRICE_PER_MTOK } from "./logic.js"
 
 const now = Date.parse("2026-10-17T12:00:00Z")
 const ago = (ms) => new Date(now - ms).toISOString()
@@ -15,6 +15,16 @@ test("isStale only flags active agents silent for over 10 minutes", () => {
     assert.equal(isStale({ status: "running", updatedAt: ago(600001) }, now), true)
     assert.equal(isStale({ status: "running", updatedAt: ago(1000) }, now), false)
     assert.equal(isStale({ status: "done", updatedAt: ago(9e6) }, now), false)
+})
+
+test("isStale flags active agents with a missing or invalid updatedAt", () => {
+    assert.equal(isStale({ status: "running" }, now), true)
+    assert.equal(isStale({ status: "fixing", updatedAt: "not a date" }, now), true)
+    assert.equal(isStale({ status: "done" }, now), false)
+})
+
+test("output prices match the current models", () => {
+    assert.deepEqual(OUTPUT_PRICE_PER_MTOK, { opus: 20, sonnet: 10, haiku: 0.5 })
 })
 
 test("countRunning counts active agents per model and skips stale ones", () => {

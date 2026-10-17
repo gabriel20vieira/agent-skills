@@ -138,7 +138,7 @@ junta e verifica. Push e PR ficam sempre com o utilizador.
   worktrees não as veriam.
 - **Branches:** um branch de corrida `crew/<runId>/run`, criado a partir do commit de partida, e um
   branch por área `crew/<runId>/<area>`, com a sua worktree fora do repositório (por exemplo
-  `../<repo>-crew/<runId>-<area>`).
+  `../<repo>-crew/<runId>/<area>`, e a do merge em `../<repo>-crew/<runId>/run`).
 - **Preparar a worktree:** a sessão principal corre o comando de instalação do projeto em cada
   worktree (por exemplo `npm ci`) antes de lançar o coordenador, e passa o caminho absoluto no
   brief. Todos os agentes dessa área trabalham nesse caminho.

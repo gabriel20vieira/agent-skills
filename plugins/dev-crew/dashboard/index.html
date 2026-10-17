@@ -164,14 +164,22 @@ function renderGauges() {
     const now = Date.now()
     const running = countRunning(view.agents, now)
     const gauges = document.getElementById("gauges")
+    // A limit input being edited is kept as is, so a re-render does not wipe what the user typed.
+    const editing = gauges.contains(document.activeElement) && document.activeElement.matches("input") ? document.activeElement : null
     gauges.textContent = ""
     for (const model of MODELS) {
         const limit = view.limits[model]
         const share = limit > 0 ? Math.min(100, (running[model] / limit) * 100) : 100
         const over = running[model] >= limit
-        const input = el("input", { type: "number", min: "0", max: "20", step: "1", id: `limit-${model}`, value: String(limit) })
+        let input = editing?.id === `limit-${model}` ? editing : null
+        if (!input) {
+            input = el("input", { type: "number", min: "0", max: "20", step: "1", id: `limit-${model}`, value: String(limit) })
+            input.addEventListener("change", () => {
+                saveLimit(model, input.value)
+                input.value = String(view.limits[model])
+            })
+        }
         input.disabled = !view.db
-        input.addEventListener("change", () => saveLimit(model, input.value))
         gauges.append(el("div", { class: "gauge" },
             el("div", { class: "gauge-head" },
                 el("span", { class: "gauge-name", style: { color: `var(--${model})` } }, model[0].toUpperCase() + model.slice(1)),
@@ -187,6 +195,8 @@ function renderGauges() {
         el("div", { class: "row" }, el("span", {}, "Tokens"), el("span", { class: "num" }, tokens.toLocaleString("en-US"))),
         el("div", { class: "row" }, el("span", {}, "Cost"), el("span", { class: "num" }, `~$${estimateCost(view.agents).toFixed(2)}`)),
         el("span", { class: "estimate" }, "Estimate: all tokens priced at output rates")))
+    // Clearing the gauges blurred the kept input: give it its focus back.
+    if (editing && document.activeElement !== editing) editing.focus()
 }
 
 function renderNode(node) {
@@ -296,7 +306,13 @@ function selectRun(runId) {
 document.getElementById("run-select").addEventListener("change", (event) => selectRun(event.target.value))
 
 render()
-const db = await claude.use("db")
+// Outside the artifact host there is no `claude` runtime: show the notice instead of failing.
+let db = null
+try {
+    db = await globalThis.claude?.use?.("db")
+} catch (error) {
+    console.error("Could not open the board's data", error)
+}
 if (!db) {
     document.getElementById("no-db").hidden = false
 } else {

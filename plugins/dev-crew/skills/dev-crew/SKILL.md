@@ -39,8 +39,9 @@ when the work splits into areas.
 3. **Worktrees.** From anywhere in the repo:
    `node "$CREW" start <runId> <area...> --install "<install command, e.g. npm ci>"`.
    It prints the base commit, the run branch (`crew/<runId>/run`) and one absolute worktree
-   path and branch per area; use the paths exactly as printed. It refuses a dirty tree, a
-   reused run id and unsafe names, and leaves nothing behind when it fails.
+   path and branch per area (`<repo>-crew/<runId>/<area>`, next to the repo); use the paths
+   exactly as printed. It refuses a dirty tree, a reused run id and unsafe names, and leaves
+   nothing behind when it fails.
 4. **Dashboard.** Open or reuse the project's dashboard (`references/dashboard.md`). If the
    Artifact tools are not available, run without it and keep the state in your replies.
    Close stale rows from earlier runs, then create `runs/<runId>` with status `running` and
@@ -54,8 +55,9 @@ when the work splits into areas.
    the notification and close its row if it is still open. If its report is missing, read its
    row and its children's rows. Report progress to the user in a line or two per event.
 7. **Merge.** When every coordinator is done: `node "$CREW" merge <runId>`. It merges each
-   area branch into `crew/<runId>/run` in its own worktree and lists `merged` and `conflicts`.
-   Resolve a trivial conflict in that worktree yourself; otherwise ask the user.
+   area branch into `crew/<runId>/run` in its own worktree (`<repo>-crew/<runId>/run`) and
+   lists `merged` and `conflicts`. Resolve a trivial conflict in that worktree yourself;
+   otherwise ask the user.
 8. **Final check.** Launch a `dev-crew:checker` in `check` mode on the run worktree with the
    project's full check and test commands.
 9. **Review.** Read `git -C <run worktree> diff <base>..HEAD` and judge it against the plan.

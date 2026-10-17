@@ -7,7 +7,8 @@
 //
 // Runs in the repo of the current folder and prints JSON. Branches: crew/<runId>/<area> per
 // area and crew/<runId>/run for the merged result. Worktrees live next to the repo, in
-// <repo>-crew/. Never pushes, never touches the user's checkout, never deletes branches.
+// <repo>-crew/<runId>/<area> and <repo>-crew/<runId>/run. Never pushes, never touches the
+// user's checkout, never deletes branches.
 import { execFileSync, execSync } from "node:child_process"
 import { existsSync, readdirSync, rmdirSync } from "node:fs"
 import { basename, dirname, join, resolve } from "node:path"
@@ -43,6 +44,14 @@ export function crewRoot(repo) {
     return join(dirname(path), `${basename(path)}-crew`)
 }
 
+/** Removes the run folder and then the crew root when they are empty. */
+function removeEmptyFolders(repo, runId) {
+    const root = crewRoot(repo)
+    for (const path of [join(root, runId), root]) {
+        if (existsSync(path) && readdirSync(path).length === 0) rmdirSync(path)
+    }
+}
+
 export function startRun({ repo, runId, areas, install }) {
     checkId(runId)
     if (!Array.isArray(areas) || areas.length === 0) throw new Error("At least one area is required")
@@ -63,7 +72,7 @@ export function startRun({ repo, runId, areas, install }) {
         git(repo, "branch", runBranch, base)
         for (const area of areas) {
             const branch = `crew/${runId}/${area}`
-            const path = join(crewRoot(repo), `${runId}-${area}`)
+            const path = join(crewRoot(repo), runId, area)
             git(repo, "worktree", "add", "-q", "-b", branch, path, base)
             worktrees.push({ area, branch, path })
             if (install) execSync(install, { cwd: path, stdio: "pipe" })
@@ -76,8 +85,7 @@ export function startRun({ repo, runId, areas, install }) {
         for (const branch of [runBranch, ...worktrees.map((tree) => tree.branch)]) {
             try { git(repo, "branch", "-D", branch) } catch {}
         }
-        const root = crewRoot(repo)
-        if (existsSync(root) && readdirSync(root).length === 0) rmdirSync(root)
+        removeEmptyFolders(repo, runId)
         throw withStderr(error)
     }
     return { base, runBranch, worktrees }
@@ -85,8 +93,10 @@ export function startRun({ repo, runId, areas, install }) {
 
 export function mergeRun({ repo, runId }) {
     checkId(runId)
-    const path = join(crewRoot(repo), runId)
-    if (!existsSync(path)) git(repo, "worktree", "add", "-q", path, `crew/${runId}/${RUN}`)
+    const runBranch = `crew/${runId}/${RUN}`
+    if (git(repo, "for-each-ref", `refs/heads/${runBranch}`) === "") throw new Error(`Run ${runId} not found`)
+    const path = join(crewRoot(repo), runId, RUN)
+    if (!existsSync(path)) git(repo, "worktree", "add", "-q", path, runBranch)
     const dirty = git(path, "status", "--porcelain")
     if (dirty !== "") throw new Error(`Run worktree ${path} has uncommitted changes: commit or discard them first\n${dirty}`)
     const merged = []
@@ -109,33 +119,35 @@ export function mergeRun({ repo, runId }) {
 
 export function cleanupRun({ repo, runId }) {
     checkId(runId)
-    const root = crewRoot(repo)
-    const paths = [join(root, runId)]
-    for (const branch of areaBranches(repo, runId)) {
-        paths.push(join(root, `${runId}-${branch.slice(`crew/${runId}/`.length)}`))
-    }
+    const folder = join(crewRoot(repo), runId)
+    const paths = [join(folder, RUN)]
+    for (const branch of areaBranches(repo, runId)) paths.push(join(folder, branch.slice(`crew/${runId}/`.length)))
     const removed = []
     for (const path of paths) {
         if (!existsSync(path)) continue
         git(repo, "worktree", "remove", "--force", path)
         removed.push(path)
     }
-    if (existsSync(root) && readdirSync(root).length === 0) rmdirSync(root)
+    // Drops the records of worktrees whose folder was deleted by hand.
+    git(repo, "worktree", "prune")
+    removeEmptyFolders(repo, runId)
     return { removed }
 }
 
 function main(argv) {
     const [command, runId, ...rest] = argv
+    const usage = "Usage: worktrees.mjs start <runId> <area...> [--install \"<cmd>\"] | merge <runId> | cleanup <runId>"
     const repo = resolve(git(process.cwd(), "rev-parse", "--show-toplevel"))
     if (command === "start") {
         const at = rest.indexOf("--install")
         const install = at >= 0 ? rest[at + 1] : undefined
+        if (at >= 0 && (!install || install.startsWith("--"))) throw new Error(`--install needs a command\n${usage}`)
         const areas = at >= 0 ? rest.filter((_, index) => index !== at && index !== at + 1) : rest
         return startRun({ repo, runId, areas, install })
     }
     if (command === "merge") return mergeRun({ repo, runId })
     if (command === "cleanup") return cleanupRun({ repo, runId })
-    throw new Error("Usage: worktrees.mjs start <runId> <area...> [--install \"<cmd>\"] | merge <runId> | cleanup <runId>")
+    throw new Error(usage)
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
