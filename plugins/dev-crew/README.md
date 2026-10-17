@@ -43,8 +43,10 @@ tests"); the `dev-crew` skill loads by itself.
   nesting at 3 levels (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`), which the crew needs.
 - **Never:** push code, open PRs or merge into your branch. A run ends on
   `crew/<runId>/run` for you to review.
-- **Always cleans up:** merged area branches and every worktree when the run ends, and the run
-  branch (local and `origin`) with `worktrees.mjs finish <runId>` once you merged it.
+- **Cleans up:** every worktree when the run ends. Merged branches (area branches, and the run
+  branch locally and on `origin` with `worktrees.mjs finish <runId>` after you merge it) are
+  deleted according to `git.deleteMergedBranches` in the project's `docs/settings.md`; the
+  crew asks once when it is not set and records your answer there.
 
 ## Layout
 

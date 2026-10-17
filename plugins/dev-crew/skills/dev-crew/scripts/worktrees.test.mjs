@@ -128,6 +128,23 @@ test("cleanupRun removes worktrees and the area branches merged into the run", (
     assert.deepEqual(branches(repo), ["crew/r1/run", "main"])
 })
 
+test("cleanupRun with keepBranches removes worktrees and deletes no branch", () => {
+    const repo = makeRepo()
+    const run = startRun({ repo, runId: "r1", areas: ["api"] })
+    commitIn(run.worktrees[0].path, "api.txt", "api\n")
+    mergeRun({ repo, runId: "r1" })
+    const result = cleanupRun({ repo, runId: "r1", keepBranches: true })
+    assert.ok(!existsSync(crewRoot(repo)))
+    assert.deepEqual(result.deleted, [])
+    assert.deepEqual(result.kept, ["crew/r1/api"])
+    assert.deepEqual(branches(repo), ["crew/r1/api", "crew/r1/run", "main"])
+    const cli2 = makeRepo()
+    startRun({ repo: cli2, runId: "r2", areas: ["ui"] })
+    const printed = JSON.parse(execFileSync("node", [cli, "cleanup", "r2", "--keep-branches"], { cwd: cli2, encoding: "utf8" }))
+    assert.deepEqual(printed.deleted, [])
+    assert.deepEqual(branches(cli2), ["crew/r2/run", "crew/r2/ui", "main"])
+})
+
 test("cleanupRun keeps an area branch that is not in the run yet", () => {
     const repo = makeRepo()
     const run = startRun({ repo, runId: "r1", areas: ["api", "ui"] })

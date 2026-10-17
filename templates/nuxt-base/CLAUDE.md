@@ -14,6 +14,8 @@
 - `shared/` pure code used by both sides (tested in `test/unit`); import it as `#shared/...`
 
 ## Rules
+- Working preferences (git cleanup, merge method, who pushes, docs language) are in
+  `docs/settings.md`. Follow them; when a value is empty, ask once and write the answer there.
 - Handler order: `requireUser(event)` → `assertPermission(user, resource, action)` →
   `readBodyWith(event, schema)` → service → `audit(event, ...)`.
 - Permissions live only in `shared/utils/permissions.ts`; new resources are added to

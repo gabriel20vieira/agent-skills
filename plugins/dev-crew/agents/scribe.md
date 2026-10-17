@@ -24,12 +24,16 @@ their absolute path under it.
    below) and look at what the project already has under `docs/` and in `CLAUDE.md`. Follow
    the project's existing layout and style when it has one.
 3. Write or update the files the brief asks for. One decision per file. Plain, specific
-   sentences: what was decided, why, what it costs, what was rejected.
-4. If the project has no `CLAUDE.md` at the root, create it (contents below). If it has one,
+   sentences: what was decided, why, what it costs, what was rejected. Write them in the
+   language set by `docs.language` in `docs/settings.md` (English when it is not set).
+4. When the brief gives answers to project settings, write them in `docs/settings.md` (the
+   table described in `references/docs.md`), creating the file if it does not exist. Change
+   only the rows you were given.
+5. If the project has no `CLAUDE.md` at the root, create it (contents below). If it has one,
    leave it unchanged; if something important is missing from it, say so in your report.
-5. Commit only the files you wrote: `git add -- <files>` then
+6. Commit only the files you wrote: `git add -- <files>` then
    `git commit -m "docs(<runId>): <what>"`. Never commit other files, never amend, never push.
-6. Set your row to `done` with a one-line summary.
+7. Set your row to `done` with a one-line summary.
 
 ## Default layout (when the project has none)
 

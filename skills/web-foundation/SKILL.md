@@ -59,11 +59,17 @@ test/unit, test/api
 - **Database**: change `server/db/schema`, then `npm run db:generate -- --name x` and review
   the SQL. Never `drizzle-kit push` on a real database.
 - `npm run check` must pass before every commit; `npm run test:api` when server code changed.
-- **Git**: once a branch is merged (PR or local), always delete it locally and on `origin`
-  (`git branch -d`, `git push origin --delete`, or `gh pr merge --delete-branch`) and
-  remove its worktree (`git worktree remove`, then `git fetch --prune`). Leave no extra
-  branch or worktree behind. Never delete a branch with unmerged commits or a worktree with
-  uncommitted files.
+- **Project settings**: `docs/settings.md` holds the working preferences (a table of
+  setting, value, options). Read it before acting on any of them. An empty value means
+  nobody decided yet: ask the user once (AskUserQuestion with the listed options), write the
+  answer in the table and commit it with the work. `ask` means ask every time. A project
+  without the file gets it from `templates/nuxt-base/docs/settings.md`.
+- **Git**: when a branch is merged (PR or local), follow `git.deleteMergedBranches`. With
+  `yes`, delete it locally and on `origin` (`git branch -d`, `git push origin --delete`, or
+  `gh pr merge --delete-branch`) and remove its worktree (`git worktree remove`, then
+  `git fetch --prune`). With `no`, keep them. Empty or `ask`: ask. Never delete a branch
+  with unmerged commits or a worktree with uncommitted files. Merge with `git.mergeMethod`;
+  push and open PRs only when `git.pushAndPr` is `agent` (or the user asks).
 
 ## Which skill
 
