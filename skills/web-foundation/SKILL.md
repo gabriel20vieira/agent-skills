@@ -59,6 +59,11 @@ test/unit, test/api
 - **Database**: change `server/db/schema`, then `npm run db:generate -- --name x` and review
   the SQL. Never `drizzle-kit push` on a real database.
 - `npm run check` must pass before every commit; `npm run test:api` when server code changed.
+- **Git**: once a branch is merged (PR or local), always delete it locally and on `origin`
+  (`git branch -d`, `git push origin --delete`, or `gh pr merge --delete-branch`) and
+  remove its worktree (`git worktree remove`, then `git fetch --prune`). Leave no extra
+  branch or worktree behind. Never delete a branch with unmerged commits or a worktree with
+  uncommitted files.
 
 ## Which skill
 
