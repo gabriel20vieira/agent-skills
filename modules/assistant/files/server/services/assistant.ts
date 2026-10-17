@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm"
-import type { AssistantMessageView, AssistantProposal, ProposalState } from "#shared/utils/assistant"
+import type { AssistantMessageView, AssistantProposal, AssistantSegment, ProposalState } from "#shared/utils/assistant"
 import { assistantConversations, assistantMessages, assistantProposals } from "../db/schema"
 import type { ChatMessage, ToolCall } from "../assistant/provider"
 
@@ -30,15 +30,25 @@ export async function deleteConversation(userId: number, id: number) {
     await useDb().delete(assistantConversations).where(eq(assistantConversations.id, id))
 }
 
-export async function appendMessage(conversationId: number, message: ChatMessage) {
-    await useDb().insert(assistantMessages).values({
+/** Stores one transcript message (provider raw blocks are never stored) and returns its id. */
+export async function appendMessage(conversationId: number, message: ChatMessage): Promise<number> {
+    const [result] = await useDb().insert(assistantMessages).values({
         conversationId,
         role: message.role,
         content: message.content,
         toolCalls: message.toolCalls?.length ? message.toolCalls : null,
         toolCallId: message.toolCallId ?? null,
-    })
+    }).$returningId()
     await useDb().update(assistantConversations).set({ updatedAt: new Date() }).where(eq(assistantConversations.id, conversationId))
+    return result!.id
+}
+
+export async function setSegments(messageId: number, segments: AssistantSegment[]) {
+    await useDb().update(assistantMessages).set({ segments }).where(eq(assistantMessages.id, messageId))
+}
+
+export async function setTitle(conversationId: number, title: string) {
+    await useDb().update(assistantConversations).set({ title: title.slice(0, 200) }).where(eq(assistantConversations.id, conversationId))
 }
 
 /** The transcript as the model sees it (last 40 messages). */
@@ -54,15 +64,36 @@ export async function loadTranscript(conversationId: number): Promise<ChatMessag
     }))
 }
 
-/** What the page shows: user and assistant text and the proposal cards (system notes are for the model). */
+/**
+ * What the page shows: one entry per user message and one per assistant reply (system notes
+ * are for the model). A reply recorded with segments is shown once, from its last message;
+ * the text of the turn's earlier model calls is already inside those segments.
+ */
 export async function conversationView(userId: number, id: number) {
     const conversation = await getOwnConversation(userId, id)
     const rows = await useDb().select().from(assistantMessages)
         .where(and(eq(assistantMessages.conversationId, id), inArray(assistantMessages.role, ["user", "assistant"])))
         .orderBy(asc(assistantMessages.id))
-    const messages: AssistantMessageView[] = rows
-        .filter(row => row.content.trim())
-        .map(row => ({ id: row.id, role: row.role as AssistantMessageView["role"], content: row.content, createdAt: row.createdAt.toISOString() }))
+    const messages: AssistantMessageView[] = []
+    let turn: typeof rows = []
+    const flush = () => {
+        const recorded = turn.findLast(row => row.segments?.length)
+        const shown = recorded ? [recorded] : turn.filter(row => row.content.trim())
+        for (const row of shown) {
+            const content = recorded ? turn.map(item => item.content).join("") : row.content
+            messages.push({ id: row.id, role: "assistant", content, ...(row.segments?.length ? { segments: row.segments } : {}), createdAt: row.createdAt.toISOString() })
+        }
+        turn = []
+    }
+    for (const row of rows) {
+        if (row.role === "assistant") {
+            turn.push(row)
+            continue
+        }
+        flush()
+        if (row.content.trim()) messages.push({ id: row.id, role: "user", content: row.content, createdAt: row.createdAt.toISOString() })
+    }
+    flush()
     const proposals = await useDb().select().from(assistantProposals)
         .where(eq(assistantProposals.conversationId, id)).orderBy(asc(assistantProposals.id))
     return { id: conversation.id, title: conversation.title, messages, proposals: proposals.map(toProposal) }

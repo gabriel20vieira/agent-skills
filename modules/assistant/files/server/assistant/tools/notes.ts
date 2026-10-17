@@ -29,6 +29,31 @@ export const listNotes = defineAssistantTool({
     },
 })
 
+export const chartNotesByMonth = defineAssistantTool({
+    kind: "chart",
+    name: "chart_notes_by_month",
+    description: "Show a chart of how many notes were last updated in each of the recent months. Use it when the user asks for a chart or trend of notes.",
+    parameters: z.object({
+        months: z.number().int().min(1).max(24).default(6).describe("How many months back, including the current one"),
+        type: z.enum(["column", "line", "area", "table"]).default("column"),
+    }),
+    permission: ["notes", "read"],
+    async run(ctx, args) {
+        const rows = await ctx.api<NoteRow[]>("/api/notes")
+        const now = new Date()
+        const keys = Array.from({ length: args.months }, (_, index) => {
+            const month = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (args.months - 1 - index), 1))
+            return month.toISOString().slice(0, 7)
+        })
+        const counts = new Map(keys.map(key => [key, 0]))
+        for (const row of rows) {
+            const key = String(row.updatedAt).slice(0, 7)
+            if (counts.has(key)) counts.set(key, counts.get(key)! + 1)
+        }
+        return { type: args.type, title: "Notes per month", categories: keys, series: [{ name: "Notes", data: keys.map(key => counts.get(key)!) }] }
+    },
+})
+
 export const proposeNote = defineAssistantTool({
     kind: "propose",
     name: "propose_note",

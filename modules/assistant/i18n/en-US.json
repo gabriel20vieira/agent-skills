@@ -1,24 +1,37 @@
 {
-    "nav": { "assistant": "Assistant" },
+    "nav": {
+        "assistant": "Assistant"
+    },
     "assistant": {
         "title": "Assistant",
         "description": "Ask about the app's data. Changes only happen when you accept them.",
         "conversations": "Conversations",
         "new": "New conversation",
-        "hint": "Type a question. The assistant can look up data and propose changes, which show up as cards for you to accept or reject.",
+        "hint": "Ask about the app's data. The assistant can look up data, draw charts and propose changes, which show up as cards for you to accept or reject.",
         "placeholder": "Type a message…",
         "send": "Send",
         "stop": "Stop",
-        "usingTool": "Looking up: {tool}…",
-        "disabled": { "title": "Assistant is off", "body": "An admin can turn it on in the settings." },
-        "delete": { "title": "Delete conversation?", "body": "The conversation and its proposals will be deleted." },
+        "disabled": {
+            "title": "Assistant is off",
+            "body": "An admin can turn it on in the settings."
+        },
+        "delete": {
+            "title": "Delete conversation?",
+            "body": "The conversation and its proposals will be deleted."
+        },
         "proposal": {
             "label": "Assistant proposal",
             "accept": "Accept",
             "reject": "Reject",
             "done": "Change made.",
             "failed": "The change was not made.",
-            "states": { "pending": "Pending", "claimed": "Applying…", "done": "Done", "rejected": "Rejected", "failed": "Failed" }
+            "states": {
+                "pending": "Pending",
+                "claimed": "Applying…",
+                "done": "Done",
+                "rejected": "Rejected",
+                "failed": "Failed"
+            }
         },
         "settings": {
             "title": "Assistant",
@@ -29,10 +42,40 @@
             "baseUrl": "Ollama address",
             "model": "Model",
             "systemPrompt": "Extra instructions",
-            "systemPromptHint": "Added to the base instructions: tone, business context, what to avoid."
+            "systemPromptHint": "Added to the base instructions: tone, business context, what to avoid.",
+            "anthropic": "Anthropic (Claude)",
+            "anthropicModel": "Anthropic model",
+            "anthropicHint": "The key lives in the server's ANTHROPIC_API_KEY environment variable, never here.",
+            "ollamaModel": "Ollama model"
+        },
+        "welcome": "How can I help?",
+        "noConversations": "No conversations yet.",
+        "suggestions": {
+            "list": "Which notes are there?",
+            "chart": "Show a chart of notes per month",
+            "propose": "Create a note called Team meeting",
+            "help": "What can you do?"
+        },
+        "thinking": {
+            "now": "Thinking",
+            "done": "Thought for {s} s",
+            "steps": "{n} steps"
+        },
+        "tools": {
+            "list_notes": "Looked up the notes",
+            "chart_notes_by_month": "Drew a chart of the notes",
+            "propose_note": "Prepared a note proposal"
+        },
+        "chart": {
+            "empty": "No data to show.",
+            "total": "Total"
         }
     },
-    "settings": { "tabs": { "assistant": "Assistant" } },
+    "settings": {
+        "tabs": {
+            "assistant": "Assistant"
+        }
+    },
     "errors": {
         "assistant": {
             "disabled": "The assistant is off.",
@@ -42,7 +85,11 @@
             "provider_error": "The language model did not answer.",
             "timeout": "The assistant took too long. Try again.",
             "too_many_steps": "The assistant needed too many steps. Rephrase the request.",
-            "failed": "The assistant failed. Try again."
+            "failed": "The assistant failed. Try again.",
+            "refused": "The model declined to answer this request.",
+            "cut_off": "The model's answer was cut off. Try again.",
+            "not_configured": "The assistant's provider is not set up (missing or invalid key).",
+            "busy": "The assistant's provider is busy. Try again shortly."
         }
     }
 }

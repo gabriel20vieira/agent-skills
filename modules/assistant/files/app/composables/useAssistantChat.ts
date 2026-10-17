@@ -1,15 +1,21 @@
-import type { AssistantProposal, AssistantStreamEvent } from "#shared/utils/assistant"
+import type { AssistantMessageView, AssistantProposal, AssistantSegment, AssistantStreamEvent } from "#shared/utils/assistant"
+import { applyEvent } from "#shared/utils/assistant"
 
-export interface ChatLine {
+/** One bubble in the page: a user message, or an assistant reply made of segments. */
+export interface ChatEntry {
     key: string
     role: "user" | "assistant"
     content: string
+    segments: AssistantSegment[]
+    /** Live only: while the reply streams, and the wall-clock time it was sent. */
+    streaming?: boolean
+    sentAt?: number
 }
 
 interface ConversationView {
     id: number
     title: string
-    messages: { id: number, role: "user" | "assistant" | "system", content: string }[]
+    messages: AssistantMessageView[]
     proposals: AssistantProposal[]
 }
 
@@ -33,27 +39,27 @@ async function* readEvents(body: ReadableStream<Uint8Array>): AsyncGenerator<Ass
 }
 
 /**
- * One assistant conversation: send messages (streamed), and accept or reject the
- * proposal cards. Accepting = claim -> the normal REST call -> settle.
+ * One assistant conversation: send messages (streamed as reasoning, text, tool steps,
+ * proposal cards and charts), and accept or reject the cards. Accepting = claim -> the
+ * normal REST call -> settle.
  */
-export function useAssistantChat() {
+export function useAssistantChat(options: { onTitle?: (id: number, title: string) => void } = {}) {
     const api = useApi()
     const errorMessage = useErrorMessage()
     const { t } = useI18n()
 
     const conversationId = ref<number | null>(null)
-    const lines = ref<ChatLine[]>([])
-    const proposals = ref<AssistantProposal[]>([])
+    const entries = ref<ChatEntry[]>([])
+    const proposals = ref<Record<number, AssistantProposal>>({})
     const streaming = ref(false)
-    const activeTool = ref<string | null>(null)
     const error = ref("")
     let controller: AbortController | null = null
 
     function reset() {
         controller?.abort()
         conversationId.value = null
-        lines.value = []
-        proposals.value = []
+        entries.value = []
+        proposals.value = {}
         error.value = ""
     }
 
@@ -61,19 +67,22 @@ export function useAssistantChat() {
         reset()
         const view = await api<ConversationView>(`/api/assistant/conversations/${id}`)
         conversationId.value = view.id
-        lines.value = view.messages
-            .filter(message => message.role !== "system")
-            .map(message => ({ key: `m${message.id}`, role: message.role as ChatLine["role"], content: message.content }))
-        proposals.value = view.proposals
+        entries.value = view.messages.map(message => ({
+            key: `m${message.id}`,
+            role: message.role,
+            content: message.content,
+            segments: message.segments ?? (message.role === "assistant" ? [{ type: "text", text: message.content }] : []),
+        }))
+        proposals.value = Object.fromEntries(view.proposals.map(proposal => [proposal.id, proposal]))
     }
 
     async function send(text: string) {
         if (streaming.value || !text.trim()) return
         error.value = ""
         streaming.value = true
-        lines.value.push({ key: `u${Date.now()}`, role: "user", content: text })
-        const reply = reactive<ChatLine>({ key: `a${Date.now()}`, role: "assistant", content: "" })
-        lines.value.push(reply)
+        entries.value.push({ key: `u${Date.now()}`, role: "user", content: text, segments: [] })
+        const reply = reactive<ChatEntry>({ key: `a${Date.now()}`, role: "assistant", content: "", segments: [], streaming: true, sentAt: Date.now() })
+        entries.value.push(reply)
         controller = new AbortController()
         try {
             const response = await fetch("/api/assistant/chat", {
@@ -88,19 +97,20 @@ export function useAssistantChat() {
             }
             for await (const event of readEvents(response.body)) {
                 if (event.type === "conversation") conversationId.value = event.id
-                else if (event.type === "text") reply.content += event.text
-                else if (event.type === "tool") activeTool.value = event.name
-                else if (event.type === "proposal") proposals.value.push(event.proposal)
+                else if (event.type === "proposal") proposals.value[event.proposal.id] = event.proposal
+                else if (event.type === "title") options.onTitle?.(event.id, event.title)
                 else if (event.type === "error") error.value = errorMessage({ data: { code: event.code } })
+                applyEvent(reply.segments, event, Date.now() - reply.sentAt!)
+                if (event.type === "text") reply.content += event.text
             }
         }
         catch (caught) {
             if ((caught as Error)?.name !== "AbortError") error.value = errorMessage(caught)
         }
         finally {
-            if (!reply.content) lines.value = lines.value.filter(line => line.key !== reply.key)
+            reply.streaming = false
+            if (!reply.segments.length) entries.value = entries.value.filter(entry => entry.key !== reply.key)
             streaming.value = false
-            activeTool.value = null
             controller = null
         }
     }
@@ -110,8 +120,7 @@ export function useAssistantChat() {
     }
 
     function update(proposal: AssistantProposal, state: AssistantProposal["state"]) {
-        const index = proposals.value.findIndex(item => item.id === proposal.id)
-        if (index >= 0) proposals.value[index] = { ...proposals.value[index]!, state }
+        proposals.value[proposal.id] = { ...proposal, state }
     }
 
     async function accept(proposal: AssistantProposal) {
@@ -138,5 +147,5 @@ export function useAssistantChat() {
         update(proposal, "rejected")
     }
 
-    return { conversationId, lines, proposals, streaming, activeTool, error, reset, load, send, stop, accept, reject }
+    return { conversationId, entries, proposals, streaming, error, reset, load, send, stop, accept, reject }
 }

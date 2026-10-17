@@ -23,7 +23,12 @@ Installs `modules/public-site` (see its README for the file list).
    ```
 
    ```vue
-   <NuxtLink to="/sobre" class="hover:text-foreground">{{ t("about.title") }}</NuxtLink>
+   <NuxtLink
+       to="/sobre"
+       class="hover:text-foreground"
+   >
+       {{ t("about.title") }}
+   </NuxtLink>
    ```
 
 3. Replace `useHead({ title: ... })` with `usePageSeo` in the existing public pages:

@@ -1,6 +1,6 @@
 import type { H3Event } from "h3"
 import { z } from "zod"
-import type { AssistantProposal } from "#shared/utils/assistant"
+import type { AssistantChart, AssistantProposal } from "#shared/utils/assistant"
 import type { ToolSpec } from "./provider"
 
 export interface ToolContext {
@@ -39,9 +39,18 @@ export interface ProposeTool<S extends z.ZodType = z.ZodType> extends BaseTool<S
     verify: (ctx: ToolContext, args: z.infer<S>, resultId: string | number | undefined) => Promise<boolean>
 }
 
-export type AssistantTool = ReadTool | ProposeTool
+/**
+ * Draws a chart. The server computes every number (through `ctx.api`), so the model can
+ * never invent one; the model only learns that a chart was shown and its size.
+ */
+export interface ChartTool<S extends z.ZodType = z.ZodType> extends BaseTool<S> {
+    kind: "chart"
+    run: (ctx: ToolContext, args: z.infer<S>) => Promise<AssistantChart>
+}
 
-export function defineAssistantTool<S extends z.ZodType>(tool: ReadTool<S> | ProposeTool<S>): AssistantTool {
+export type AssistantTool = ReadTool | ProposeTool | ChartTool
+
+export function defineAssistantTool<S extends z.ZodType>(tool: ReadTool<S> | ProposeTool<S> | ChartTool<S>): AssistantTool {
     if (tool.kind === "propose" && !tool.name.startsWith("propose_")) {
         throw new Error(`Write tools must be named propose_*: ${tool.name}`)
     }

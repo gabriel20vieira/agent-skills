@@ -1,5 +1,5 @@
 import { foreignKey, index, int, json, mediumtext, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core"
-import type { AssistantProposal, ProposalState } from "#shared/utils/assistant"
+import type { AssistantProposal, AssistantSegment, ProposalState } from "#shared/utils/assistant"
 import { users } from "./users"
 
 // Foreign keys are named by hand: the generated names exceed MySQL's 64-character limit.
@@ -23,6 +23,8 @@ export const assistantMessages = mysqlTable("assistant_messages", {
     content: mediumtext("content").notNull(),
     toolCalls: json("tool_calls").$type<{ id: string, name: string, arguments: Record<string, unknown> }[]>(),
     toolCallId: varchar("tool_call_id", { length: 64 }),
+    /** The reply as the page shows it (reasoning, tools, cards, charts), on the turn's last assistant message. */
+    segments: json("segments").$type<AssistantSegment[]>(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
 }, table => [
     index("assistant_messages_conversation_idx").on(table.conversationId, table.id),

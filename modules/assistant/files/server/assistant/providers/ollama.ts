@@ -1,40 +1,31 @@
 import { randomUUID } from "node:crypto"
 import type { ChatChunk, ChatMessage, ChatProvider, ToolSpec } from "../provider"
+import { parseOllamaLine, toOllama } from "./ollamaStream"
 
-interface OllamaLine {
-    message?: {
-        content?: string
-        tool_calls?: { function: { name: string, arguments: Record<string, unknown> | string } }[]
-    }
-    done?: boolean
-    error?: string
-}
+// Models that rejected `think: true` (no reasoning support): asked without it from then on.
+const noThink = new Set<string>()
 
-function toOllama(messages: ChatMessage[]) {
-    return messages.map(message => ({
-        role: message.role,
-        content: message.content,
-        ...(message.toolCalls?.length
-            ? { tool_calls: message.toolCalls.map(call => ({ function: { name: call.name, arguments: call.arguments } })) }
-            : {}),
-    }))
-}
-
-/** Ollama's /api/chat with streaming (NDJSON) and native tool calling. */
+/** Ollama's /api/chat with streaming (NDJSON), native tool calling and reasoning (`think`). */
 export function createOllamaProvider(options: { baseUrl: string, model: string }): ChatProvider {
+    const endpoint = `${options.baseUrl.replace(/\/$/, "")}/api/chat`
+    const post = (body: Record<string, unknown>, signal: AbortSignal) => fetch(endpoint, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        signal,
+        body: JSON.stringify({ model: options.model, ...body }),
+    })
+
     return {
         async* chat({ messages, tools, signal }: { messages: ChatMessage[], tools: ToolSpec[], signal: AbortSignal }): AsyncIterable<ChatChunk> {
-            const response = await fetch(`${options.baseUrl.replace(/\/$/, "")}/api/chat`, {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                signal,
-                body: JSON.stringify({
-                    model: options.model,
-                    stream: true,
-                    messages: toOllama(messages),
-                    tools: tools.map(tool => ({ type: "function", function: tool })),
-                }),
-            })
+            const body = { stream: true, messages: toOllama(messages), tools: tools.map(tool => ({ type: "function", function: tool })) }
+            const think = !noThink.has(options.model)
+            let response = await post(think ? { ...body, think: true } : body, signal)
+            if (think && response.status === 400) {
+                const detail = await response.text().catch(() => "")
+                if (!/think/i.test(detail)) throw fail(502, "assistant.provider_error", `Ollama answered 400: ${detail.slice(0, 200)}`)
+                noThink.add(options.model)
+                response = await post(body, signal)
+            }
             if (!response.ok || !response.body) throw fail(502, "assistant.provider_error", `Ollama answered ${response.status}`)
 
             const decoder = new TextDecoder()
@@ -46,23 +37,21 @@ export function createOllamaProvider(options: { baseUrl: string, model: string }
                     const line = buffer.slice(0, newline).trim()
                     buffer = buffer.slice(newline + 1)
                     if (!line) continue
-                    const data = JSON.parse(line) as OllamaLine
-                    if (data.error) throw fail(502, "assistant.provider_error", data.error)
-                    if (data.message?.content) yield { type: "text", text: data.message.content }
-                    if (data.message?.tool_calls?.length) {
-                        yield {
-                            type: "tool_calls",
-                            calls: data.message.tool_calls.map(call => ({
-                                id: randomUUID(),
-                                name: call.function.name,
-                                arguments: typeof call.function.arguments === "string"
-                                    ? JSON.parse(call.function.arguments) as Record<string, unknown>
-                                    : call.function.arguments,
-                            })),
-                        }
+                    try {
+                        yield* parseOllamaLine(line, randomUUID)
+                    }
+                    catch (error) {
+                        throw fail(502, "assistant.provider_error", (error as Error).message)
                     }
                 }
             }
+        },
+
+        async complete({ messages, signal }) {
+            const response = await post({ stream: false, messages: toOllama(messages) }, signal)
+            if (!response.ok) throw fail(502, "assistant.provider_error", `Ollama answered ${response.status}`)
+            const data = await response.json() as { message?: { content?: string } }
+            return data.message?.content ?? ""
         },
     }
 }

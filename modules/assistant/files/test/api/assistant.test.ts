@@ -49,8 +49,22 @@ describe("assistant", () => {
         expect(result.events[0]).toMatchObject({ type: "conversation" })
         conversationId = result.events[0].id
         const text = result.events.filter((event: any) => event.type === "text").map((event: any) => event.text).join("")
-        expect(text).toBe("You said: hello (tools: list_notes, propose_note)")
+        expect(text).toBe("You said: hello (tools: chart_notes_by_month, list_notes, propose_note)")
+        const thinking = result.events.filter((event: any) => event.type === "thinking").map((event: any) => event.text).join("")
+        expect(thinking).toBe("Reading the request. Deciding what to do.")
+        // Reasoning streams before the answer.
+        expect(result.events.findIndex((event: any) => event.type === "thinking")).toBeLessThan(result.events.findIndex((event: any) => event.type === "text"))
+        // A new conversation gets a title written by the model.
+        expect(result.events).toContainEqual({ type: "title", id: conversationId, title: "Title: hello" })
         expect(result.events.at(-1)).toEqual({ type: "done" })
+    })
+
+    it("records the reply as ordered segments that survive a reload", async () => {
+        const view = (await editor.get(`/api/assistant/conversations/${conversationId}`)).data
+        expect(view.title).toBe("Title: hello")
+        const reply = view.messages.find((message: any) => message.role === "assistant")
+        expect(reply.segments.map((segment: any) => segment.type)).toEqual(["thinking", "text"])
+        expect(reply.segments[0]).toMatchObject({ text: "Reading the request. Deciding what to do.", start: expect.any(Number), end: expect.any(Number) })
     })
 
     it("offers only the tools the user's roles allow, and refuses the rest", async () => {
@@ -63,11 +77,28 @@ describe("assistant", () => {
     it("reads through the REST API with an allow-list of fields", async () => {
         await editor.post("/api/notes", { title: "Existing", body: "secret body" })
         const result = await chat(editor, { conversationId, message: "list notes" })
-        expect(result.events).toContainEqual({ type: "tool", name: "list_notes" })
+        expect(result.events).toContainEqual({ type: "tool", name: "list_notes", status: "running" })
+        expect(result.events).toContainEqual({ type: "tool", name: "list_notes", status: "done" })
         const text = result.events.filter((event: any) => event.type === "text").map((event: any) => event.text).join("")
         expect(text).toContain("Existing")
         expect(text).not.toContain("secret body")
         expect(text).not.toContain("authorName")
+    })
+
+    it("draws charts from server-side data, never from the model", async () => {
+        const result = await chat(editor, { conversationId, message: "chart notes" })
+        const chart = result.events.find((event: any) => event.type === "chart")?.chart
+        expect(chart).toMatchObject({ type: "column", title: "Notes per month" })
+        expect(chart.categories).toHaveLength(6)
+        expect(chart.series[0].data.at(-1)).toBeGreaterThanOrEqual(1)
+        const text = result.events.filter((event: any) => event.type === "text").map((event: any) => event.text).join("")
+        expect(text).toContain("\"shown\":true")
+
+        const view = (await editor.get(`/api/assistant/conversations/${conversationId}`)).data
+        const reply = view.messages.at(-1)
+        // One reply for the whole turn (two model calls), in order.
+        expect(reply.segments.map((segment: any) => segment.type)).toEqual(["thinking", "tool", "chart", "thinking", "text"])
+        expect(view.messages.filter((message: any) => message.role === "assistant").length).toBe(3)
     })
 
     it("turns a write into a proposal the user settles through REST", async () => {
