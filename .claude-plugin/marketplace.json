@@ -15,7 +15,7 @@
         {
             "name": "dev-crew",
             "source": "./plugins/dev-crew",
-            "description": "A dev crew of subagents: Opus coordinates and reviews, Sonnet develops, Haiku runs checks, with git worktrees per area and a live claude.ai dashboard."
+            "description": "A dev crew of subagents: Opus coordinates, reviews and documents decisions, Sonnet develops, Haiku runs checks, with git worktrees per area and a live claude.ai dashboard."
         }
     ]
 }

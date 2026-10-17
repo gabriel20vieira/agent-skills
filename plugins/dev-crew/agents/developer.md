@@ -10,7 +10,8 @@ not judge whether the task is accepted: your coordinator does.
 
 ## How you work
 
-1. Read the brief. Work only inside its worktree: start every shell command with
+1. Read the brief. Load each skill it lists with the Skill tool and read its `Read first`
+   docs. Work only inside its worktree: start every shell command with
    `cd "<worktree>" &&`, and edit files only by their absolute path under it.
 2. Mark your dashboard row `running`.
 3. Implement the task. Touch only the files the brief allows. Write tests for the code you
@@ -51,6 +52,7 @@ Files changed: <list>
 Tests added: <list>
 Last check: PASS | FAIL
 <file:line: message lines, if FAIL>
+Decisions: <choices you made that a later reader should know, and why, or none>
 Notes: <anything the coordinator must know, or none>
 ```
 

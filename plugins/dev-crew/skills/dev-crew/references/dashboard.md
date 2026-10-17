@@ -47,7 +47,7 @@ refused, read the row again and redo the write.
 |---|---|---|
 | `config` | `limits` | `opus`, `sonnet`, `haiku`: max agents running at once (defaults 2, 4, 6). Edited on the page. |
 | `runs` | `<runId>` | `title`, `status` (`running`, `accepted`, `rejected`, `stopped`), `startedAt`, `endedAt`, `verdict` |
-| `runs/<runId>/agents` | `<agentId>` | `parentId`, `model` (`opus`, `sonnet`, `haiku`), `role` (`main`, `coordinator`, `developer`, `checker`), `area`, `task`, `status`, `loops`, `lastCheck: { ok, failures: [{ file, line, message }] }`, `verdict`, `summary`, `tokens`, `startedAt`, `updatedAt` |
+| `runs/<runId>/agents` | `<agentId>` | `parentId`, `model` (`opus`, `sonnet`, `haiku`), `role` (`main`, `scribe`, `coordinator`, `developer`, `checker`), `area`, `task`, `status`, `loops`, `lastCheck: { ok, failures: [{ file, line, message }] }`, `verdict`, `summary`, `tokens`, `startedAt`, `updatedAt` |
 
 Agent statuses: `queued`, `running`, `fixing`, `passed`, `failed`, `accepted`, `rejected`,
 `done`. Dates are ISO strings. An active row (`running` or `fixing`) whose `updatedAt` is older
@@ -71,7 +71,7 @@ ArtifactData list   collection "runs/<runId>/agents"
 
 Before launching an agent, read `config/limits` (missing means the defaults) and count the
 rows of the current run with that model and an active status that are not "no signal". The
-`main` row never counts: the main session is outside the limits. At the
+`main` and `scribe` rows never count: both are outside the limits. At the
 limit, wait for one of your own agents to finish. Two launchers can overshoot by one at the
 same moment; that is accepted.
 

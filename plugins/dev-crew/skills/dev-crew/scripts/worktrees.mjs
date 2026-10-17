@@ -7,8 +7,9 @@
 //
 // Runs in the repo of the current folder and prints JSON. Branches: crew/<runId>/<area> per
 // area and crew/<runId>/run for the merged result. Worktrees live next to the repo, in
-// <repo>-crew/<runId>/<area> and <repo>-crew/<runId>/run. Never pushes, never touches the
-// user's checkout, never deletes branches.
+// <repo>-crew/<runId>/<area> and <repo>-crew/<runId>/run. The run worktree exists from the
+// start so docs and decisions can be committed on the run branch while the areas work. Never
+// pushes, never touches the user's checkout, never deletes branches.
 import { execFileSync, execSync } from "node:child_process"
 import { existsSync, readdirSync, rmdirSync } from "node:fs"
 import { basename, dirname, join, resolve } from "node:path"
@@ -67,9 +68,13 @@ export function startRun({ repo, runId, areas, install }) {
     }
     const base = git(repo, "rev-parse", "HEAD")
     const runBranch = `crew/${runId}/${RUN}`
+    const runPath = join(crewRoot(repo), runId, RUN)
     const worktrees = []
+    let runOpen = false
     try {
         git(repo, "branch", runBranch, base)
+        git(repo, "worktree", "add", "-q", runPath, runBranch)
+        runOpen = true
         for (const area of areas) {
             const branch = `crew/${runId}/${area}`
             const path = join(crewRoot(repo), runId, area)
@@ -79,8 +84,8 @@ export function startRun({ repo, runId, areas, install }) {
         }
     } catch (error) {
         // Roll back so the same run id can be retried: nothing of this call survives.
-        for (const tree of worktrees) {
-            try { git(repo, "worktree", "remove", "--force", tree.path) } catch {}
+        for (const path of [...(runOpen ? [runPath] : []), ...worktrees.map((tree) => tree.path)]) {
+            try { git(repo, "worktree", "remove", "--force", path) } catch {}
         }
         for (const branch of [runBranch, ...worktrees.map((tree) => tree.branch)]) {
             try { git(repo, "branch", "-D", branch) } catch {}
@@ -88,7 +93,7 @@ export function startRun({ repo, runId, areas, install }) {
         removeEmptyFolders(repo, runId)
         throw withStderr(error)
     }
-    return { base, runBranch, worktrees }
+    return { base, runBranch, runPath, worktrees }
 }
 
 export function mergeRun({ repo, runId }) {

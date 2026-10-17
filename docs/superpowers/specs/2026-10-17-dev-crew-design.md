@@ -282,3 +282,24 @@ O `web-foundation` continua na raiz, sem alterações.
 - Layout e estilo da dashboard, desde que mostre o que está em 6.3.
 - O texto exato dos prompts dos agents e da skill, desde que siga os papéis em 3.
 - Como a página gera ids e formata datas.
+
+## 11. Adenda: contexto, skills e documentação (2026-10-17, pedido do utilizador)
+
+- **Contexto antes do plano.** A sessão principal lê primeiro o que o projeto já sabe:
+  `CLAUDE.md`, README, specs, planos e decisões em `docs/`. Specs e documentação são o input
+  mais importante. Depois escolhe, entre as skills e os plugins disponíveis na sessão, as que
+  importam para a tarefa (por exemplo, num projeto do template: `web-foundation` mais a
+  `web-*` da alteração). Cada brief leva `Skills:` e `Read first:`, e cada agente carrega
+  essas skills antes de trabalhar.
+- **Scribe (Opus).** Todas as decisões e toda a documentação são escritas por um novo agent,
+  `dev-crew:scribe` (Opus, effort `medium`), lançado pela sessão principal: depois do plano,
+  depois de cada relatório de coordenador e no fim. Escreve em `docs/` um ficheiro `.md` por
+  decisão (`docs/decisions/<data>-<slug>.md`), o registo da corrida (`docs/runs/<runId>.md`) e
+  o índice (`docs/README.md`), seguindo o layout do projeto quando já existe um. Se o projeto
+  não tiver `CLAUDE.md`, cria-o; se tiver, não o altera e reporta o que falta.
+- **Onde escreve.** O scribe faz commit no branch da corrida, na worktree da corrida, que agora
+  é criada logo no `start` (`runPath`). Assim, a documentação junta-se ao código no merge.
+  Nunca há dois scribes ao mesmo tempo, e o `merge` espera pelo scribe.
+- **Limites.** Tal como a sessão principal, o scribe não conta para os limites por modelo.
+- Os relatórios do coordenador e do developer passam a ter uma linha `Decisions:`, que a
+  sessão principal encaminha para o scribe.

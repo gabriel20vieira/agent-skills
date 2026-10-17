@@ -127,7 +127,7 @@ const STATE_COLOR = {
     queued: "--idle", running: "--accent", fixing: "--warn", passed: "--ok", accepted: "--ok",
     done: "--ok", failed: "--bad", rejected: "--bad", stopped: "--idle",
 }
-const ROLE_ORDER = { main: 0, coordinator: 1, developer: 2, checker: 3 }
+const ROLE_ORDER = { main: 0, scribe: 1, coordinator: 2, developer: 3, checker: 4 }
 const view = { db: null, runs: [], runId: null, agents: [], limits: normalizeLimits(null), stopAgents: null }
 
 function el(tag, attrs = {}, ...children) {

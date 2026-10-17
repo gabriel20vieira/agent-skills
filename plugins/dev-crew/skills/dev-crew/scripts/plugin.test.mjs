@@ -47,7 +47,7 @@ test("plugin manifest", () => {
 })
 
 test("agents pin model and effort", () => {
-    const expected = { coordinator: ["opus", "high"], developer: ["sonnet", "medium"], checker: ["haiku", "low"] }
+    const expected = { coordinator: ["opus", "high"], developer: ["sonnet", "medium"], checker: ["haiku", "low"], scribe: ["opus", "medium"] }
     for (const [name, [model, effort]] of Object.entries(expected)) {
         const fields = frontmatter(join(pluginRoot, "agents", `${name}.md`))
         assert.equal(fields.name, name)
@@ -85,5 +85,18 @@ test("skill references exist", () => {
 
 test("skill names every agent", () => {
     const text = readFileSync(join(skillDir, "SKILL.md"), "utf8")
-    for (const agent of ["dev-crew:coordinator", "dev-crew:developer", "dev-crew:checker"]) assert.ok(text.includes(agent), agent)
+    for (const agent of ["dev-crew:coordinator", "dev-crew:developer", "dev-crew:checker", "dev-crew:scribe"]) assert.ok(text.includes(agent), agent)
+})
+
+test("scribe writes docs but launches nobody", () => {
+    const fields = frontmatter(join(pluginRoot, "agents", "scribe.md"))
+    const tools = list(fields.tools)
+    for (const tool of ["Read", "Write", "Edit", "Bash"]) assert.ok(tools.includes(tool), tool)
+    assert.ok(!tools.includes("Agent"))
+})
+
+test("skill reads docs and picks skills before planning", () => {
+    const text = readFileSync(join(skillDir, "SKILL.md"), "utf8")
+    assert.ok(text.includes("references/docs.md"))
+    assert.ok(text.indexOf("**Context.**") < text.indexOf("**Plan.**"), "Context step comes before Plan")
 })

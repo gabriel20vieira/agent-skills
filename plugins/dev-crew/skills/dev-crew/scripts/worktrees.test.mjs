@@ -188,3 +188,18 @@ test("cli rejects --install without a command", () => {
     }
     assert.deepEqual(branches(repo), ["main"])
 })
+
+test("startRun opens the run worktree so docs can be committed during the run", () => {
+    const repo = makeRepo()
+    const run = startRun({ repo, runId: "r1", areas: ["api"] })
+    assert.equal(run.runPath, join(crewRoot(repo), "r1", "run"))
+    assert.equal(git(run.runPath, "branch", "--show-current"), "crew/r1/run")
+    mkdirSync(join(run.runPath, "docs"), { recursive: true })
+    commitIn(run.runPath, join("docs", "decision.md"), "# Decision\n")
+    commitIn(run.worktrees[0].path, "api.txt", "api\n")
+    const result = mergeRun({ repo, runId: "r1" })
+    assert.equal(result.path, run.runPath)
+    assert.deepEqual(result.merged, ["api"])
+    assert.ok(existsSync(join(run.runPath, "docs", "decision.md")))
+    assert.ok(existsSync(join(run.runPath, "api.txt")))
+})

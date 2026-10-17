@@ -13,6 +13,8 @@ Files you may touch: <list>
 Files you must not touch: all others
 Done when: <verifiable criteria>
 Check: <exact commands>
+Skills: <skills to load with the Skill tool first, or none>
+Read first: <doc paths, or none>
 Return: <shape of the final report>
 Dashboard: <url>, run <runId>, your agent id <agentId>, parent <parentId>
 ```
@@ -32,6 +34,7 @@ The launcher picks the id and creates the row as `queued` before launching.
 | checker of a developer | `checker-<area>-<n>-<k>` | `checker-api-2-1` |
 | checker of a coordinator | `checker-<area>-0-<k>` | `checker-api-0-1` |
 | checker of the main session | `checker-main-<k>` | `checker-main-1` |
+| scribe | `scribe-<k>` | `scribe-1` |
 
 ## Examples
 
@@ -48,7 +51,9 @@ Files you may touch: server/api/notes/**, server/services/notes.ts, tests/api/no
 Files you must not touch: all others
 Done when: both tasks committed on the area branch, check passes
 Check: npm run check && npm run test:api
-Return: Area, Branch, Tasks (accepted <commit> | unresolved <why>), Files touched, Risks
+Skills: web-foundation, web-crud-resource
+Read first: CLAUDE.md, docs/superpowers/specs/2026-09-19-website-foundation-design.md
+Return: Area, Branch, Tasks (accepted <commit> | unresolved <why>), Files touched, Decisions, Risks
 Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id coordinator-api, parent main
 ```
 
@@ -61,7 +66,9 @@ Files you may touch: server/api/notes/export.get.ts, server/services/notes.ts
 Files you must not touch: all others
 Done when: route returns text/csv with a header row; 403 without notes.read
 Check: npm run check
-Return: files changed, tests added, last check result (PASS/FAIL + failures)
+Skills: web-crud-resource
+Read first: CLAUDE.md
+Return: files changed, tests added, last check result (PASS/FAIL + failures), decisions made
 Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id developer-api-1, parent coordinator-api
 ```
 
@@ -73,4 +80,17 @@ Worktree: D:/work/notes-app-crew/20261017-1405-notes-export/api
 Check: npm run check
 Return: PASS, or FAIL with file:line: message lines
 Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id checker-api-1-1, parent developer-api-1
+```
+
+Main session to a scribe:
+
+```
+Task: Record the plan of run 20261017-1405-notes-export
+Worktree: D:/work/notes-app-crew/20261017-1405-notes-export/run
+Record: goal, areas api and ui, skills (web-foundation, web-crud-resource), docs read;
+  decisions: CSV built server-side, not in the browser (keeps permission checks in one place)
+CLAUDE.md: missing
+Read first: references/docs.md of the dev-crew skill (layout), docs/
+Return: files written, commit, CLAUDE.md status
+Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id scribe-1, parent main
 ```

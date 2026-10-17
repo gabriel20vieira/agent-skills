@@ -5,7 +5,7 @@ A Claude Code plugin marketplace with two plugins, installed separately:
 | Plugin | What it is |
 |---|---|
 | `web-foundation` | Build websites quickly on one consistent Nuxt 4 base (this page) |
-| `dev-crew` | A crew of subagents (Opus coordinates, Sonnet develops, Haiku checks) with a live dashboard; see `plugins/dev-crew/README.md` |
+| `dev-crew` | A crew of subagents (Opus coordinates and documents, Sonnet develops, Haiku checks) with a live dashboard; see `plugins/dev-crew/README.md` |
 
 ```bash
 claude plugin marketplace add <path-or-git-url-of-this-repo>

@@ -64,3 +64,8 @@ test("countRunning leaves the main session out of the limits", () => {
     ]
     assert.deepEqual(countRunning(agents, now), { opus: 1, sonnet: 0, haiku: 0 })
 })
+
+test("countRunning leaves the scribe out of the limits", () => {
+    const agents = [{ role: "scribe", model: "opus", status: "running", updatedAt: ago(1000) }]
+    assert.deepEqual(countRunning(agents, now), { opus: 0, sonnet: 0, haiku: 0 })
+})

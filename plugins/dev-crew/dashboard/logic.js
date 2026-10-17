@@ -23,11 +23,11 @@ export function isStale(agent, now) {
     return Number.isNaN(updated) || now - updated > STALE_MS
 }
 
-/** Active agents per model; the main session is outside the limits. */
+/** Active agents per model; the main session and the scribe are outside the limits. */
 export function countRunning(agents, now) {
     const counts = { opus: 0, sonnet: 0, haiku: 0 }
     for (const agent of agents) {
-        if (agent.role === "main") continue
+        if (agent.role === "main" || agent.role === "scribe") continue
         if (ACTIVE.includes(agent.status) && !isStale(agent, now) && agent.model in counts) counts[agent.model]++
     }
     return counts

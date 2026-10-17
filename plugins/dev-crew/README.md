@@ -1,16 +1,19 @@
 # dev-crew
 
-A crew of Claude Code subagents that develops, monitors and verifies a coding task, each model
-doing what it is good at:
+A crew of Claude Code subagents that develops, monitors, verifies and documents a coding task,
+each model doing what it is good at:
 
 | Level | Agent | Model | Job |
 |---|---|---|---|
-| 0 | main session (the `dev-crew` skill) | Opus | plan, split into areas, merge, final check and review |
+| 0 | main session (the `dev-crew` skill) | Opus | read docs, pick skills, plan, split into areas, merge, final check and review |
+| 1 | `dev-crew:scribe` | Opus | writes every decision and the run log to `docs/*.md`; creates `CLAUDE.md` if missing |
 | 1 | `dev-crew:coordinator` | Opus | briefs, reviews each task, commits on the area branch |
 | 2 | `dev-crew:developer` | Sonnet | code and tests, fixes until the check passes |
 | 3 | `dev-crew:checker` | Haiku | runs checks or locates code, reports facts only |
 
-Each area works in its own git worktree and branch (`crew/<runId>/<area>`). At the end, the
+Before planning, the main session reads `CLAUDE.md`, the README and the project's specs and
+decisions, and picks the installed skills that matter; every brief names the skills and docs
+its agent must load. Each area works in its own git worktree and branch (`crew/<runId>/<area>`). At the end, the
 main session merges them into `crew/<runId>/run`, runs the full check and reviews the diff.
 A live claude.ai page shows agents running per model against editable limits, and the crew
 tree with each agent's status and checks.
@@ -43,9 +46,9 @@ tests"); the `dev-crew` skill loads by itself.
 
 ## Layout
 
-- `skills/dev-crew/`: the skill, its references (`brief.md`, `dashboard.md`) and
-  `scripts/worktrees.mjs` (start, merge and clean up a run's worktrees).
-- `agents/`: the three crew agents, with the model and effort pinned in the frontmatter.
+- `skills/dev-crew/`: the skill, its references (`brief.md`, `dashboard.md`,
+  `docs.md`) and `scripts/worktrees.mjs` (start, merge and clean up a run's worktrees).
+- `agents/`: the four crew agents, with the model and effort pinned in the frontmatter.
 - `dashboard/`: the page (`index.html`) and its pure logic (`logic.js`).
 
 Tests: `node --test plugins/dev-crew/skills/*/scripts/*.test.mjs plugins/dev-crew/dashboard/*.test.mjs`.
