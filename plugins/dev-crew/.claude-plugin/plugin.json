@@ -1,0 +1,7 @@
+{
+    "name": "dev-crew",
+    "version": "0.1.0",
+    "description": "A dev crew of subagents: Opus coordinates and reviews, Sonnet develops, Haiku runs checks, with git worktrees per area and a live claude.ai dashboard.",
+    "author": { "name": "Gabriel Vieira", "email": "gabriel20vieira@hotmail.com" },
+    "keywords": ["subagents", "orchestration", "worktrees", "dashboard"]
+}
