@@ -36,9 +36,19 @@ accepts, and the server verifies the result.
 
 5. `app/utils/navigation.ts`, main group:
    `{ to: "/assistente", labelKey: "nav.assistant", icon: BotIcon, permission: ["assistant", "read"] }`.
-6. `app/pages/admin/definicoes.vue`: a tab
-   `<TabsTrigger value="assistant">{{ t("settings.tabs.assistant") }}</TabsTrigger>` and
-   `<TabsContent value="assistant"><AssistantSettings /></TabsContent>`.
+6. `app/pages/admin/definicoes.vue`: a tab (written as the linter wants it):
+
+   ```vue
+   <TabsTrigger value="assistant">
+       {{ t("settings.tabs.assistant") }}
+   </TabsTrigger>
+   ```
+
+   ```vue
+   <TabsContent value="assistant">
+       <AssistantSettings />
+   </TabsContent>
+   ```
 7. Migration: `npm run db:generate -- --name assistant`, read the SQL, `npm run db:migrate`.
 8. `.env.example` (and the deployment's secrets): `ANTHROPIC_API_KEY=` with an empty value,
    when the project will use Anthropic. With Docker Compose, pass it to the `app` service.
