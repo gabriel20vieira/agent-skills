@@ -3,7 +3,7 @@
 //
 //   node worktrees.mjs start <runId> <area...> [--install "<cmd>"]
 //   node worktrees.mjs merge <runId>
-//   node worktrees.mjs cleanup <runId>
+//   node worktrees.mjs cleanup <runId> [--keep-branches]
 //   node worktrees.mjs finish <runId>
 //
 // Runs in the repo of the current folder and prints JSON. Branches: crew/<runId>/<area> per
@@ -134,7 +134,7 @@ export function mergeRun({ repo, runId }) {
     return { path, merged, conflicts }
 }
 
-export function cleanupRun({ repo, runId }) {
+export function cleanupRun({ repo, runId, keepBranches = false }) {
     checkId(runId)
     const folder = join(crewRoot(repo), runId)
     const paths = [join(folder, RUN)]
@@ -153,7 +153,7 @@ export function cleanupRun({ repo, runId }) {
     const runBranch = `crew/${runId}/${RUN}`
     const hasRun = git(repo, "for-each-ref", `refs/heads/${runBranch}`) !== ""
     for (const branch of areaBranches(repo, runId)) {
-        if (!hasRun || !isAncestor(repo, branch, runBranch)) {
+        if (keepBranches || !hasRun || !isAncestor(repo, branch, runBranch)) {
             kept.push(branch)
             continue
         }
@@ -185,7 +185,7 @@ export function finishRun({ repo, runId }) {
 
 function main(argv) {
     const [command, runId, ...rest] = argv
-    const usage = "Usage: worktrees.mjs start <runId> <area...> [--install \"<cmd>\"] | merge <runId> | cleanup <runId> | finish <runId>"
+    const usage = "Usage: worktrees.mjs start <runId> <area...> [--install \"<cmd>\"] | merge <runId> | cleanup <runId> [--keep-branches] | finish <runId>"
     const repo = resolve(git(process.cwd(), "rev-parse", "--show-toplevel"))
     if (command === "start") {
         const at = rest.indexOf("--install")
@@ -195,7 +195,7 @@ function main(argv) {
         return startRun({ repo, runId, areas, install })
     }
     if (command === "merge") return mergeRun({ repo, runId })
-    if (command === "cleanup") return cleanupRun({ repo, runId })
+    if (command === "cleanup") return cleanupRun({ repo, runId, keepBranches: rest.includes("--keep-branches") })
     if (command === "finish") return finishRun({ repo, runId })
     throw new Error(usage)
 }

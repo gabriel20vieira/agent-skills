@@ -304,16 +304,25 @@ O `web-foundation` continua na raiz, sem alterações.
 - Os relatórios do coordenador e do developer passam a ter uma linha `Decisions:`, que a
   sessão principal encaminha para o scribe.
 
-## 12. Adenda: limpeza de branches e worktrees (2026-10-17, pedido do utilizador)
+## 12. Adenda: limpeza de branches e worktrees e definições do projeto (2026-10-17, pedido do utilizador)
 
-- **Apagar sempre o que sobra.** Nenhum branch ou worktree extra fica para trás depois de o
-  trabalho estar integrado.
-- `worktrees.mjs cleanup <runId>` remove as worktrees e apaga cada branch de área que já está
-  no branch da corrida. Os que não estão (conflitos por resolver) ficam em `kept`.
-- `worktrees.mjs finish <runId>` (novo passo 15) corre depois de o utilizador fazer merge do
-  branch da corrida, a partir do branch onde entrou. Apaga `crew/<runId>/run` localmente e no
-  `origin`, e recusa se o branch não estiver integrado.
-- A mesma regra vale para outros branches e worktrees da tarefa: depois de um PR entrar, o
-  branch é apagado localmente e no remoto.
-- Nunca se apaga trabalho por integrar: nem um branch com commits fora do destino, nem uma
-  worktree com ficheiros por guardar.
+- **Definições do projeto.** Cada projeto tem `docs/settings.md`: uma tabela com Setting, Value,
+  Options e What it decides, com as preferências de trabalho (não a configuração da app). Um
+  valor vazio quer dizer que ainda ninguém decidiu: o agente pergunta uma vez, com as opções, e
+  escreve a resposta na tabela. `ask` quer dizer perguntar sempre. Qualquer outro valor é
+  seguido sem perguntar. O template traz o ficheiro com `git.deleteMergedBranches`,
+  `git.mergeMethod`, `git.pushAndPr` e `docs.language`, todos vazios.
+- **A crew lê as definições no passo 2.** Pergunta numa só pergunta as que vai usar e estão
+  vazias (`git.deleteMergedBranches`, `docs.language`). O primeiro scribe escreve as
+  respostas, e os documentos são escritos na língua de `docs.language`.
+- **Worktrees da crew:** são sempre removidas no fim.
+- **Branches integrados:** seguem `git.deleteMergedBranches`.
+  - `worktrees.mjs cleanup <runId>` apaga os branches de área que já estão no branch da corrida.
+  - Com `no`, usa-se `cleanup <runId> --keep-branches`.
+  - Os branches com conflitos por resolver ficam em `kept`.
+- **Passo 15:** `worktrees.mjs finish <runId>` corre depois do merge, quando a definição é `yes`.
+  - Corre a partir do branch onde o branch da corrida entrou.
+  - Apaga `crew/<runId>/run` localmente e no `origin`.
+  - Recusa se o branch ainda não estiver integrado.
+- **Trabalho por integrar:** nunca se apaga. Isto inclui branches com commits que não estão no
+  destino e worktrees com ficheiros por guardar.

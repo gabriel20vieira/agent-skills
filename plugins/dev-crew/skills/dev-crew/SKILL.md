@@ -41,6 +41,9 @@ file under `docs/decisions/` yourself).
    decisions under `docs/` (`references/docs.md`). Specs and docs come first: they say what
    was already decided. Then choose the skills from this session's skills and plugins that
    matter for the task, and the docs each area must read. Note whether `CLAUDE.md` is missing.
+   Read `docs/settings.md` (project settings, `references/docs.md`). For each setting the
+   run will use (`git.deleteMergedBranches`, `docs.language`) that is empty or missing, ask
+   the user now, in one question, and have the first scribe write the answers there.
 3. **Plan.** Write a short plan if there is none: areas and their tasks, the skills and docs
    chosen, and the decisions it makes. Two areas never touch the same files. Each area lists
    the files it may touch and its check commands (from the project: `package.json` scripts,
@@ -80,25 +83,28 @@ file under `docs/decisions/` yourself).
 12. **Record the outcome.** Launch a last scribe with the checks, the verdict and the open
     items, and wait for it. Then set your own row to `done`.
 13. **Clean up.** `node "$CREW" cleanup <runId>` removes the worktrees and deletes every
-    area branch already in the run branch. It lists `kept` area branches (conflicts not yet
-    merged): resolve them or ask the user, then run cleanup again. Only `crew/<runId>/run`
-    remains.
+    area branch already in the run branch. With `git.deleteMergedBranches` set to `no`, run
+    `cleanup <runId> --keep-branches` instead (with `ask`, ask first). It lists `kept`
+    area branches (conflicts not yet merged): resolve them or ask the user, then run cleanup
+    again.
 14. **Report** to the user: the run branch `crew/<runId>/run`, the base commit, what each
     area did, the check result, your verdict, the docs written (and `CLAUDE.md` if created),
     and anything unresolved. Propose the next step (review the branch, merge it, open a PR).
     Do not do it.
-15. **Finish.** As soon as the user has merged the run branch (locally or through a PR), from
-    the branch it went into: `node "$CREW" finish <runId>`. It deletes `crew/<runId>/run`
-    locally and on `origin`, and refuses if it is not merged. Leave no crew branch or
-    worktree behind.
+15. **Finish.** Once the user has merged the run branch (locally or through a PR), follow
+    `git.deleteMergedBranches`: with `yes`, from the branch it went into, run
+    `node "$CREW" finish <runId>`. It deletes `crew/<runId>/run` locally and on `origin`,
+    and refuses if it is not merged. With `ask` (or still empty), ask the user first. With
+    `no`, keep it.
 
 ## Rules
 
 - Never push code, open a PR, merge into the user's branch or rebase. The user does that.
-- Always delete extra branches and worktrees once their work is merged: area branches in
-  step 13, the run branch in step 15 (local and remote). The same goes for any other merged
-  feature branch or worktree of the task, including after a PR is merged. Never delete a
-  branch whose commits are not merged, or a worktree with uncommitted files.
+- Crew worktrees are always removed at the end. Deleting merged branches (area branches in
+  step 13, the run branch in step 15, any other merged branch of the task) follows
+  `git.deleteMergedBranches` in `docs/settings.md`; when it is empty, ask once and record
+  the answer. Never delete a branch whose commits are not merged, or a worktree with
+  uncommitted files.
 - Every real decision ends up in a file under `docs/`, written by a scribe. Nothing important
   lives only in the conversation.
 - A rejected run is never reverted automatically. Say what failed and what you propose.
