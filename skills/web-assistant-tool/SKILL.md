@@ -1,13 +1,13 @@
 ---
 name: web-assistant-tool
-description: Use when the assistant module of a web-foundation Nuxt project needs a new capability - a read tool that looks up data or a propose_* tool that suggests a create/update/delete for the user to accept.
+description: Use when the assistant module of a web-foundation Nuxt project needs a new capability - a read tool that looks up data, a chart tool that draws a chart from server-side numbers, or a propose_* tool that suggests a create/update/delete for the user to accept.
 ---
 
 # Add an assistant tool
 
 Tools live in `server/assistant/tools/<resource>.ts` and are listed in
-`server/assistant/registry.ts`. `server/assistant/tools/notes.ts` is the model for both
-kinds. The resource's REST API must exist first (`web-crud-resource`): tools never touch
+`server/assistant/registry.ts`. `server/assistant/tools/notes.ts` is the model for the
+three kinds. The resource's REST API must exist first (`web-crud-resource`): tools never touch
 the database.
 
 ## Read tool
@@ -31,6 +31,32 @@ export const listProducts = defineAssistantTool({
 - Return only the fields the answer needs (`pickFields`), and cap list sizes: every
   token goes to the model.
 - `description` says *when* to use it. `.describe()` each parameter.
+
+## Chart tool
+
+```ts
+export const chartSalesByMonth = defineAssistantTool({
+    kind: "chart",
+    name: "chart_sales_by_month",
+    description: "Show a chart of sales per month. Use it when the user asks for a chart or trend of sales.",
+    parameters: z.object({
+        months: z.number().int().min(1).max(24).default(12),
+        type: z.enum(["column", "line", "area", "table"]).default("line"),
+    }),
+    permission: ["sales", "read"],
+    async run(ctx, args) {
+        const rows = await ctx.api<{ month: string, total: number }[]>("/api/sales/monthly", { query: { months: args.months } })
+        return { type: args.type, title: "Sales per month", unit: "€", categories: rows.map(row => row.month), series: [{ name: "Sales", data: rows.map(row => row.total) }] }
+    },
+})
+```
+
+- The server computes every number through `ctx.api`; the model never supplies data for a
+  chart. It only learns that a chart was shown and its size.
+- Types: `column`, `bar`, `line`, `area`, `stacked`, `donut`, `radar`, `table`. Several
+  series give grouped or stacked charts; `donut` uses the first series.
+- The loop cleans the result with `normalizeChart` (at most 60 categories and 10 series, one
+  finite number per category).
 
 ## Propose tool (writes)
 
@@ -66,10 +92,12 @@ export const proposeProductPrice = defineAssistantTool({
 
 ## Register and test
 
-1. Add the tool to `ASSISTANT_TOOLS` in `server/assistant/registry.ts`.
+1. Add the tool to `ASSISTANT_TOOLS` in `server/assistant/registry.ts`, and its step label to
+   `assistant.tools.<name>` in `i18n/locales/pt-PT.json` and `en-US.json` (shown in the
+   reasoning block; the tool name is the fallback).
 2. In `test/api/assistant.test.ts`, extend the fake provider trigger (in
    `server/assistant/providers/fake.ts`, e.g. `"propose price: <id> <price>"`) and assert:
-   the tool is offered only to roles with the permission, a propose creates a pending card
-   and writes nothing, claim + REST + settle ends in `done`, and a settle the database
+   the tool is offered only to roles with the permission, a chart tool emits a `chart` event
+   with the expected numbers, a propose creates a pending card and writes nothing, claim + REST + settle ends in `done`, and a settle the database
    does not confirm ends in `failed`.
 3. `npm run check && npm run test:api`.

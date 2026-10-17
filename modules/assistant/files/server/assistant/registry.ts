@@ -1,8 +1,8 @@
 import type { AssistantTool } from "./defineTool"
-import { listNotes, proposeNote } from "./tools/notes"
+import { chartNotesByMonth, listNotes, proposeNote } from "./tools/notes"
 
 /** Every tool the assistant may use. Add new ones here (web-assistant-tool skill). */
-export const ASSISTANT_TOOLS: AssistantTool[] = [listNotes, proposeNote]
+export const ASSISTANT_TOOLS: AssistantTool[] = [listNotes, chartNotesByMonth, proposeNote]
 
 /** The tools this user may use right now (filtered by the permission matrix). */
 export function toolsFor(user: AuthUser): Map<string, AssistantTool> {

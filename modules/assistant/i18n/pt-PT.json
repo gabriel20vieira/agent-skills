@@ -1,24 +1,37 @@
 {
-    "nav": { "assistant": "Assistente" },
+    "nav": {
+        "assistant": "Assistente"
+    },
     "assistant": {
         "title": "Assistente",
         "description": "Pergunta sobre os dados da aplicação. As alterações só acontecem quando aceitas.",
         "conversations": "Conversas",
         "new": "Nova conversa",
-        "hint": "Escreve uma pergunta. O assistente pode consultar dados e propor alterações, que aparecem como cartões para aceitares ou recusares.",
+        "hint": "Pergunta sobre os dados da aplicação. O assistente pode consultar dados, desenhar gráficos e propor alterações, que aparecem como cartões para aceitares ou recusares.",
         "placeholder": "Escreve uma mensagem…",
         "send": "Enviar",
         "stop": "Parar",
-        "usingTool": "A consultar: {tool}…",
-        "disabled": { "title": "Assistente desligado", "body": "Um administrador pode ligá-lo nas definições." },
-        "delete": { "title": "Apagar conversa?", "body": "A conversa e as suas propostas vão ser apagadas." },
+        "disabled": {
+            "title": "Assistente desligado",
+            "body": "Um administrador pode ligá-lo nas definições."
+        },
+        "delete": {
+            "title": "Apagar conversa?",
+            "body": "A conversa e as suas propostas vão ser apagadas."
+        },
         "proposal": {
             "label": "Proposta do assistente",
             "accept": "Aceitar",
             "reject": "Recusar",
             "done": "Alteração feita.",
             "failed": "A alteração não foi feita.",
-            "states": { "pending": "Pendente", "claimed": "A aplicar…", "done": "Feito", "rejected": "Recusada", "failed": "Falhou" }
+            "states": {
+                "pending": "Pendente",
+                "claimed": "A aplicar…",
+                "done": "Feito",
+                "rejected": "Recusada",
+                "failed": "Falhou"
+            }
         },
         "settings": {
             "title": "Assistente",
@@ -29,10 +42,40 @@
             "baseUrl": "Endereço do Ollama",
             "model": "Modelo",
             "systemPrompt": "Instruções adicionais",
-            "systemPromptHint": "Juntadas às instruções base: tom, contexto do negócio, o que evitar."
+            "systemPromptHint": "Juntadas às instruções base: tom, contexto do negócio, o que evitar.",
+            "anthropic": "Anthropic (Claude)",
+            "anthropicModel": "Modelo Anthropic",
+            "anthropicHint": "A chave fica na variável de ambiente ANTHROPIC_API_KEY do servidor, nunca aqui.",
+            "ollamaModel": "Modelo Ollama"
+        },
+        "welcome": "Como posso ajudar?",
+        "noConversations": "Ainda não há conversas.",
+        "suggestions": {
+            "list": "Que notas existem?",
+            "chart": "Mostra um gráfico das notas por mês",
+            "propose": "Cria uma nota chamada Reunião de equipa",
+            "help": "O que consegues fazer?"
+        },
+        "thinking": {
+            "now": "A pensar",
+            "done": "Pensou durante {s} s",
+            "steps": "{n} passos"
+        },
+        "tools": {
+            "list_notes": "Consultou as notas",
+            "chart_notes_by_month": "Desenhou um gráfico das notas",
+            "propose_note": "Preparou uma proposta de nota"
+        },
+        "chart": {
+            "empty": "Sem dados para mostrar.",
+            "total": "Total"
         }
     },
-    "settings": { "tabs": { "assistant": "Assistente" } },
+    "settings": {
+        "tabs": {
+            "assistant": "Assistente"
+        }
+    },
     "errors": {
         "assistant": {
             "disabled": "O assistente está desligado.",
@@ -42,7 +85,11 @@
             "provider_error": "O modelo de linguagem não respondeu.",
             "timeout": "O assistente demorou demasiado. Tenta de novo.",
             "too_many_steps": "O assistente precisou de demasiados passos. Reformula o pedido.",
-            "failed": "O assistente falhou. Tenta de novo."
+            "failed": "O assistente falhou. Tenta de novo.",
+            "refused": "O modelo recusou responder a este pedido.",
+            "cut_off": "A resposta do modelo ficou cortada. Tenta de novo.",
+            "not_configured": "O fornecedor do assistente não está configurado (chave em falta ou inválida).",
+            "busy": "O fornecedor do assistente está ocupado. Tenta daqui a pouco."
         }
     }
 }

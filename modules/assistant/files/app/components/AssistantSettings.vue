@@ -7,9 +7,10 @@ const notify = useNotify()
 
 type Values = {
     "assistant.enabled": boolean
-    "assistant.provider": "ollama" | "fake"
+    "assistant.provider": "ollama" | "anthropic" | "fake"
     "assistant.baseUrl": string
     "assistant.model": string
+    "assistant.anthropicModel": string
     "assistant.systemPrompt": string
 }
 
@@ -59,6 +60,9 @@ async function save<K extends keyof Values>(key: K) {
                             <SelectItem value="ollama">
                                 Ollama
                             </SelectItem>
+                            <SelectItem value="anthropic">
+                                {{ t("assistant.settings.anthropic") }}
+                            </SelectItem>
                             <SelectItem value="fake">
                                 {{ t("assistant.settings.fake") }}
                             </SelectItem>
@@ -69,7 +73,25 @@ async function save<K extends keyof Values>(key: K) {
                     </Button>
                 </div>
             </FormField>
+            <template v-if="draft['assistant.provider'] === 'anthropic'">
+                <FormField
+                    for="assistant-anthropic-model"
+                    :label="t('assistant.settings.anthropicModel')"
+                    :hint="t('assistant.settings.anthropicHint')"
+                >
+                    <div class="flex gap-2">
+                        <Input
+                            id="assistant-anthropic-model"
+                            v-model="draft['assistant.anthropicModel']"
+                        />
+                        <Button @click="save('assistant.anthropicModel')">
+                            {{ t("common.save") }}
+                        </Button>
+                    </div>
+                </FormField>
+            </template>
             <FormField
+                v-if="draft['assistant.provider'] !== 'anthropic'"
                 for="assistant-base-url"
                 :label="t('assistant.settings.baseUrl')"
             >
@@ -84,8 +106,9 @@ async function save<K extends keyof Values>(key: K) {
                 </div>
             </FormField>
             <FormField
+                v-if="draft['assistant.provider'] !== 'anthropic'"
                 for="assistant-model"
-                :label="t('assistant.settings.model')"
+                :label="t('assistant.settings.ollamaModel')"
             >
                 <div class="flex gap-2">
                     <Input
