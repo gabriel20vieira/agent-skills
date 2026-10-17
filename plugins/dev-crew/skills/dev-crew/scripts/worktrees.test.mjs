@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { after, test } from "node:test"
-import { cleanupRun, crewRoot, mergeRun, startRun } from "./worktrees.mjs"
+import { cleanupRun, crewRoot, finishRun, mergeRun, startRun } from "./worktrees.mjs"
 
 const cli = join(import.meta.dirname, "worktrees.mjs")
 
@@ -113,16 +113,56 @@ test("mergeRun reports conflicts and keeps the rest", () => {
     assert.equal(git(result.path, "status", "--porcelain"), "")
 })
 
-test("cleanupRun removes worktrees and keeps branches", () => {
+test("cleanupRun removes worktrees and the area branches merged into the run", () => {
     const repo = makeRepo()
     const run = startRun({ repo, runId: "r1", areas: ["api", "ui"] })
+    commitIn(run.worktrees[0].path, "api.txt", "api\n")
     const merged = mergeRun({ repo, runId: "r1" })
     const result = cleanupRun({ repo, runId: "r1" })
     assert.equal(result.removed.length, 3)
     for (const tree of run.worktrees) assert.ok(!existsSync(tree.path))
     assert.ok(!existsSync(merged.path))
     assert.ok(!existsSync(crewRoot(repo)))
-    assert.deepEqual(branches(repo), ["crew/r1/api", "crew/r1/run", "crew/r1/ui", "main"])
+    assert.deepEqual(result.deleted, ["crew/r1/api", "crew/r1/ui"])
+    assert.deepEqual(result.kept, [])
+    assert.deepEqual(branches(repo), ["crew/r1/run", "main"])
+})
+
+test("cleanupRun keeps an area branch that is not in the run yet", () => {
+    const repo = makeRepo()
+    const run = startRun({ repo, runId: "r1", areas: ["api", "ui"] })
+    commitIn(run.worktrees[0].path, "shared.txt", "api\n")
+    commitIn(run.worktrees[1].path, "shared.txt", "ui\n")
+    const merged = mergeRun({ repo, runId: "r1" })
+    assert.deepEqual(merged.conflicts, ["ui"])
+    const result = cleanupRun({ repo, runId: "r1" })
+    assert.deepEqual(result.deleted, ["crew/r1/api"])
+    assert.deepEqual(result.kept, ["crew/r1/ui"])
+    assert.deepEqual(branches(repo), ["crew/r1/run", "crew/r1/ui", "main"])
+})
+
+test("finishRun deletes the run branch locally and on origin once it is merged", () => {
+    const repo = makeRepo()
+    const remote = join(repo, "..", "remote.git")
+    git(repo, "init", "-q", "--bare", remote)
+    git(repo, "remote", "add", "origin", remote)
+    const run = startRun({ repo, runId: "r1", areas: ["api"] })
+    commitIn(run.worktrees[0].path, "api.txt", "api\n")
+    mergeRun({ repo, runId: "r1" })
+    cleanupRun({ repo, runId: "r1" })
+    git(repo, "push", "-q", "origin", "crew/r1/run")
+    assert.throws(() => finishRun({ repo, runId: "r1" }), /not merged into main/)
+    git(repo, "merge", "-q", "--no-ff", "-m", "merge run", "crew/r1/run")
+    const result = finishRun({ repo, runId: "r1" })
+    assert.deepEqual(result, { deleted: ["crew/r1/run"], remote: ["crew/r1/run"] })
+    assert.deepEqual(branches(repo), ["main"])
+    assert.equal(git(repo, "ls-remote", "--heads", "origin", "crew/r1/*"), "")
+})
+
+test("finishRun refuses while worktrees or area branches remain", () => {
+    const repo = makeRepo()
+    startRun({ repo, runId: "r1", areas: ["api"] })
+    assert.throws(() => finishRun({ repo, runId: "r1" }), /cleanup r1 first/)
 })
 
 test("startRun rolls back when install fails and reports its stderr", () => {

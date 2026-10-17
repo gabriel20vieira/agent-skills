@@ -303,3 +303,17 @@ O `web-foundation` continua na raiz, sem alterações.
 - **Limites.** Tal como a sessão principal, o scribe não conta para os limites por modelo.
 - Os relatórios do coordenador e do developer passam a ter uma linha `Decisions:`, que a
   sessão principal encaminha para o scribe.
+
+## 12. Adenda: limpeza de branches e worktrees (2026-10-17, pedido do utilizador)
+
+- **Apagar sempre o que sobra.** Nenhum branch ou worktree extra fica para trás depois de o
+  trabalho estar integrado.
+- `worktrees.mjs cleanup <runId>` remove as worktrees e apaga cada branch de área que já está
+  no branch da corrida. Os que não estão (conflitos por resolver) ficam em `kept`.
+- `worktrees.mjs finish <runId>` (novo passo 15) corre depois de o utilizador fazer merge do
+  branch da corrida, a partir do branch onde entrou. Apaga `crew/<runId>/run` localmente e no
+  `origin`, e recusa se o branch não estiver integrado.
+- A mesma regra vale para outros branches e worktrees da tarefa: depois de um PR entrar, o
+  branch é apagado localmente e no remoto.
+- Nunca se apaga trabalho por integrar: nem um branch com commits fora do destino, nem uma
+  worktree com ficheiros por guardar.

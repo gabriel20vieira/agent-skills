@@ -79,16 +79,26 @@ file under `docs/decisions/` yourself).
     `verdict`.
 12. **Record the outcome.** Launch a last scribe with the checks, the verdict and the open
     items, and wait for it. Then set your own row to `done`.
-13. **Clean up.** `node "$CREW" cleanup <runId>` removes the worktrees and keeps the branches.
+13. **Clean up.** `node "$CREW" cleanup <runId>` removes the worktrees and deletes every
+    area branch already in the run branch. It lists `kept` area branches (conflicts not yet
+    merged): resolve them or ask the user, then run cleanup again. Only `crew/<runId>/run`
+    remains.
 14. **Report** to the user: the run branch `crew/<runId>/run`, the base commit, what each
     area did, the check result, your verdict, the docs written (and `CLAUDE.md` if created),
     and anything unresolved. Propose the next step (review the branch, merge it, open a PR).
     Do not do it.
+15. **Finish.** As soon as the user has merged the run branch (locally or through a PR), from
+    the branch it went into: `node "$CREW" finish <runId>`. It deletes `crew/<runId>/run`
+    locally and on `origin`, and refuses if it is not merged. Leave no crew branch or
+    worktree behind.
 
 ## Rules
 
-- Never push, open a PR, merge into the user's branch, rebase, or delete branches. The user
-  does that.
+- Never push code, open a PR, merge into the user's branch or rebase. The user does that.
+- Always delete extra branches and worktrees once their work is merged: area branches in
+  step 13, the run branch in step 15 (local and remote). The same goes for any other merged
+  feature branch or worktree of the task, including after a PR is merged. Never delete a
+  branch whose commits are not merged, or a worktree with uncommitted files.
 - Every real decision ends up in a file under `docs/`, written by a scribe. Nothing important
   lives only in the conversation.
 - A rejected run is never reverted automatically. Say what failed and what you propose.
