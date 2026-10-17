@@ -11,6 +11,10 @@ table of agents in the chat.
 
 ## Open or reuse
 
+When `crew.dashboardUrl` in the project's `docs/settings.md` is set, use that URL: it is the
+project's shared dashboard (the people who use it need edit access to it). Republish it only
+for an older version, as below. Otherwise use the local file:
+
 The project keeps `{ "url": "...", "version": "<plugin version>" }` in
 `.claude/dev-crew.local.json`. Keep it out of git without touching tracked files: add the
 line `.claude/dev-crew.local.json` to `.git/info/exclude` (create the file if needed) before
@@ -68,6 +72,10 @@ ArtifactData list   collection "runs/<runId>/agents"
 ```
 
 ## Limits
+
+At the start of each run, when `crew.limits` in `docs/settings.md` is set (`opus N, sonnet N,
+haiku N`), write it to `config/limits`. Edits made on the page then hold for the rest of the
+run; to keep them, change the setting.
 
 Before launching an agent, read `config/limits` (missing means the defaults) and count the
 rows of the current run with that model and an active status that are not "no signal". The
