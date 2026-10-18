@@ -1,4 +1,4 @@
-# claude-skills
+# agent-skills
 
 A Claude Code plugin marketplace with two plugins, installed separately:
 
@@ -9,8 +9,8 @@ A Claude Code plugin marketplace with two plugins, installed separately:
 
 ```bash
 claude plugin marketplace add <path-or-git-url-of-this-repo>
-claude plugin install web-foundation@claude-skills
-claude plugin install dev-crew@claude-skills
+claude plugin install web-foundation@agent-skills
+claude plugin install dev-crew@agent-skills
 ```
 
 ## web-foundation

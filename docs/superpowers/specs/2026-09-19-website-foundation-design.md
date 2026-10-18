@@ -6,7 +6,7 @@
 
 ## 1. Objetivo
 
-Este repositório (`claude-skills`) passa a ser a base para desenvolver websites rapidamente com o Claude. Contém:
+Este repositório (`agent-skills`) passa a ser a base para desenvolver websites rapidamente com o Claude. Contém:
 
 1. um **template canónico** (`templates/nuxt-base/`), que corre e tem testes, com o núcleo comum a todos os projetos;
 2. **skills modulares** que criam projetos a partir do template e lhes acrescentam funcionalidades de forma consistente.
@@ -24,7 +24,7 @@ A fundação junta o que funcionou nos quatro repos e corrige o que se repetiu m
 O repo é um **plugin do Claude Code**, instalável via marketplace:
 
 ```
-claude-skills/
+agent-skills/
   .claude-plugin/plugin.json
   README.md                       como instalar e usar
   CLAUDE.md                       regras para trabalhar neste repo

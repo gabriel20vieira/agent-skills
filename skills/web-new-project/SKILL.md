@@ -10,7 +10,7 @@ realtime, dialogs, themes, i18n, Docker). Read `web-foundation` for the conventi
 afterwards.
 
 Template path: `${CLAUDE_PLUGIN_ROOT}/templates/nuxt-base` when installed as a plugin,
-`templates/nuxt-base` inside the claude-skills repo.
+`templates/nuxt-base` inside the agent-skills repo.
 
 ## Ask only what you cannot default
 

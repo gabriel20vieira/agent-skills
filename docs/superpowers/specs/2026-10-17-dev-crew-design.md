@@ -2,7 +2,7 @@
 
 - **Data:** 2026-10-17
 - **Estado:** proposta para revisão
-- **Âmbito:** novo plugin `dev-crew` no marketplace `claude-skills`, separado do `web-foundation`
+- **Âmbito:** novo plugin `dev-crew` no marketplace `agent-skills`, separado do `web-foundation`
 
 ## 1. Objetivo
 
