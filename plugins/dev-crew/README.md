@@ -24,7 +24,7 @@ Design: `docs/superpowers/specs/2026-10-17-dev-crew-design.md`.
 
 ```bash
 claude plugin marketplace add <path-or-git-url-of-this-repo>
-claude plugin install dev-crew@agent-skills
+claude plugin install dev-crew@gv-agent-skills
 ```
 
 Then ask for a task that splits into areas ("add CSV export to notes, API and UI, with

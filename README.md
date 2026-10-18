@@ -9,9 +9,13 @@ A Claude Code plugin marketplace with two plugins, installed separately:
 
 ```bash
 claude plugin marketplace add <path-or-git-url-of-this-repo>
-claude plugin install web-foundation@agent-skills
-claude plugin install dev-crew@agent-skills
+claude plugin install web-foundation@gv-agent-skills
+claude plugin install dev-crew@gv-agent-skills
 ```
+
+The marketplace is `gv-agent-skills`, not `agent-skills`: that name is reserved for
+Anthropic's own marketplaces. To try the plugins without installing, start
+`claude --plugin-dir <repo> --plugin-dir <repo>/plugins/dev-crew`.
 
 ## web-foundation
 
