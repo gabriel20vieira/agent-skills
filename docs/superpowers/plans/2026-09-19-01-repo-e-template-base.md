@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Deixar o repo `claude-skills` como plugin do Claude Code e criar `templates/nuxt-base/`: uma app Nuxt 4 que arranca, com UI (Tailwind v4 + shadcn-vue), i18n, tema claro/escuro, MySQL com migrações Drizzle e `/api/health`. Tem de correr com Docker e sem Docker.
+**Goal:** Deixar o repo `agent-skills` como plugin do Claude Code e criar `templates/nuxt-base/`: uma app Nuxt 4 que arranca, com UI (Tailwind v4 + shadcn-vue), i18n, tema claro/escuro, MySQL com migrações Drizzle e `/api/health`. Tem de correr com Docker e sem Docker.
 
 **Architecture:** Monólito Nuxt 4 full-stack (Nitro `node-server`), com `app/`, `server/` e `shared/`. O código puro fica em `shared/` e `scripts/lib/`, testado com vitest. A DB é MySQL 8.4 via Drizzle, com migrações versionadas aplicadas pelo entrypoint do contentor ou por `npm run db:migrate`.
 
@@ -145,7 +145,7 @@ skill. Each module lists the files it adds and the core extension points it touc
 
 `README.md`:
 ```markdown
-# claude-skills — website foundation
+# agent-skills — website foundation
 
 Claude Code plugin to build websites quickly on one consistent base.
 
@@ -171,7 +171,7 @@ See `templates/nuxt-base/README.md` for running it with and without Docker.
 
 `CLAUDE.md`:
 ```markdown
-# claude-skills
+# agent-skills
 
 Plugin repo: a Nuxt 4 template (`templates/nuxt-base`) plus skills that use it.
 

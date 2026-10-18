@@ -1,4 +1,4 @@
-# claude-skills
+# agent-skills
 
 Plugin marketplace with two plugins:
 - `web-foundation` (repo root): a Nuxt 4 template (`templates/nuxt-base`) plus skills that use it.
