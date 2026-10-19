@@ -5,7 +5,7 @@ A Claude Code plugin marketplace with two plugins, installed separately:
 | Plugin | What it is |
 |---|---|
 | `web-foundation` | Build websites quickly on one consistent Nuxt 4 base (this page) |
-| `dev-crew` | A crew of subagents (Opus coordinates and documents, Sonnet develops, Haiku checks) with a live dashboard; see `plugins/dev-crew/README.md` |
+| `dev-crew` | A crew of subagents (Opus coordinates and documents, Sonnet develops, Haiku checks) in git worktrees per area; see `plugins/dev-crew/README.md` |
 
 ```bash
 claude plugin marketplace add <path-or-git-url-of-this-repo>
@@ -59,6 +59,6 @@ npm run test:api       # builds and runs API/realtime tests against <db>_test
 Skill scripts have their own tests (both plugins):
 
 ```bash
-node --test skills/*/scripts/*.test.mjs plugins/*/skills/*/scripts/*.test.mjs plugins/*/dashboard/*.test.mjs
+node --test skills/*/scripts/*.test.mjs plugins/*/skills/*/scripts/*.test.mjs
 ```
 See `templates/nuxt-base/README.md` for running the template.

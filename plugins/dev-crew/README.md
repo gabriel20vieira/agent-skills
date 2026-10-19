@@ -15,8 +15,8 @@ Before planning, the main session reads `CLAUDE.md`, the README and the project'
 decisions, and picks the installed skills that matter; every brief names the skills and docs
 its agent must load. Each area works in its own git worktree and branch (`crew/<runId>/<area>`). At the end, the
 main session merges them into `crew/<runId>/run`, runs the full check and reviews the diff.
-A live claude.ai page shows agents running per model against editable limits, and the crew
-tree with each agent's status and checks.
+Progress shows up in the chat: the main session reports each coordinator as it finishes, and
+each agent's final report is the record of what it did.
 
 Design: `docs/superpowers/specs/2026-10-17-dev-crew-design.md`.
 
@@ -32,13 +32,9 @@ tests"); the `dev-crew` skill loads by itself.
 
 ## Good to know
 
-- **Dashboard:** needs Claude Code signed in to claude.ai (the Artifact tools). Without it the
-  crew still runs and reports in the chat. Its URL is kept in `.claude/dev-crew.local.json`,
-  which stays out of git.
-- **Permissions:** agents write their dashboard rows with `ArtifactData`. If your permission
-  mode asks before those writes, allow `ArtifactData` in your settings so background agents do
-  not stall.
-- **Limits:** set per model on the dashboard (defaults: 2 Opus, 4 Sonnet, 6 Haiku at once).
+- **Limits:** set per model in `crew.limits` of the project's `docs/settings.md` (defaults:
+  2 Opus, 4 Sonnet, 6 Haiku at once). Each launcher counts only the agents it launched;
+  coordinators get a Sonnet quota in their brief.
   Claude Code caps concurrent subagents at 20 (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`), and
   nesting at 3 levels (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`), which the crew needs.
 - **Never:** push code, open PRs or merge into your branch. A run ends on
@@ -50,9 +46,7 @@ tests"); the `dev-crew` skill loads by itself.
 
 ## Layout
 
-- `skills/dev-crew/`: the skill, its references (`brief.md`, `dashboard.md`,
-  `docs.md`) and `scripts/worktrees.mjs` (start, merge, clean up and finish a run).
+- `skills/dev-crew/`: the skill, its references (`brief.md`, `docs.md`) and `scripts/worktrees.mjs` (start, merge, clean up and finish a run).
 - `agents/`: the four crew agents, with the model and effort pinned in the frontmatter.
-- `dashboard/`: the page (`index.html`) and its pure logic (`logic.js`).
 
-Tests: `node --test plugins/dev-crew/skills/*/scripts/*.test.mjs plugins/dev-crew/dashboard/*.test.mjs`.
+Tests: `node --test plugins/dev-crew/skills/*/scripts/*.test.mjs`.

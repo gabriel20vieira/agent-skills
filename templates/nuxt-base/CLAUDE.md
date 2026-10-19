@@ -15,7 +15,7 @@
 
 ## Rules
 - Working preferences (base branch, git cleanup, merge method, who pushes, checks before
-  commit, docs language, installed modules, dev-crew limits and dashboard) are in
+  commit, docs language, installed modules, dev-crew limits) are in
   `docs/settings.md`. Follow them; when a value is empty, ask once and write the answer there.
 - Handler order: `requireUser(event)` → `assertPermission(user, resource, action)` →
   `readBodyWith(event, schema)` → service → `audit(event, ...)`.
