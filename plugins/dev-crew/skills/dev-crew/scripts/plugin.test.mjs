@@ -1,6 +1,6 @@
 // node --test plugins/dev-crew/skills/dev-crew/scripts/plugin.test.mjs
 import assert from "node:assert/strict"
-import { existsSync, readFileSync } from "node:fs"
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs"
 import { dirname, join, resolve } from "node:path"
 import { test } from "node:test"
 import { fileURLToPath } from "node:url"
@@ -42,7 +42,7 @@ test("marketplace lists dev-crew", () => {
 test("plugin manifest", () => {
     const manifest = readJson(join(pluginRoot, ".claude-plugin", "plugin.json"))
     assert.equal(manifest.name, "dev-crew")
-    assert.equal(manifest.version, "0.1.0")
+    assert.equal(manifest.version, "0.2.0")
     assert.ok(manifest.author?.name)
 })
 
@@ -59,7 +59,7 @@ test("agents pin model and effort", () => {
 
 test("checker tool list has no edit tools", () => {
     const fields = frontmatter(join(pluginRoot, "agents", "checker.md"))
-    assert.deepEqual(list(fields.tools), ["Read", "Grep", "Glob", "Bash", "ToolSearch", "ArtifactData"])
+    assert.deepEqual(list(fields.tools), ["Read", "Grep", "Glob", "Bash"])
 })
 
 test("coordinator does not write code", () => {
@@ -99,4 +99,27 @@ test("skill reads docs and picks skills before planning", () => {
     const text = readFileSync(join(skillDir, "SKILL.md"), "utf8")
     assert.ok(text.includes("references/docs.md"))
     assert.ok(text.indexOf("**Context.**") < text.indexOf("**Plan.**"), "Context step comes before Plan")
+})
+
+test("the crew has no dashboard", () => {
+    assert.ok(!existsSync(join(pluginRoot, "dashboard")), "dashboard folder")
+    assert.ok(!existsSync(join(skillDir, "references", "dashboard.md")), "dashboard reference")
+    const files = []
+    const walk = (dir) => {
+        for (const entry of readdirSync(dir)) {
+            const path = join(dir, entry)
+            if (statSync(path).isDirectory()) walk(path)
+            else if (path.endsWith(".md") || path.endsWith(".json")) files.push(path)
+        }
+    }
+    walk(pluginRoot)
+    for (const path of files) {
+        const text = readFileSync(path, "utf8")
+        assert.ok(!/ArtifactData|dashboard/i.test(text), `${path} still mentions the dashboard`)
+    }
+})
+
+test("launchers pass a quota instead of reading shared limits", () => {
+    const text = readFileSync(join(skillDir, "references", "brief.md"), "utf8")
+    assert.match(text, /Quota: up to/)
 })

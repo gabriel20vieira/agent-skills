@@ -1,6 +1,6 @@
 ---
 name: dev-crew
-description: Use when a coding task is big enough to split across several agents (several files or areas, a feature with tests, a plan with independent tasks) and the user wants it developed, monitored, verified and documented by a crew - Opus coordinates, reviews and records decisions, Sonnet develops, Haiku runs the checks - in git worktrees per area, with a live claude.ai dashboard.
+description: Use when a coding task is big enough to split across several agents (several files or areas, a feature with tests, a plan with independent tasks) and the user wants it developed, monitored, verified and documented by a crew - Opus coordinates, reviews and records decisions, Sonnet develops, Haiku runs the checks - in git worktrees per area.
 ---
 
 # Dev crew
@@ -19,8 +19,8 @@ verdict. The crew:
 | 3 | `dev-crew:checker` | Haiku | runs checks or locates code; reports facts only |
 
 Briefs follow `references/brief.md`. What to read, which skills to pick and how docs are kept
-is in `references/docs.md`. The dashboard is described in `references/dashboard.md`. Git
-worktrees are handled by `scripts/worktrees.mjs` (path below as `$CREW`):
+is in `references/docs.md`. Git worktrees are handled by `scripts/worktrees.mjs` (path below as
+`$CREW`):
 
 ```
 CREW="${CLAUDE_PLUGIN_ROOT}/skills/dev-crew/scripts/worktrees.mjs"
@@ -46,58 +46,51 @@ file under `docs/decisions/` yourself).
    Read `docs/settings.md` (project settings, `references/docs.md`). For each setting the
    run will use (`git.deleteMergedBranches`, `docs.language`, `crew.limits`,
    `checks.beforeCommit`) that is empty or missing, ask the user now, in one question, and
-   have the first scribe write the answers there. `crew.dashboardUrl` is never asked: empty
-   means each person's own dashboard.
+   have the first scribe write the answers there.
 3. **Plan.** Write a short plan if there is none: areas and their tasks, the skills and docs
    chosen, and the decisions it makes. Two areas never touch the same files. Each area lists
    the files it may touch and its check commands (`checks.beforeCommit` first, then the
-   project's `package.json` scripts, the README, `CLAUDE.md`). Pick `runId` as `<yyyymmdd>-<hhmm>-<slug>` (lowercase, digits
-   and dashes only).
+   project's `package.json` scripts, the README, `CLAUDE.md`). Pick `runId` as
+   `<yyyymmdd>-<hhmm>-<slug>` (lowercase, digits and dashes only).
 4. **Worktrees.** From anywhere in the repo:
    `node "$CREW" start <runId> <area...> --install "<install command, e.g. npm ci>"`.
    It prints the base commit, the run branch (`crew/<runId>/run`) and its worktree
    (`runPath`), and one worktree path and branch per area (`<repo>-crew/<runId>/<area>`, next
    to the repo); use the paths exactly as printed. It refuses a dirty tree, a reused run id
    and unsafe names, and leaves nothing behind when it fails.
-5. **Dashboard.** Open or reuse the project's dashboard (`references/dashboard.md`; a set
-   `crew.dashboardUrl` wins over the local file). When `crew.limits` is set, write it to
-   `config/limits`. If the
-   Artifact tools are not available, run without it and keep the state in your replies.
-   Close stale rows from earlier runs, then create `runs/<runId>` with status `running` and
-   your own row `main`.
-6. **Record the plan.** Launch a `dev-crew:scribe` in the background on `runPath` with the
+5. **Record the plan.** Launch a `dev-crew:scribe` in the background on `runPath` with the
    plan, the decisions, the skills and docs chosen, and whether `CLAUDE.md` is missing. It
    writes the run doc, the decision files and, when missing, `CLAUDE.md`.
-7. **Launch coordinators.** Read `config/limits` (defaults: opus 2, sonnet 4, haiku 6) and
-   count the active Opus rows of this run, not counting `main` or the scribe (both are outside
-   the limits). Launch one `dev-crew:coordinator` per area in the background, within the Opus
-   limit (queue the rest). Create each coordinator's row as `queued` first. Its brief carries
-   its worktree path and branch, `Skills:` and `Read first:`.
-8. **Monitor.** When a coordinator's completion notification arrives, write its `tokens` from
-   the notification and close its row if it is still open. If its report is missing, read its
-   row and its children's rows. Report progress to the user in a line or two per event. Send
-   the decisions and results from each report to a scribe (one at a time; batch reports that
-   arrive together).
-9. **Merge.** When every coordinator and scribe is done: `node "$CREW" merge <runId>`. It
+6. **Launch coordinators.** Take the limits from `crew.limits` (defaults: opus 2, sonnet 4,
+   haiku 6). Launch one `dev-crew:coordinator` per area in the background, at most the Opus
+   limit at once (the scribe and you do not count); queue the rest and launch each when one
+   finishes. Share the Sonnet limit between the coordinators running at once and put each
+   share in its brief as `Quota: up to <n> sonnet at once` (at least 1). Each brief also
+   carries its worktree path and branch, `Skills:` and `Read first:`.
+7. **Monitor.** Keep your own list of the agents you launched and their state. When a
+   coordinator's completion notification arrives, read its report and tell the user in a line
+   or two what it did. A coordinator that ends without a report counts as failed: say so and
+   decide whether to relaunch it. Send the decisions and results from each report to a scribe
+   (one at a time; batch reports that arrive together).
+8. **Merge.** When every coordinator and scribe is done: `node "$CREW" merge <runId>`. It
    merges each area branch into `crew/<runId>/run` in the run worktree and lists `merged` and
    `conflicts`. Resolve a trivial conflict there yourself; otherwise ask the user.
-10. **Final check.** Launch a `dev-crew:checker` in `check` mode on the run worktree with the
-    project's full check and test commands.
-11. **Review.** Read `git -C <runPath> diff <base>..HEAD` and judge it against the plan and the
-    docs read in step 2. Set `runs/<runId>` to `accepted` or `rejected` with a one-line
-    `verdict`.
-12. **Record the outcome.** Launch a last scribe with the checks, the verdict and the open
-    items, and wait for it. Then set your own row to `done`.
-13. **Clean up.** `node "$CREW" cleanup <runId>` removes the worktrees and deletes every
+9. **Final check.** Launch a `dev-crew:checker` in `check` mode on the run worktree with the
+   project's full check and test commands.
+10. **Review.** Read `git -C <runPath> diff <base>..HEAD` and judge it against the plan and the
+    docs read in step 2. Decide `accepted` or `rejected`, with a one-line verdict.
+11. **Record the outcome.** Launch a last scribe with the checks, the verdict and the open
+    items, and wait for it.
+12. **Clean up.** `node "$CREW" cleanup <runId>` removes the worktrees and deletes every
     area branch already in the run branch. With `git.deleteMergedBranches` set to `no`, run
     `cleanup <runId> --keep-branches` instead (with `ask`, ask first). It lists `kept`
     area branches (conflicts not yet merged): resolve them or ask the user, then run cleanup
     again.
-14. **Report** to the user: the run branch `crew/<runId>/run`, the base commit, what each
+13. **Report** to the user: the run branch `crew/<runId>/run`, the base commit, what each
     area did, the check result, your verdict, the docs written (and `CLAUDE.md` if created),
     and anything unresolved. Propose the next step (review the branch, merge it, open a PR).
     Do not do it.
-15. **Finish.** Once the user has merged the run branch (locally or through a PR), follow
+14. **Finish.** Once the user has merged the run branch (locally or through a PR), follow
     `git.deleteMergedBranches`: with `yes`, from the branch it went into, run
     `node "$CREW" finish <runId>`. It deletes `crew/<runId>/run` locally and on `origin`,
     and refuses if it is not merged. With `ask` (or still empty), ask the user first. With
@@ -107,7 +100,7 @@ file under `docs/decisions/` yourself).
 
 - Never push code, open a PR, merge into the user's branch or rebase. The user does that.
 - Crew worktrees are always removed at the end. Deleting merged branches (area branches in
-  step 13, the run branch in step 15, any other merged branch of the task) follows
+  step 12, the run branch in step 14, any other merged branch of the task) follows
   `git.deleteMergedBranches` in `docs/settings.md`; when it is empty, ask once and record
   the answer. Never delete a branch whose commits are not merged, or a worktree with
   uncommitted files.
@@ -115,6 +108,7 @@ file under `docs/decisions/` yourself).
   lives only in the conversation.
 - A rejected run is never reverted automatically. Say what failed and what you propose.
 - A coordinator escalates a task after 2 send-backs. Decide it yourself or ask the user.
-- Limits are a rule, not a lock. Respect them when launching, and never exceed the platform
-  cap of 20 concurrent subagents (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`).
+- Limits are a rule, not a lock. Each launcher counts only the agents it launched itself and
+  stays within its quota. Never exceed the platform cap of 20 concurrent subagents
+  (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`).
 - Keep reports short at every level. Never pass whole logs up the tree.

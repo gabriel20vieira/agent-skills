@@ -334,3 +334,23 @@ O `web-foundation` continua na raiz, sem alterações.
     usa a sua, em `.claude/dev-crew.local.json`, e a crew nunca pergunta.
 
   Do lado da web-foundation, `apply-module.mjs` mantém `modules.installed` atualizado.
+
+## 13. Adenda: sem dashboard (2026-10-19, pedido do utilizador)
+
+- **A dashboard sai.** Já não há página no claude.ai nem escritas com `ArtifactData`. Isto
+  substitui o que as secções anteriores dizem sobre a dashboard, as linhas por agente, o
+  heartbeat e `config/limits`.
+  - Foram apagados `plugins/dev-crew/dashboard/` e `references/dashboard.md`.
+  - A definição `crew.dashboardUrl` também desaparece.
+- **Registo.** O que cada agente fez fica no relatório final que entrega a quem o lançou. A
+  sessão principal mostra o progresso no chat, à medida que cada coordenador termina. Um
+  agente que acaba sem relatório conta como falhado.
+- **Limites.** Os limites vêm de `crew.limits`; por omissão, opus 2, sonnet 4 e haiku 6.
+  - Cada agente que lança outros conta só os que lançou.
+  - A sessão principal limita os coordenadores ao limite Opus e divide o limite Sonnet entre
+    eles. Cada coordenador recebe a sua parte no brief, como `Quota: up to <n> sonnet at once`.
+  - Cada developer corre um checker de cada vez.
+- **Ids e linhas.** Saem os ids dos agentes e as linhas de estado. O checker e o scribe
+  deixam de ter `ToolSearch` e `ArtifactData`.
+- **Passos.** O fluxo passa de 15 para 14 passos: sai o passo da dashboard.
+- **Versão.** O plugin passa a 0.2.0.

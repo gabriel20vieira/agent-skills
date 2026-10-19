@@ -2,7 +2,7 @@
 
 Every agent in the crew gets a closed brief: enough to finish without asking, and nothing
 that invites it to wander. The launcher writes it; the agent's last message answers its
-`Return` line.
+`Return` line, and that report is the only record of what the agent did.
 
 ## Format
 
@@ -16,25 +16,17 @@ Check: <exact commands>
 Skills: <skills to load with the Skill tool first, or none>
 Read first: <doc paths, or none>
 Return: <shape of the final report>
-Dashboard: <url>, run <runId>, your agent id <agentId>, parent <parentId>
 ```
 
-Leave the `Dashboard` line out when the run has no dashboard. In the fallback where limits are
-shared out by quota, add `Quota: up to <n> <model> at once`.
+A coordinator's brief also carries `Branch: <area branch>`, its `Tasks:` and
+`Quota: up to <n> sonnet at once` (its share of `crew.limits`, at least 1).
 
-## Agent ids
+## Limits
 
-The launcher picks the id and creates the row as `queued` before launching.
-
-| Agent | Id | Example |
-|---|---|---|
-| main session | `main` | `main` |
-| coordinator | `coordinator-<area>` | `coordinator-api` |
-| developer | `developer-<area>-<n>` (n counted by the coordinator) | `developer-api-2` |
-| checker of a developer | `checker-<area>-<n>-<k>` | `checker-api-2-1` |
-| checker of a coordinator | `checker-<area>-0-<k>` | `checker-api-0-1` |
-| checker of the main session | `checker-main-<k>` | `checker-main-1` |
-| scribe | `scribe-<k>` | `scribe-1` |
+Each launcher keeps its own list of the agents it launched and counts only those: the main
+session counts coordinators against the Opus limit, each coordinator counts its developers
+against its quota, and each developer runs one checker at a time. Nothing is shared between
+launchers, so there is nothing to read or lock.
 
 ## Examples
 
@@ -53,8 +45,8 @@ Done when: both tasks committed on the area branch, check passes
 Check: npm run check && npm run test:api
 Skills: web-foundation, web-crud-resource
 Read first: CLAUDE.md, docs/superpowers/specs/2026-09-19-website-foundation-design.md
+Quota: up to 2 sonnet at once
 Return: Area, Branch, Tasks (accepted <commit> | unresolved <why>), Files touched, Decisions, Risks
-Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id coordinator-api, parent main
 ```
 
 Coordinator to a developer:
@@ -69,7 +61,6 @@ Check: npm run check
 Skills: web-crud-resource
 Read first: CLAUDE.md
 Return: files changed, tests added, last check result (PASS/FAIL + failures), decisions made
-Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id developer-api-1, parent coordinator-api
 ```
 
 Developer to a checker:
@@ -79,7 +70,6 @@ Mode: check
 Worktree: D:/work/notes-app-crew/20261017-1405-notes-export/api
 Check: npm run check
 Return: PASS, or FAIL with file:line: message lines
-Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id checker-api-1-1, parent developer-api-1
 ```
 
 Main session to a scribe:
@@ -92,5 +82,4 @@ Record: goal, areas api and ui, skills (web-foundation, web-crud-resource), docs
 CLAUDE.md: missing
 Read first: references/docs.md of the dev-crew skill (layout), docs/
 Return: files written, commit, CLAUDE.md status
-Dashboard: https://claude.ai/artifact/..., run 20261017-1405-notes-export, your agent id scribe-1, parent main
 ```

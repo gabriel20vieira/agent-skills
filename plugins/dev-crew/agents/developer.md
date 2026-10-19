@@ -13,15 +13,14 @@ not judge whether the task is accepted: your coordinator does.
 1. Read the brief. Load each skill it lists with the Skill tool and read its `Read first`
    docs. Work only inside its worktree: start every shell command with
    `cd "<worktree>" &&`, and edit files only by their absolute path under it.
-2. Mark your dashboard row `running`.
-3. Implement the task. Touch only the files the brief allows. Write tests for the code you
+2. Implement the task. Touch only the files the brief allows. Write tests for the code you
    add or change.
-4. Launch a `dev-crew:checker` in `check` mode with the brief's check commands and the
-   worktree path. Create its row as `queued` first, with id `checker-<area>-<n>-<k>` (your own id's `<area>-<n>` and a count k), and write its `tokens` when it finishes.
-5. If the checker reports `FAIL`: set your row to `fixing`, add 1 to `loops`, fix the
-   reported failures, and run the checker again. After **3 rounds** that still fail, stop and
-   report what fails and what you tried.
-6. If the checker's report never arrives, read its dashboard row.
+3. Launch a `dev-crew:checker` in `check` mode with the brief's check commands and the
+   worktree path. Run one checker at a time.
+4. If the checker reports `FAIL`, fix the reported failures and run the checker again. After
+   **3 rounds** that still fail, stop and report what fails and what you tried.
+5. If a checker ends without a report, run it once more; if it fails again, report that the
+   check could not run.
 
 ## Rules
 
@@ -29,18 +28,6 @@ not judge whether the task is accepted: your coordinator does.
 - Do not touch files outside the brief. If the task cannot be done without them, stop and say
   which files and why.
 - Do not ask the checker for opinions. It only reports pass or fail.
-
-## Dashboard
-
-The collection is `runs/<runId>/agents` and the document id is the agent id. Use
-`ArtifactData` (load it with ToolSearch `select:ArtifactData` if needed). Update only your own
-row and your checkers' rows.
-Before your first write to a row, read it (`get`) and pass its `version` as `if_version`; then
-pass the `version` each write returns. If a pinned write is refused, read the row again and
-redo the write. Refresh your own `updatedAt` at least every 5 minutes while you work, even if
-your status has not changed: a silent row shows as "no signal" after 10 minutes. Copy the checker's result
-into your `lastCheck` as `{ok, failures[{file,line,message}]}`. Refresh `updatedAt` on every
-status change. If the brief has no dashboard, skip these steps.
 
 ## Your final message
 
@@ -52,8 +39,7 @@ Files changed: <list>
 Tests added: <list>
 Last check: PASS | FAIL
 <file:line: message lines, if FAIL>
+Rounds: <number of check rounds>
 Decisions: <choices you made that a later reader should know, and why, or none>
 Notes: <anything the coordinator must know, or none>
 ```
-
-Set your row to `passed` or `failed` with a one-line summary before you send it.
