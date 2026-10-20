@@ -15,7 +15,7 @@ How agents work in this repo. Same format as `templates/nuxt-base/docs/settings.
 | `git.pushAndPr` | `agent` | `agent`, `user`, `ask` | Who pushes branches and opens PRs. With `user`, agents stop at a local commit. |
 | `checks.beforeCommit` | `node --test skills/*/scripts/*.test.mjs plugins/dev-crew/skills/dev-crew/scripts/*.test.mjs`; `npm run check` in `templates/nuxt-base` when the template changed; for a module, the throwaway-project check in `CLAUDE.md` | commands | What must pass before every commit. |
 | `docs.language` | `pt-PT` | `en-US`, `pt-PT`, ... | Language of specs, plans and decision docs. Code and comments stay in English. |
-| `crew.models` | | `principal fable|opus, coordinator opus, developer sonnet, checker haiku, scribe opus` (suggested as written) | dev-crew: the model each role runs on. The principal is the session's model; the others are passed at launch. |
+| `crew.models` | `principal fable, coordinator opus, developer sonnet, checker haiku, scribe opus` | `principal fable|opus, coordinator opus, developer sonnet, checker haiku, scribe opus` (suggested as written) | dev-crew: the model each role runs on. The principal is the session's model; the others are passed at launch. |
 | `crew.limits` | | `coordinator N, developer N, checker N` (suggested `coordinator 2, developer 4, checker 6`) | dev-crew: agents of each role running at once, counted by whoever launched them. |
 
 Add a row when a new recurring question comes up, rather than asking it again in every
