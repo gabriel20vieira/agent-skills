@@ -66,7 +66,7 @@ test/unit, test/api
   answer in the table and commit it with the work. `ask` means ask every time. A project
   without the file gets it from `templates/nuxt-base/docs/settings.md`. Settings:
   `git.baseBranch`, `git.deleteMergedBranches`, `git.mergeMethod`, `git.pushAndPr`,
-  `checks.beforeCommit`, `docs.language`, `modules.installed`, `crew.limits`.
+  `checks.beforeCommit`, `docs.language`, `modules.installed`, `crew.models`, `crew.limits`.
 - **Git**: start work from `git.baseBranch` and target it with PRs. When a branch is merged (PR or local), follow `git.deleteMergedBranches`. With
   `yes`, delete it locally and on `origin` (`git branch -d`, `git push origin --delete`, or
   `gh pr merge --delete-branch`) and remove its worktree (`git worktree remove`, then

@@ -42,7 +42,7 @@ test("marketplace lists dev-crew", () => {
 test("plugin manifest", () => {
     const manifest = readJson(join(pluginRoot, ".claude-plugin", "plugin.json"))
     assert.equal(manifest.name, "dev-crew")
-    assert.equal(manifest.version, "0.2.0")
+    assert.equal(manifest.version, "0.3.0")
     assert.ok(manifest.author?.name)
 })
 
@@ -122,4 +122,41 @@ test("the crew has no dashboard", () => {
 test("launchers pass a quota instead of reading shared limits", () => {
     const text = readFileSync(join(skillDir, "references", "brief.md"), "utf8")
     assert.match(text, /Quota: up to/)
+})
+
+test("roles are functions: the principal may launch any of them directly", () => {
+    const text = readFileSync(join(skillDir, "SKILL.md"), "utf8")
+    assert.match(text, /not a hierarchy/i)
+    assert.match(text, /`crew.models`/)
+    assert.match(text, /`crew.limits`/)
+})
+
+test("the skill detects code and analysis modes", () => {
+    const text = readFileSync(join(skillDir, "SKILL.md"), "utf8")
+    assert.match(text, /## Mode `code`/)
+    assert.match(text, /## Mode `analysis`/)
+})
+
+test("agents handle both modes", () => {
+    for (const name of ["coordinator", "developer"]) {
+        const text = readFileSync(join(pluginRoot, "agents", `${name}.md`), "utf8")
+        assert.match(text, /Mode `code`/, `${name} code`)
+        assert.match(text, /Mode `analysis`/, `${name} analysis`)
+    }
+    const checker = readFileSync(join(pluginRoot, "agents", "checker.md"), "utf8")
+    for (const mode of ["check", "locate", "verify"]) assert.match(checker, new RegExp(`## Mode \`${mode}\``), mode)
+})
+
+test("briefs carry mode and model", () => {
+    const text = readFileSync(join(skillDir, "references", "brief.md"), "utf8")
+    assert.match(text, /^Mode: /m)
+    assert.match(text, /^Model: /m)
+    assert.match(text, /^Inputs: /m)
+    assert.match(text, /^Output: /m)
+})
+
+test("settings reference lists crew.models and role limits", () => {
+    const text = readFileSync(join(skillDir, "references", "docs.md"), "utf8")
+    assert.match(text, /`crew.models`/)
+    assert.match(text, /coordinator N, developer N, checker N/)
 })

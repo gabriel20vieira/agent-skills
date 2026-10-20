@@ -354,3 +354,41 @@ O `web-foundation` continua na raiz, sem alterações.
   deixam de ter `ToolSearch` e `ArtifactData`.
 - **Passos.** O fluxo passa de 15 para 14 passos: sai o passo da dashboard.
 - **Versão.** O plugin passa a 0.2.0.
+
+## 14. Adenda: cargos como funções, modos code e analysis, modelo por cargo (2026-10-20, pedido do utilizador)
+
+- **Objetivo.** Fazer tarefas grandes ou complexas mais depressa, e analisar grandes volumes
+  de código ou documentação, distribuindo cada função ao modelo que lhe serve.
+- **Quatro cargos, não uma hierarquia.** Os nomes dos agentes mantêm-se (`coordinator`,
+  `developer`, `checker`, `scribe`); a ordem principal > coordenador > developer > checker é
+  só de nome. Cada cargo é uma função, e quem precisa dela lança-a diretamente:
+  - **principal** (a sessão): lê, compreende, decompõe o problema em tarefas, diz quais podem
+    correr em simultâneo e escolhe o cargo de cada uma. Só escreve texto (plano, relatório,
+    verdicto); nunca código.
+  - **coordinator**: recebe uma tarefa que precisa de ser distribuída e reparte-a por
+    developers; revê o que volta.
+  - **developer**: executa uma tarefa concreta (código com testes, ou leitura de uma fatia
+    com conclusões citadas).
+  - **checker**: lê, verifica e correlaciona (corre checks, localiza código, confirma
+    afirmações nas fontes).
+  - O principal lança um coordenador só quando a tarefa se reparte; uma tarefa simples vai
+    direta a um developer; uma verificação vai direta a um checker. O limite de 3 níveis de
+    subagentes fica folgado.
+- **Dois modos, detetados pelo principal.** `code` quando o resultado é código no repo
+  (worktrees, commits, checks, como até aqui). `analysis` quando o resultado é compreensão:
+  pesquisa, leitura, análise de código ou de documentação. Sem git: o coordenador parte o
+  corpus em fatias, cada developer lê a sua e devolve conclusões com citações
+  (`ficheiro:linha` ou fonte), o checker em modo `verify` relê as fontes, confirma cada
+  afirmação e correlaciona entre fatias (contradições, lacunas), e o principal junta tudo num
+  relatório em `docs/`. O scribe regista as decisões nos dois modos. Uma tarefa pode misturar
+  os modos (analisar primeiro, codificar depois).
+- **Modelo por cargo.** Nova definição `crew.models` em `docs/settings.md`:
+  `principal fable|opus, coordinator opus, developer sonnet, checker haiku, scribe opus`.
+  Os ficheiros dos agentes guardam estes defaults no frontmatter; quem lança passa `model`
+  do setting ao Agent tool, que se sobrepõe ao frontmatter. O principal é o modelo da sessão:
+  a skill compara com o setting e, se for outro, pede `/model`.
+- **Limites por cargo.** `crew.limits` passa a `coordinator N, developer N, checker N`, porque
+  o modelo de cada cargo já não é fixo. Cada lançador conta só o que lançou.
+- **Briefs.** Formato único com `Mode:` e, em `analysis`, `Inputs:` (o que ler) e `Output:`
+  (ficheiro das conclusões) no lugar de worktree e commits.
+- **Versão.** O plugin passa a 0.3.0.

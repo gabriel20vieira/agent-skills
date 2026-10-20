@@ -20,7 +20,8 @@ Read this file before acting on anything in the table. Values:
 | `checks.beforeCommit` | `npm run check`; `npm run test:api` when server code changed | commands | What must pass before every commit (and what dev-crew checkers run by default). |
 | `docs.language` | | `en-US`, `pt-PT`, ... | Language of specs, plans and decision docs. Code and comments stay in English. |
 | `modules.installed` | `none` | module names; kept up to date by `apply-module.mjs` | Modules applied to this project, so skills know what exists. |
-| `crew.limits` | | `opus N, sonnet N, haiku N` (suggested `opus 2, sonnet 4, haiku 6`) | dev-crew: agents per model running at once (coordinators, and the Sonnet quota each gets). |
+| `crew.models` | | `principal fable|opus, coordinator opus, developer sonnet, checker haiku, scribe opus` (suggested as written) | dev-crew: the model each role runs on. The principal is the session's model; the others are passed at launch. |
+| `crew.limits` | | `coordinator N, developer N, checker N` (suggested `coordinator 2, developer 4, checker 6`) | dev-crew: agents of each role running at once, counted by whoever launched them. |
 
 Add a row when a new recurring question comes up, rather than asking it again in every
 session.
