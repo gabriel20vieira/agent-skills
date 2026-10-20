@@ -31,8 +31,8 @@ each listed skill with the Skill tool before they start.
 
 ## During the run: the scribe
 
-Decisions and docs are written by a `dev-crew:scribe` (Opus), launched by the main session in
-the background. Never two scribes at once: they share the run worktree. Launch one:
+Decisions and docs are written by a `dev-crew:scribe` (Opus by default), launched by the
+principal in the background. Never two scribes at once: they share the run worktree. Launch one:
 
 1. **After the plan:** the run doc (goal, areas, skills, docs read), one decision file per
    real decision in the plan (an approach chosen over another, a constraint accepted), and
@@ -41,9 +41,11 @@ the background. Never two scribes at once: they share the run worktree. Launch o
    doc. Batch reports that arrive close together into one scribe.
 3. **At the end, before cleanup:** the checks, the verdict, open items, and the docs index.
 
-The scribe commits on the run branch, in the run worktree (`<repo>-crew/<runId>/run`), so the
-docs merge with the code. Wait for the running scribe to finish before `merge`, because
-`merge` refuses a dirty run worktree.
+In `code` mode the scribe commits on the run branch, in the run worktree
+(`<repo>-crew/<runId>/run`), so the docs merge with the code; wait for the running scribe to
+finish before `merge`, because `merge` refuses a dirty run worktree. In `analysis` mode it
+works in the repo itself and commits the findings and the report under `docs/analysis/<runId>/`
+on the current branch, together with the decisions.
 
 ## Project settings: docs/settings.md
 
@@ -54,11 +56,12 @@ value is followed without asking. The crew uses:
 
 | Setting | Options | Used in |
 | --- | --- | --- |
-| `git.deleteMergedBranches` | `yes`, `no`, `ask` | steps 13 and 15: delete merged branches locally and on `origin` |
-| `docs.language` | `en-US`, `pt-PT`, ... | language of the docs the scribe writes |
+| `crew.models` | `principal fable|opus, coordinator opus, developer sonnet, checker haiku, scribe opus` | every launch: the model passed to the Agent tool; the principal checks its own against it |
+| `crew.limits` | `coordinator N, developer N, checker N` | every launch: agents of a role at once, per launcher |
+| `git.deleteMergedBranches` | `yes`, `no`, `ask` | code steps 12 and 14: delete merged branches locally and on `origin` |
+| `docs.language` | `en-US`, `pt-PT`, ... | language of the docs the scribe writes, and of findings and reports |
 | `git.baseBranch` | branch name | step 1: the run should start from it |
-| `checks.beforeCommit` | commands | step 3: default check commands of each area |
-| `crew.limits` | `opus N, sonnet N, haiku N` | step 6: coordinators at once and their Sonnet quotas |
+| `checks.beforeCommit` | commands | code step 5: default check commands of each area |
 
 If the file does not exist, the first scribe creates it with these rows (plus any the
 project's template already defines) and the answers given. Rows the crew does not use are

@@ -2,13 +2,13 @@
 
 Plugin marketplace with two plugins:
 - `web-foundation` (repo root): a Nuxt 4 template (`templates/nuxt-base`) plus skills that use it.
-- `dev-crew` (`plugins/dev-crew`): subagent crew (Opus/Sonnet/Haiku) and its worktree script.
+- `dev-crew` (`plugins/dev-crew`): a crew of subagents (each role on its own model) for big code tasks and large analyses, with its worktree script.
 
 The template, module and i18n rules below apply to `web-foundation` only.
 
 ## Rules
 - Working preferences (base branch, git cleanup, merge method, who pushes, checks before
-  commit, docs language, dev-crew limits) are in `docs/settings.md`. Follow them; when a value is empty, ask once and write the answer there.
+  commit, docs language, dev-crew models and limits) are in `docs/settings.md`. Follow them; when a value is empty, ask once and write the answer there.
 - The template is the source of truth. Skills point at its files; they never copy code.
 - Any change to the template must keep `npm run check` green (run it in
   `templates/nuxt-base`).

@@ -1,22 +1,30 @@
 # dev-crew
 
-A crew of Claude Code subagents that develops, monitors, verifies and documents a coding task,
-each model doing what it is good at:
+A crew of Claude Code subagents for two kinds of work: big coding tasks (a feature across
+several areas, a plan with independent tasks) and large analyses (reading and auditing a big
+codebase or body of documentation). Four roles, each on the model suited to it:
 
-| Level | Agent | Model | Job |
+| Role | Agent | Default model | Function |
 |---|---|---|---|
-| 0 | main session (the `dev-crew` skill) | Opus | read docs, pick skills, plan, split into areas, merge, final check and review |
-| 1 | `dev-crew:scribe` | Opus | writes every decision and the run log to `docs/*.md`; creates `CLAUDE.md` if missing |
-| 1 | `dev-crew:coordinator` | Opus | briefs, reviews each task, commits on the area branch |
-| 2 | `dev-crew:developer` | Sonnet | code and tests, fixes until the check passes |
-| 3 | `dev-crew:checker` | Haiku | runs checks or locates code, reports facts only |
+| principal | your session (the `dev-crew` skill) | Fable or Opus | understand, decompose, decide what runs in parallel, merge, review, verdict |
+| coordinator | `dev-crew:coordinator` | Opus | takes one task that must be distributed, splits it among developers, reviews what comes back |
+| developer | `dev-crew:developer` | Sonnet | one concrete task: code with tests, or one slice of a corpus read and reported with citations |
+| checker | `dev-crew:checker` | Haiku | reads, verifies, correlates: runs checks, locates code, confirms claims against sources |
+| scribe | `dev-crew:scribe` | Opus | writes every decision and the run log to `docs/*.md`; creates `CLAUDE.md` if missing |
 
-Before planning, the main session reads `CLAUDE.md`, the README and the project's specs and
-decisions, and picks the installed skills that matter; every brief names the skills and docs
-its agent must load. Each area works in its own git worktree and branch (`crew/<runId>/<area>`). At the end, the
-main session merges them into `crew/<runId>/run`, runs the full check and reviews the diff.
-Progress shows up in the chat: the main session reports each coordinator as it finishes, and
-each agent's final report is the record of what it did.
+The roles are functions, not a hierarchy: whoever needs one launches it. The principal
+sends a task that splits to a coordinator, a single task straight to a developer, a
+verification straight to a checker. Models are set per role in `crew.models` of the
+project's `docs/settings.md` and passed at launch; the principal is whatever model the
+session runs on (`/model`).
+
+The principal picks the mode from the task. In **`code`** mode each area works in its own git
+worktree and branch (`crew/<runId>/<area>`); at the end the principal merges them into
+`crew/<runId>/run`, runs the full check and reviews the diff. In **`analysis`** mode there is
+no git: the corpus is split into slices, each slice is read and reported with citations,
+every claim is verified against its source by a checker, and the principal writes one report
+under `docs/analysis/<runId>/`. Progress shows up in the chat, and each agent's final report
+is the record of what it did.
 
 Design: `docs/superpowers/specs/2026-10-17-dev-crew-design.md`.
 
@@ -27,14 +35,15 @@ claude plugin marketplace add <path-or-git-url-of-this-repo>
 claude plugin install dev-crew@gv-agent-skills
 ```
 
-Then ask for a task that splits into areas ("add CSV export to notes, API and UI, with
-tests"); the `dev-crew` skill loads by itself.
+Then ask for a task that splits ("add CSV export to notes, API and UI, with tests", or
+"audit how every server handler checks permissions"); the `dev-crew` skill loads by itself.
 
 ## Good to know
 
-- **Limits:** set per model in `crew.limits` of the project's `docs/settings.md` (defaults:
-  2 Opus, 4 Sonnet, 6 Haiku at once). Each launcher counts only the agents it launched;
-  coordinators get a Sonnet quota in their brief.
+- **Models and limits:** `crew.models` and `crew.limits` in the project's `docs/settings.md`
+  (defaults: coordinator Opus, developer Sonnet, checker Haiku; 2, 4 and 6 at once). Each
+  launcher counts only the agents it launched; coordinators get a developer quota in their
+  brief.
   Claude Code caps concurrent subagents at 20 (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`), and
   nesting at 3 levels (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`), which the crew needs.
 - **Never:** push code, open PRs or merge into your branch. A run ends on

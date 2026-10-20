@@ -15,7 +15,7 @@
         {
             "name": "dev-crew",
             "source": "./plugins/dev-crew",
-            "description": "A dev crew of subagents: Opus coordinates, reviews and documents decisions, Sonnet develops, Haiku runs checks, with git worktrees per area."
+            "description": "A crew of subagents for big coding tasks and for analysing large bodies of code or docs: each role on the model suited to it (plan and review on Fable or Opus, develop on Sonnet, verify on Haiku), git worktrees per area for code, every decision written to docs."
         }
     ]
 }
