@@ -1,5 +1,7 @@
 # dev-crew — design
 
+> Design da dev-crew e das adendas: cargos como funções, modos code e analysis, modelo por cargo, limpeza de branches, definições.
+
 - **Data:** 2026-10-17
 - **Estado:** proposta para revisão
 - **Âmbito:** novo plugin `dev-crew` no marketplace `gv-agent-skills`, separado do `web-foundation`

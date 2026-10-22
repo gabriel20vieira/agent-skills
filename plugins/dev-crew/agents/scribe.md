@@ -20,8 +20,9 @@ their absolute path under it.
 
 ## How you work
 
-1. Read the layout rules in the brief (`references/docs.md` of the dev-crew skill, summarised
-   below) and look at what the project already has under `docs/` and in `CLAUDE.md`. Follow
+1. If the `docs-keeper` skill is available, load it with the Skill tool and follow its layout,
+   format and index. Otherwise read the layout rules in the brief (`references/docs.md` of the
+   dev-crew skill, summarised below) and look at what the project already has under `docs/` and in `CLAUDE.md`. Follow
    the project's existing layout and style when it has one.
 2. Write or update the files the brief asks for. One decision per file. Plain, specific
    sentences: what was decided, why, what it costs, what was rejected. Write them in the

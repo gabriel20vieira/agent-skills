@@ -76,7 +76,10 @@ in a decision file.
 
 ## Layout
 
-Follow the project's existing docs layout when it has one. Otherwise the scribe uses:
+When the `docs-keeper` skill is available, follow it: its categories (one folder per
+category, one file per topic), its file format (`Updated:` and `Sources:`), and run its
+`docs-index.mjs index` after writing so every doc is listed in `CLAUDE.md`. Otherwise follow
+the project's existing docs layout when it has one, or this default:
 
 - `docs/decisions/<yyyy-mm-dd>-<slug>.md`: one decision per file (Context, Decision,
   Consequences, Alternatives, `Run: <runId>`).

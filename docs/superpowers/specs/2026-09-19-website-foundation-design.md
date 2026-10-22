@@ -1,5 +1,7 @@
 # Fundação para websites — design
 
+> Design da fundação para websites: template Nuxt 4, regras do núcleo, skills e módulos.
+
 - **Data:** 2026-09-19
 - **Estado:** proposta para revisão
 - **Fontes analisadas:** `mauricio`, `simple-band-inventory`, `simple-parish-manager` (Nuxt 4 + Drizzle + MySQL) e `model-inference-platform` (FastAPI + Nuxt SPA)

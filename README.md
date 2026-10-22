@@ -1,21 +1,23 @@
 # agent-skills
 
-A Claude Code plugin marketplace with two plugins, installed separately:
+A Claude Code plugin marketplace with three plugins, installed separately:
 
 | Plugin | What it is |
 |---|---|
 | `web-foundation` | Build websites quickly on one consistent Nuxt 4 base (this page) |
 | `dev-crew` | A crew of subagents for big coding tasks and large analyses of code or docs, each role on the model suited to it (plan and review on Fable or Opus, develop on Sonnet, verify on Haiku); see `plugins/dev-crew/README.md` |
+| `docs-keeper` | Keeps `docs/` as one folder per category and one file per topic, updated as the code changes and always listed in `CLAUDE.md`; see `plugins/docs-keeper/README.md` |
 
 ```bash
 claude plugin marketplace add <path-or-git-url-of-this-repo>
 claude plugin install web-foundation@gv-agent-skills
 claude plugin install dev-crew@gv-agent-skills
+claude plugin install docs-keeper@gv-agent-skills
 ```
 
 The marketplace is `gv-agent-skills`, not `agent-skills`: that name is reserved for
 Anthropic's own marketplaces. To try the plugins without installing, start
-`claude --plugin-dir <repo> --plugin-dir <repo>/plugins/dev-crew`.
+`claude --plugin-dir <repo> --plugin-dir <repo>/plugins/dev-crew --plugin-dir <repo>/plugins/docs-keeper`.
 
 ## web-foundation
 

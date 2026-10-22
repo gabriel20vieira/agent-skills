@@ -1,5 +1,7 @@
 # Plano 1 — Esqueleto do repo e template base
 
+> Plano 1: esqueleto do repo como plugin e template Nuxt 4 base com UI, i18n, temas, MySQL/Drizzle e /api/health.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Deixar o repo `agent-skills` como plugin do Claude Code e criar `templates/nuxt-base/`: uma app Nuxt 4 que arranca, com UI (Tailwind v4 + shadcn-vue), i18n, tema claro/escuro, MySQL com migrações Drizzle e `/api/health`. Tem de correr com Docker e sem Docker.

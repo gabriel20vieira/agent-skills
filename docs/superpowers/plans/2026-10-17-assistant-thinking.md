@@ -1,5 +1,7 @@
 # Plano — Assistente: pensamento, resumos, gráficos, Ollama e Anthropic
 
+> Plano do assistente com raciocínio visível, títulos, gráficos e os providers Ollama e Anthropic.
+
 > Executado inline. O plano fixa ficheiros, interfaces e verificação; o texto vive nos commits.
 
 **Spec:** `docs/superpowers/specs/2026-10-17-assistant-thinking-design.md`

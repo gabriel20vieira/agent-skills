@@ -1,5 +1,7 @@
 # Plano 2 — Auth, sessões, permissões, definições, auditoria
 
+> Plano 2: contas, sessões revogáveis, matriz de permissões, definições editáveis e auditoria no servidor.
+
 > **For agentic workers:** executado inline pela sessão que o escreveu (escolha do utilizador: "tudo, na main").
 > Por isso este plano fixa **ficheiros, interfaces, comportamentos e casos de teste**. O código completo vive nos commits: repeti-lo aqui duplicaria o trabalho sem acrescentar precisão. Cada task segue TDD (teste a falhar, implementação, verde, commit).
 
