@@ -1,5 +1,7 @@
 # Assistente: pensamento visível, resumos, gráficos, Ollama e Anthropic — design
 
+> Design do assistente: pensamento visível, resumos, gráficos, Ollama e Anthropic, segmentos guardados.
+
 - **Data:** 2026-10-17
 - **Estado:** aprovado pelo utilizador (resumo apresentado em chat)
 - **Base:** módulo `modules/assistant` (spec 2026-09-19, §15) e o assistente de `D:\Repositories\mauricio`

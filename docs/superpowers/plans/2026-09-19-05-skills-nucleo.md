@@ -1,5 +1,7 @@
 # Plano 5 — Skills do núcleo
 
+> Plano 5: as skills do núcleo do web-foundation (projeto novo, recurso CRUD, realtime, tema, deploy, audit).
+
 > Executado inline, como os planos anteriores. O plano fixa os ficheiros, o conteúdo esperado de cada skill e a verificação; o texto vive nos commits.
 
 **Goal:** Escrever as skills que tornam o template utilizável pelo Claude noutros projetos: criar um projeto, acrescentar um recurso ou um evento em tempo real, importar um tema, fazer deploy e auditar a segurança.

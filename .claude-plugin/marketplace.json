@@ -4,7 +4,7 @@
         "name": "Gabriel Vieira"
     },
     "metadata": {
-        "description": "Claude Code plugins: a Nuxt 4 website foundation and a model-tiered dev crew."
+        "description": "Claude Code plugins: a Nuxt 4 website foundation, a crew of subagents, and a docs keeper."
     },
     "plugins": [
         {
@@ -16,6 +16,11 @@
             "name": "dev-crew",
             "source": "./plugins/dev-crew",
             "description": "A crew of subagents for big coding tasks and for analysing large bodies of code or docs: each role on the model suited to it (plan and review on Fable or Opus, develop on Sonnet, verify on Haiku), git worktrees per area for code, every decision written to docs."
+        },
+        {
+            "name": "docs-keeper",
+            "source": "./plugins/docs-keeper",
+            "description": "Keeps a project's docs/ as one folder per category and one file per topic, updated as the code changes and always listed in CLAUDE.md."
         }
     ]
 }
