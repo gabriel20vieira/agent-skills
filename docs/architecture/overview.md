@@ -1,8 +1,8 @@
 # Visão geral do repo
 
-> Como o repo está organizado: um marketplace com três plugins (web-foundation, dev-crew, docs-keeper), o que cada um traz e onde vive.
+> Como o repo está organizado: um marketplace com quatro plugins (web-foundation, dev-crew, docs-keeper, mock-kit), o que cada um traz e onde vive.
 
-Updated: 2026-10-22
+Updated: 2026-11-13
 Sources: .claude-plugin/, skills/, templates/, modules/, plugins/
 
 ## O que é
@@ -15,6 +15,7 @@ O nome não pode ser `agent-skills`, que está reservado para os marketplaces da
 | `web-foundation` | raiz do repo | o template Nuxt 4 em `templates/nuxt-base/`, os módulos opcionais em `modules/` e as skills `web-*` em `skills/` |
 | `dev-crew` | `plugins/dev-crew/` | a skill `dev-crew`, quatro agentes (`coordinator`, `developer`, `checker`, `scribe`) e `worktrees.mjs` |
 | `docs-keeper` | `plugins/docs-keeper/` | a skill `docs-keeper`, as categorias e o formato dos docs, e `docs-index.mjs` |
+| `mock-kit` | `plugins/mock-kit/` | a skill `mock-kit`, o kit para o browser (Vue 3, Tailwind, Lucide por CDN), o shell de componentes e `mock-kit.mjs` (init, new, component, index, check, serve, shots) |
 
 ## Onde vive cada coisa
 

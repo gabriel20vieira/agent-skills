@@ -1,0 +1,7 @@
+{
+    "name": "mock-kit",
+    "version": "0.1.0",
+    "description": "Interactive mocks before big features: one HTML file each, Vue 3 + Tailwind by CDN with no build, always white and styled like the project's theme, a component library that grows with every mock, browser verification and screenshots.",
+    "author": { "name": "Gabriel Vieira", "email": "gabriel20vieira@hotmail.com" },
+    "keywords": ["mock", "prototype", "vue", "tailwind", "ui"]
+}

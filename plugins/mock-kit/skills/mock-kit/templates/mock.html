@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="__LANG__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__ · Mock</title>
+__HEAD__
+<style>[v-cloak] { display: none; }</style>
+</head>
+<body class="bg-white text-slate-900 antialiased">
+<div id="app" v-cloak>
+    <mock-bar title="__TITLE__"></mock-bar>
+    <main class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
+        <mock-frame>
+__VARIANTS__
+        </mock-frame>
+        <mock-rules :rules="rules"></mock-rules>
+    </main>
+    <mock-toast></mock-toast>
+</div>
+<script type="module">
+import { createMock } from "./_kit/kit.js"
+// Project components: import Name from "./_kit/components/Name.js" and add it to `components`.
+
+createMock({
+    variants: __VARIANT_LIST__,
+    components: {},
+    state: () => ({
+        clicks: 0,
+    }),
+    data: () => ({
+        rules: __RULES__,
+    }),
+})
+</script>
+</body>
+</html>
