@@ -14,7 +14,6 @@ __HEAD__
         <mock-frame>
 __VARIANTS__
         </mock-frame>
-        <mock-rules :rules="rules"></mock-rules>
     </main>
     <mock-toast></mock-toast>
 </div>
@@ -24,12 +23,10 @@ import { createMock } from "./_kit/kit.js"
 
 createMock({
     variants: __VARIANT_LIST__,
+    options: __OPTIONS__,
     components: {},
     state: () => ({
         clicks: 0,
-    }),
-    data: () => ({
-        rules: __RULES__,
     }),
 })
 </script>

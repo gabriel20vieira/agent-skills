@@ -102,3 +102,18 @@ iterar até ao «sim», depois `status aprovada` e, implementado, `status implem
 
 Gerar código de produção a partir da mock. Ler temas de apps automaticamente a partir de código
 nativo: o agente traduz para tokens JSON.
+
+## 8. Adenda: dispositivos, opções e decisões fora da mock (2026-11-13, pedido do utilizador)
+
+- **Três dispositivos sempre.** A barra mostra sempre computador, tablet (768px) e telemóvel
+  (390px), e o `shots` captura os três (janelas de 1280, 860 e 520px).
+- **Opções por variante.** Além das variantes (A, B, C...), cada variante pode ter opções
+  independentes que se ligam e desligam: A com X e Y, B com Y e Z. Mostram combinações do que
+  implementar ou deixar de fora. Entram ou não conforme o que o utilizador pedir, caso a caso.
+  - `new --options "A:X,Y;B:Y,Z"`; na mock `<mock-option name="X">` ou `option('X')`.
+  - Na barra, interruptores das opções da variante ativa.
+  - `?options=X,Y` liga exatamente essas, e `shots --variants A --options "X,Y"` captura essa
+    combinação (`--options ""` para nenhuma).
+- **Decisões fora da mock.** `MockRules` («O que esta mock decide») sai do shell e do modelo.
+  O agente escreve no texto as decisões, as variantes e as opções, com prós, contras e a
+  recomendação. `mocks.json` pode guardar as decisões para registo.

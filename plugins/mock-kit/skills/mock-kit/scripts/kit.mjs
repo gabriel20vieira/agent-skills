@@ -1,6 +1,6 @@
 // The mock kit inside a project: init, new mocks, components, the index and its checks.
 // Every function takes { root, dir }: the project root and the mocks folder relative to it.
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs"
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs"
 import { dirname, join, relative, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 import { DEFAULT_TOKENS, renderThemeCss, themeBlock, tokensFromCss, tokensFromJson } from "./theme.mjs"
@@ -19,6 +19,8 @@ const TEXT = {
     "pt-PT": {
         variant: "Variante",
         placeholder: "Substitua este conteúdo pela mock: dados realistas e tudo clicável.",
+        option: "Opção",
+        optionHint: "Só aparece com esta opção ligada na barra.",
         tryIt: "Experimentar",
         clicked: "Clique",
         title: "Mocks",
@@ -34,6 +36,8 @@ const TEXT = {
     "en-US": {
         variant: "Variant",
         placeholder: "Replace this with the mock: realistic data, everything clickable.",
+        option: "Option",
+        optionHint: "Only shown while this option is on in the bar.",
         tryIt: "Try it",
         clicked: "Click",
         title: "Mocks",
@@ -107,7 +111,7 @@ export function init({ root, dir, lang = "pt-PT", fromCss, fromTokens, updateShe
     for (const source of listFiles(ASSETS)) {
         const rel = relative(ASSETS, source)
         const target = join(p.kit, rel)
-        const isShell = rel.startsWith("shell")
+        const isShell = rel.startsWith("shell") || rel === "kit.js"
         if (existsSync(target) && !(isShell && updateShell)) {
             kept.push(rel)
             continue
@@ -116,12 +120,24 @@ export function init({ root, dir, lang = "pt-PT", fromCss, fromTokens, updateShe
         cpSync(source, target)
         created.push(rel)
     }
+    // The shell belongs to the plugin: on update, drop shell files it no longer ships.
+    const removed = []
+    if (updateShell) {
+        const shipped = new Set(listFiles(join(ASSETS, "shell")).map((file) => relative(ASSETS, file).replace(/\\/g, "/")))
+        for (const file of listFiles(join(p.kit, "shell"))) {
+            const rel = relative(p.kit, file).replace(/\\/g, "/")
+            if (!shipped.has(rel)) {
+                rmSync(file)
+                removed.push(rel)
+            }
+        }
+    }
     if (!existsSync(p.components)) writeJson(p.components, [])
     if (!existsSync(p.mocks)) writeJson(p.mocks, { lang, mocks: [] })
     let theme = "kept"
     if (fromCss || fromTokens || !existsSync(p.theme)) theme = writeTheme({ root, dir, fromCss, fromTokens })
     buildIndex({ root, dir })
-    return { created, kept, theme }
+    return { created, kept, removed, theme }
 }
 
 /** The generated <head> block: importmap, Tailwind, Lucide, theme.css and the @theme mapping. */
@@ -147,8 +163,21 @@ function withHead(html, head) {
     return html.replace(/<\/head>/i, `${head}\n</head>`)
 }
 
-/** Creates <slug>.html from the template and registers it in mocks.json. */
-export function newMock({ root, dir, slug, title, variants = ["A"], decisions = [], date = new Date().toISOString().slice(0, 10) }) {
+/** "A:X,Y;B:Y,Z" -> { A: ["X", "Y"], B: ["Y", "Z"] }. Options are independent on/off choices per variant. */
+export function parseOptions(text, variants) {
+    const options = {}
+    for (const part of (text ?? "").split(";").map((item) => item.trim()).filter(Boolean)) {
+        const at = part.indexOf(":")
+        const variant = (at < 0 ? "" : part.slice(0, at)).trim()
+        if (!variants.includes(variant)) throw new Error(`Unknown variant "${variant}" in --options: use ${variants.join(", ")}`)
+        options[variant] = part.slice(at + 1).split(",").map((item) => item.trim()).filter(Boolean)
+    }
+    return options
+}
+
+/** Creates <slug>.html from the template and registers it in mocks.json. Decisions are kept in the
+ * registry for the record; they are presented in the agent's message, never inside the mock. */
+export function newMock({ root, dir, slug, title, variants = ["A"], options = {}, decisions = [], date = new Date().toISOString().slice(0, 10) }) {
     if (!SLUG.test(slug ?? "")) throw new Error(`Invalid slug "${slug}": use lowercase letters, digits and dashes`)
     const p = paths(root, dir)
     const registry = readJson(p.mocks, { lang: "pt-PT", mocks: [] })
@@ -161,6 +190,11 @@ export function newMock({ root, dir, slug, title, variants = ["A"], decisions = 
         `                    <h1 class="text-xl font-semibold">${escapeHtml(title)} · ${t.variant} ${escapeHtml(name)}</h1>`,
         `                    <p class="text-muted-foreground">${t.placeholder}</p>`,
         `                    <button type="button" class="w-fit rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" @click="state.clicks++; toast('${t.clicked} ' + state.clicks)">${t.tryIt}</button>`,
+        ...(options[name] ?? []).flatMap((option) => [
+            `                    <mock-option name="${escapeHtml(option)}">`,
+            `                        <p class="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">${t.option} ${escapeHtml(option)}: ${t.optionHint}</p>`,
+            "                    </mock-option>",
+        ]),
         "                </section>",
         "            </mock-variant>",
     ].join("\n"))
@@ -170,9 +204,9 @@ export function newMock({ root, dir, slug, title, variants = ["A"], decisions = 
         .replaceAll("__TITLE__", escapeHtml(title))
         .replace("__VARIANTS__", () => blocks.join("\n"))
         .replace("__VARIANT_LIST__", () => scriptJson(variants))
-        .replace("__RULES__", () => scriptJson(decisions))
+        .replace("__OPTIONS__", () => scriptJson(options))
     writeFileSync(join(p.base, file), html)
-    registry.mocks.push({ file, title, date, status: "proposta", decisions, variants })
+    registry.mocks.push({ file, title, date, status: "proposta", decisions, variants, options })
     writeJson(p.mocks, registry)
     buildIndex({ root, dir })
     return { file: join(p.base, file) }

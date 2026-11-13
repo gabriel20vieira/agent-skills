@@ -3,19 +3,19 @@
 //
 //   node mock-kit.mjs init [--dir docs/mocks] [--lang pt-PT] [--from-css f | --from-tokens f] [--update-shell]
 //   node mock-kit.mjs theme --from-css f | --from-tokens f
-//   node mock-kit.mjs new <slug> --title "..." [--variants A,B] [--decisions "first|second"]
+//   node mock-kit.mjs new <slug> --title "..." [--variants A,B] [--options "A:X,Y;B:Y,Z"] [--decisions "first|second"]
 //   node mock-kit.mjs component <Name> --desc "..."
 //   node mock-kit.mjs index | check
 //   node mock-kit.mjs used <slug>
 //   node mock-kit.mjs status <slug> proposta|aprovada|implementada
 //   node mock-kit.mjs serve [--port 8765]
-//   node mock-kit.mjs shots <slug> [--browser path]
+//   node mock-kit.mjs shots <slug> [--variants A] [--options "X,Y"] [--browser path]
 //
 // Runs in the repo of the current folder; --dir is relative to the repo root.
 import { execFileSync } from "node:child_process"
 import { resolve } from "node:path"
 import { fileURLToPath } from "node:url"
-import { addComponent, buildIndex, checkKit, init, newMock, setStatus, used, writeTheme } from "./kit.mjs"
+import { addComponent, buildIndex, checkKit, init, newMock, parseOptions, setStatus, used, writeTheme } from "./kit.mjs"
 import { launchEntry, startServer } from "./serve.mjs"
 import { findBrowser, takeShots } from "./shots.mjs"
 
@@ -61,7 +61,7 @@ async function main(argv) {
     switch (command) {
         case "init": {
             const result = init({ ...ctx, lang: options.lang, fromCss: options["from-css"], fromTokens: options["from-tokens"], updateShell: options["update-shell"] })
-            console.log(`Kit in ${resolve(root, dir)}: ${result.created.length} files created, ${result.kept.length} kept, theme ${result.theme}`)
+            console.log(`Kit in ${resolve(root, dir)}: ${result.created.length} files created, ${result.kept.length} kept, ${result.removed.length} removed, theme ${result.theme}`)
             return 0
         }
         case "theme": {
@@ -76,7 +76,7 @@ async function main(argv) {
             if (!options.title) throw new Error(`new needs --title\n${USAGE}`)
             const variants = (options.variants ?? "A").split(",").map((item) => item.trim()).filter(Boolean)
             const decisions = options.decisions ? options.decisions.split("|").map((item) => item.trim()).filter(Boolean) : []
-            const { file } = newMock({ ...ctx, slug: first, title: options.title, variants, decisions })
+            const { file } = newMock({ ...ctx, slug: first, title: options.title, variants, options: parseOptions(options.options, variants), decisions })
             console.log(`Created ${file}`)
             return 0
         }
@@ -116,7 +116,14 @@ async function main(argv) {
             return null
         }
         case "shots": {
-            const files = await takeShots({ ...ctx, slug: first, browser: options.browser ?? findBrowser() })
+            const list = (value) => value.split(",").map((item) => item.trim()).filter(Boolean)
+            const files = await takeShots({
+                ...ctx,
+                slug: first,
+                browser: options.browser ?? findBrowser(),
+                variants: options.variants ? list(options.variants) : null,
+                options: options.options === undefined ? null : list(options.options),
+            })
             for (const file of files) console.log(file)
             buildIndex(ctx)
             return 0
