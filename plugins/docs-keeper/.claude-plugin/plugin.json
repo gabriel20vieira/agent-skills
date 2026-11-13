@@ -3,5 +3,6 @@
     "version": "0.1.0",
     "description": "Keeps a project's docs/ as one folder per category and one file per topic: detects and creates what is missing, updates docs as the code changes, and keeps every doc listed in CLAUDE.md.",
     "author": { "name": "Gabriel Vieira", "email": "gabriel20vieira@hotmail.com" },
+    "license": "MIT",
     "keywords": ["documentation", "docs", "claude-md"]
 }

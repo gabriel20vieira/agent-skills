@@ -66,3 +66,7 @@ Skill scripts have their own tests (both plugins):
 node --test skills/*/scripts/*.test.mjs plugins/*/skills/*/scripts/*.test.mjs
 ```
 See `templates/nuxt-base/README.md` for running the template.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
