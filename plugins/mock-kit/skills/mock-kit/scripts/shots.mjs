@@ -1,5 +1,5 @@
 // Screenshots of a mock with the machine's Chrome, Edge or Chromium in headless mode: every
-// variant, on desktop and on mobile, into <dir>/_shots/.
+// variant, on desktop, tablet and mobile, into <dir>/_shots/.
 import { execFile } from "node:child_process"
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
@@ -10,7 +10,8 @@ import { startServer } from "./serve.mjs"
 const run = promisify(execFile)
 // Mobile is wider than the 390px frame: headless Chrome on Windows keeps windows at least ~500px
 // wide and crops a narrower screenshot, which cuts the frame. 520px shows it whole, centred.
-export const SIZES = { desktop: [1280, 900], mobile: [520, 932] }
+export const SIZES = { desktop: [1280, 900], tablet: [860, 1180], mobile: [520, 932] }
+export const DEVICES = ["desktop", "tablet", "mobile"]
 
 /** The browser to use: MOCK_KIT_BROWSER, then the usual install paths. Null when none is found. */
 export function findBrowser({ env = process.env, platform = process.platform, exists = existsSync } = {}) {
@@ -32,13 +33,17 @@ export function findBrowser({ env = process.env, platform = process.platform, ex
     return candidates.find((path) => exists(path)) ?? null
 }
 
-/** One shot per variant and device. */
-export function shotPlan({ slug, variants = ["A"], devices = ["desktop", "mobile"] }) {
+const fileSafe = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+
+/** One shot per variant and device. With options (a list, even empty), exactly those are on. */
+export function shotPlan({ slug, variants = ["A"], devices = DEVICES, options = null }) {
+    const suffix = options ? (options.length ? `-${options.map(fileSafe).join("+")}` : "-no-options") : ""
+    const optionQuery = options ? `&options=${encodeURIComponent(options.join(","))}` : ""
     return variants.flatMap((variant) => devices.map((device) => ({
         variant,
         device,
-        file: `${slug}-${variant}-${device}.png`,
-        query: `?variant=${encodeURIComponent(variant)}&device=${device}&shot=1`,
+        file: `${slug}-${variant}${suffix}-${device}.png`,
+        query: `?variant=${encodeURIComponent(variant)}&device=${device}&shot=1${optionQuery}`,
         size: SIZES[device],
     })))
 }
@@ -59,8 +64,9 @@ export function browserArgs({ url, file, size, profileDir }) {
     ]
 }
 
-/** Serves the mocks folder on a free port and captures every shot of one mock. Returns the PNG paths. */
-export async function takeShots({ root, dir, slug, browser = findBrowser() }) {
+/** Serves the mocks folder on a free port and captures every shot of one mock. Returns the PNG paths.
+ * variants limits the variants; options turns exactly those options on. */
+export async function takeShots({ root, dir, slug, browser = findBrowser(), variants = null, options = null }) {
     if (!browser) throw new Error("No Chrome, Edge or Chromium found: set MOCK_KIT_BROWSER or pass --browser <path>")
     const base = join(root, dir)
     const registry = JSON.parse(readFileSync(join(base, "mocks.json"), "utf8"))
@@ -72,7 +78,7 @@ export async function takeShots({ root, dir, slug, browser = findBrowser() }) {
     const { server, url } = await startServer({ root: base, port: 0 })
     const files = []
     try {
-        for (const shot of shotPlan({ slug, variants: mock.variants ?? ["A"] })) {
+        for (const shot of shotPlan({ slug, variants: variants ?? mock.variants ?? ["A"], options })) {
             const file = join(outDir, shot.file)
             rmSync(file, { force: true })
             await run(browser, browserArgs({ url: `${url}${mock.file}${shot.query}`, file, size: shot.size, profileDir }), { timeout: 90000 })

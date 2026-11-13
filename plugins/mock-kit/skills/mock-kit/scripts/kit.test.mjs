@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { after, test } from "node:test"
-import { addComponent, buildIndex, checkKit, HEAD_END, HEAD_START, init, newMock, setStatus, usedComponents } from "./kit.mjs"
+import { addComponent, buildIndex, checkKit, HEAD_END, HEAD_START, init, newMock, parseOptions, setStatus, usedComponents } from "./kit.mjs"
 
 const base = mkdtempSync(join(tmpdir(), "mock-kit-"))
 after(() => rmSync(base, { recursive: true, force: true }))
@@ -36,6 +36,21 @@ test("init creates the kit, the registries and the index, and is idempotent", ()
     assert.equal(read(root, "_kit/theme.css"), ":root { --primary: red; }\n")
 })
 
+test("init --update-shell refreshes kit.js and the shell, never components or versions", () => {
+    const root = project()
+    init({ root, dir })
+    writeFileSync(join(root, dir, "_kit/kit.js"), "// old runtime\n")
+    writeFileSync(join(root, dir, "_kit/shell/MockBar.js"), "// old bar\n")
+    writeFileSync(join(root, dir, "_kit/versions.json"), "{\"vue\":\"pinned\"}\n")
+    writeFileSync(join(root, dir, "_kit/shell/MockRules.js"), "// dropped from the shell\n")
+    const result = init({ root, dir, updateShell: true })
+    assert.ok(!existsSync(join(root, dir, "_kit/shell/MockRules.js")), "shell files the plugin no longer ships are removed")
+    assert.deepEqual(result.removed, ["shell/MockRules.js"])
+    assert.match(read(root, "_kit/kit.js"), /createMock/)
+    assert.match(read(root, "_kit/shell/MockBar.js"), /MockBar/)
+    assert.equal(read(root, "_kit/versions.json"), "{\"vue\":\"pinned\"}\n")
+})
+
 test("init --from-css writes the project tokens into theme.css", () => {
     const root = project()
     mkdirSync(join(root, "app"), { recursive: true })
@@ -51,17 +66,25 @@ test("init --from-css writes the project tokens into theme.css", () => {
 test("newMock writes an interactive mock with the head block and registers it", () => {
     const root = project()
     init({ root, dir })
-    newMock({ root, dir, slug: "checkout", title: "Checkout", variants: ["A", "B"], decisions: ["Pay at the end", "Guest checkout"], date: "2026-11-13" })
+    newMock({ root, dir, slug: "checkout", title: "Checkout", variants: ["A", "B"], options: { A: ["Coupons", "Gift wrap"], B: ["Gift wrap", "Express"] }, decisions: ["Pay at the end", "Guest checkout"], date: "2026-11-13" })
     const html = read(root, "checkout.html")
     assert.ok(html.includes(HEAD_START) && html.includes(HEAD_END))
     assert.match(html, /<script type="importmap">/)
     assert.match(html, /@theme inline/)
     assert.match(html, /<mock-variant name="A">/)
     assert.match(html, /<mock-variant name="B">/)
-    assert.match(html, /"Guest checkout"/)
+    assert.doesNotMatch(html, /Guest checkout|mock-rules/, "decisions belong in the agent's text, not in the mock")
+    assert.match(html, /options: \{"A":\["Coupons","Gift wrap"\],"B":\["Gift wrap","Express"\]\}/)
+    assert.match(html, /<mock-option name="Coupons">/)
     assert.match(html, /@click=/)
-    assert.deepEqual(json(root, "mocks.json").mocks, [{ file: "checkout.html", title: "Checkout", date: "2026-11-13", status: "proposta", decisions: ["Pay at the end", "Guest checkout"], variants: ["A", "B"] }])
+    assert.deepEqual(json(root, "mocks.json").mocks, [{ file: "checkout.html", title: "Checkout", date: "2026-11-13", status: "proposta", decisions: ["Pay at the end", "Guest checkout"], variants: ["A", "B"], options: { A: ["Coupons", "Gift wrap"], B: ["Gift wrap", "Express"] } }])
     assert.match(read(root, "index.html"), /checkout\.html/)
+})
+
+test("parseOptions reads per-variant options and refuses unknown variants", () => {
+    assert.deepEqual(parseOptions("A:X,Y;B:Y,Z", ["A", "B"]), { A: ["X", "Y"], B: ["Y", "Z"] })
+    assert.deepEqual(parseOptions("", ["A"]), {})
+    assert.throws(() => parseOptions("C:X", ["A", "B"]), /Unknown variant "C"/)
 })
 
 test("newMock refuses invalid slugs and never overwrites", () => {

@@ -22,35 +22,44 @@ Versions live in `_kit/versions.json`; the theme in `_kit/theme.css`.
 ## Flow
 
 1. **Summary first.** A few lines on what will be built, and the decisions as a numbered list
-   (Decision 1, 2, 3...). No app code yet.
+   (Decision 1, 2, 3...). No app code yet. The decisions, variants and options are written in
+   your message, never inside the mock.
 2. **Kit.** If the mocks folder has no `_kit/`, run `node "$MOCK" init`. When the project has a
    theme, use it (`references/theme.md`): web CSS with `--from-css <file>`, an app's theme as a
    tokens JSON with `--from-tokens <file>`. Mocks are always white and light; colours, fonts and
-   radii come from the theme.
+   radii come from the theme. After a plugin update, `init --update-shell` refreshes `kit.js` and
+   the shell (and removes shell files no longer shipped); components and versions stay.
 3. **Reuse before writing.** Read `_kit/components.json`. Use what exists. Anything new that
    another mock could use (a list with actions, a stepped form, a status card, the project's
    navigation bar) becomes a component: `node "$MOCK" component <Name> --desc "..."`, then
    write it (`references/components.md`). Never paste a reusable block straight into a mock.
-4. **Write the mock.** `node "$MOCK" new <slug> --title "..." --variants A,B --decisions "a|b|c"`,
-   then replace the placeholder content:
+4. **Write the mock.** `node "$MOCK" new <slug> --title "..." --variants A,B --options "A:X,Y;B:Y,Z"`
+   (`--decisions "a|b|c"` keeps them in `mocks.json` for the record), then replace the
+   placeholder content:
    - realistic data in the project's language (names, amounts, dates, states);
    - simulated state in `state: () => ({ ... })`, so "Reset" restores it;
    - every interaction clickable: buttons, filters, forms, tabs, confirmations, empty and error
      states. A mock that cannot be clicked is not a mock (`check` fails without interactions);
-   - variants when there is a choice to make (`references/variants.md`);
-   - the decisions in `<mock-rules>`, numbered as in the summary.
+   - variants (A, B, C...) when there is a choice of approach, and per-variant options (X, Y,
+     Z...) for independent pieces that can be built or left out (`references/variants.md`):
+     whether to add them depends on what the user asked, case by case;
+   - the bar always offers desktop, tablet and mobile: the mock must work on all three.
 5. **Index.** `node "$MOCK" index` (head blocks, `index.html`, which mock uses which component),
    then `node "$MOCK" check`.
 6. **Verify in the browser.** Serve the folder: add the entry `serve` prints to
    `.claude/launch.json` and open it in the browser pane (or run `node "$MOCK" serve` in the
    background and open `http://127.0.0.1:8765/<slug>.html`). Go through
-   `references/mock-checklist.md`: main paths clicked, console without errors, desktop and
-   mobile, every variant. Fix and repeat until it passes.
-7. **Screenshots.** `node "$MOCK" shots <slug>` writes desktop and mobile shots of every
-   variant to `_shots/`. Look at them, then show them to the user with the summary and the
-   link: send the PNG files (SendUserFile when available) or show them inline. Always include
-   screenshots when presenting a mock.
-8. **Iterate** with the user until they say yes. Then `node "$MOCK" status <slug> aprovada`.
+   `references/mock-checklist.md`: main paths clicked, console without errors, desktop, tablet
+   and mobile, every variant and option. Fix and repeat until it passes.
+7. **Screenshots.** `node "$MOCK" shots <slug>` writes desktop, tablet and mobile shots of
+   every variant to `_shots/`, with each variant's default options. For a specific
+   combination: `shots <slug> --variants B --options "Y,Z"` (`--options ""` for none). Look at
+   them, then show them to the user with the summary and the link: send the PNG files
+   (SendUserFile when available) or show them inline. Always include screenshots when
+   presenting a mock.
+8. **Present** in your message: the summary, the numbered decisions, each variant and its
+   options with pros and cons and your recommendation, the screenshots and the local link.
+9. **Iterate** with the user until they say yes. Then `node "$MOCK" status <slug> aprovada`.
    After the feature is built, `node "$MOCK" status <slug> implementada`.
 
 ## Rules
@@ -63,6 +72,7 @@ Versions live in `_kit/versions.json`; the theme in `_kit/theme.css`.
   `text-muted-foreground`, `border-border`, `rounded-lg`, `font-sans`), and read the project's
   UI guide (for example `docs/ui/`) when there is one.
 - Page and frame are always white. Never add a dark mode to a mock.
+- No decision list inside the mock: what the mock decides is written in your message.
 - In HTML files, components are written in kebab-case with a closing tag
   (`<order-list></order-list>`), never self-closing.
 - Cleaning up: when the user asks to delete mocks, delete the files they named, then
