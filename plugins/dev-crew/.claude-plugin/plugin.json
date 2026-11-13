@@ -3,5 +3,6 @@
     "version": "0.3.0",
     "description": "A crew of subagents for big coding tasks and for analysing large bodies of code or docs: each role on the model suited to it (plan and review on Fable or Opus, develop on Sonnet, verify on Haiku), git worktrees per area for code, every decision written to docs.",
     "author": { "name": "Gabriel Vieira", "email": "gabriel20vieira@hotmail.com" },
+    "license": "MIT",
     "keywords": ["subagents", "orchestration", "worktrees"]
 }

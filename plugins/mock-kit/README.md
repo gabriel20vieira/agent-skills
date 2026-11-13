@@ -56,3 +56,7 @@ Shell components: `MockBar`, `MockFrame`, `MockVariant`, `MockOption`, `MockToas
 for English). The decisions are written in Claude's message, not in the mock. Set `MOCK_KIT_BROWSER` if your Chrome, Edge or Chromium is not in the usual place.
 
 Design: `docs/superpowers/specs/2026-11-13-mock-kit-design.md`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

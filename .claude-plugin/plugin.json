@@ -3,5 +3,6 @@
     "version": "0.1.0",
     "description": "Nuxt 4 website foundation: a runnable template plus skills to scaffold projects and add resources, realtime, assistant, PWA and deploy.",
     "author": { "name": "Gabriel Vieira", "email": "gabriel20vieira@hotmail.com" },
+    "license": "MIT",
     "keywords": ["nuxt", "website", "template", "scaffold"]
 }

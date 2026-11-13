@@ -31,3 +31,7 @@ Docs are written in `docs.language` from `docs/settings.md` when the project has
 dev-crew scribe follows this plugin's layout when both are installed.
 
 Design: `docs/superpowers/specs/2026-10-22-docs-keeper-design.md`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

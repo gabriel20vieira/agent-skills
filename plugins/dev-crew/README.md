@@ -59,3 +59,7 @@ Then ask for a task that splits ("add CSV export to notes, API and UI, with test
 - `agents/`: the four crew agents, with the model and effort pinned in the frontmatter.
 
 Tests: `node --test plugins/dev-crew/skills/*/scripts/*.test.mjs`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
