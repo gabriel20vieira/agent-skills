@@ -4,7 +4,7 @@
         "name": "Gabriel Vieira"
     },
     "metadata": {
-        "description": "Claude Code plugins: a Nuxt 4 website foundation, a crew of subagents, and a docs keeper."
+        "description": "Claude Code plugins: a Nuxt 4 website foundation, a crew of subagents, a docs keeper and a mock kit."
     },
     "plugins": [
         {
@@ -21,6 +21,11 @@
             "name": "docs-keeper",
             "source": "./plugins/docs-keeper",
             "description": "Keeps a project's docs/ as one folder per category and one file per topic, updated as the code changes and always listed in CLAUDE.md."
+        },
+        {
+            "name": "mock-kit",
+            "source": "./plugins/mock-kit",
+            "description": "Interactive mocks before big features: Vue 3 + Tailwind by CDN with no build, always white and styled like the project, a growing component library, browser checks and screenshots."
         }
     ]
 }
