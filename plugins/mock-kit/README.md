@@ -8,9 +8,9 @@ those mocks fast and consistent:
   versions pinned in one place (`_kit/versions.json`).
 - **Always white, in your project's style.** Colours, fonts and radii come from your web theme
   (`--from-css`) or your app's tokens (`--from-tokens`).
-- **Always interactive.** The bar shows desktop, tablet and mobile with "State" (the simulated
-  state), then variants A/B/C and per-variant options that switch on and off (A with X and Y,
-  B with Y and Z), and "Reset". Modals and toasts. `check` fails on a mock with nothing to click.
+- **Always interactive.** The bar's first row shows desktop, tablet and mobile with "State" (the
+  simulated state as a searchable, collapsible JSON tree) and "Reset"; the second row shows
+  variants A/B/C and per-variant options that switch on and off (A with X and Y, B with Y and Z). Modals and toasts. `check` fails on a mock with nothing to click.
 - **Responsive.** The frame is a container: mocks use container variants (`@3xl:`), so the
   layout follows the chosen device. `check` warns about viewport breakpoints.
 - **The choice is recorded.** What is selected in the bar is saved in `mocks.json`; the user
@@ -51,7 +51,7 @@ node <plugin>/skills/mock-kit/scripts/mock-kit.mjs shots checkout --variants B -
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs status checkout aprovada
 ```
 
-Shell components: `MockBar`, `MockFrame`, `MockVariant`, `MockOption`, `MockToast`, `MockModal`,
+Shell components: `MockBar`, `MockFrame`, `MockVariant`, `MockOption`, `MockToast`, `MockModal`, `MockJson`,
 `MockStepper`, `MockIcon`. Mock texts are pt-PT by default (`init --lang en-US`
 for English). The decisions are written in Claude's message, not in the mock. Set `MOCK_KIT_BROWSER` if your Chrome, Edge or Chromium is not in the usual place.
 
