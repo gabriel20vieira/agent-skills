@@ -15,15 +15,15 @@ writeFileSync(join(root, "_kit", "kit.js"), "export {}")
 writeFileSync(join(base, "secret.txt"), "secret")
 after(() => rmSync(base, { recursive: true, force: true }))
 
-function get(port, path) {
+function get(port, path, method = "GET", body = null) {
     return new Promise((resolve, reject) => {
-        const req = request({ host: "127.0.0.1", port, path, method: "GET" }, (res) => {
+        const req = request({ host: "127.0.0.1", port, path, method }, (res) => {
             let body = ""
             res.on("data", (chunk) => { body += chunk })
             res.on("end", () => resolve({ status: res.statusCode, type: res.headers["content-type"], body }))
         })
         req.on("error", reject)
-        req.end()
+        req.end(body ?? undefined)
     })
 }
 
@@ -51,6 +51,32 @@ test("refuses paths that leave the folder", async () => {
             assert.equal(res.status, 403, path)
             assert.doesNotMatch(res.body, /secret/)
         }
+    } finally {
+        server.close()
+    }
+})
+
+test("renders / fresh and saves the mock choice by POST /_kit/choice", async () => {
+    const saved = []
+    const { server, port } = await startServer({
+        root,
+        port: 0,
+        renderIndex: () => "<h1>fresh</h1>",
+        saveChoice: (choice) => {
+            if (choice.variant === "bad") throw new Error("Unknown variant")
+            saved.push(choice)
+            return choice
+        },
+    })
+    try {
+        assert.equal((await get(port, "/")).body, "<h1>fresh</h1>")
+        assert.equal((await get(port, "/index.html")).body, "<h1>fresh</h1>")
+        const ok = await get(port, "/_kit/choice", "POST", JSON.stringify({ file: "pay.html", variant: "B", options: ["Z"] }))
+        assert.equal(ok.status, 200)
+        assert.deepEqual(saved, [{ file: "pay.html", variant: "B", options: ["Z"] }])
+        assert.equal((await get(port, "/_kit/choice", "POST", "{nope")).status, 400)
+        assert.equal((await get(port, "/_kit/choice", "POST", JSON.stringify({ file: "pay.html", variant: "bad", options: [] }))).status, 400)
+        assert.equal((await get(port, "/_kit/choice", "POST", "x".repeat(20000))).status, 413)
     } finally {
         server.close()
     }

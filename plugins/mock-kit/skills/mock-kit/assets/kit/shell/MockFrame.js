@@ -1,5 +1,6 @@
 // MockFrame: the white frame the mock lives in. Desktop (up to 1280px), tablet (768px), mobile (390px), or a
-// fixed ratio such as "3:2" for a POS or kiosk screen.
+// fixed ratio such as "3:2" for a POS or kiosk screen. The frame is a container: mocks use container
+// variants (@md:, @3xl:, @5xl:) so the layout follows the chosen device, not the browser window.
 import { computed, defineComponent } from "vue"
 import { useMock } from "../kit.js"
 
@@ -24,7 +25,7 @@ export default defineComponent({
     },
     template: `
         <div class="flex justify-center">
-            <div class="relative max-w-full overflow-hidden bg-white text-foreground shadow-sm ring-1 ring-slate-200 font-sans"
+            <div class="@container relative max-w-full overflow-hidden bg-white text-foreground shadow-sm ring-1 ring-slate-200 font-sans"
                 :class="mock.device === 'mobile' ? 'rounded-[2rem]' : mock.device === 'tablet' ? 'rounded-[1.5rem]' : 'rounded-xl'"
                 :style="style" :data-device="mock.device">
                 <slot></slot>

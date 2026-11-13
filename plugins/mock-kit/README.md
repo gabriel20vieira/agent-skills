@@ -8,9 +8,13 @@ those mocks fast and consistent:
   versions pinned in one place (`_kit/versions.json`).
 - **Always white, in your project's style.** Colours, fonts and radii come from your web theme
   (`--from-css`) or your app's tokens (`--from-tokens`).
-- **Always interactive.** Simulated state with "Reset", variants A/B/C, per-variant options
-  that switch on and off (A with X and Y, B with Y and Z), desktop, tablet and mobile always in
-  the bar, modals and toasts. `check` fails on a mock with nothing to click.
+- **Always interactive.** The bar shows desktop, tablet and mobile with "State" (the simulated
+  state), then variants A/B/C and per-variant options that switch on and off (A with X and Y,
+  B with Y and Z), and "Reset". Modals and toasts. `check` fails on a mock with nothing to click.
+- **Responsive.** The frame is a container: mocks use container variants (`@3xl:`), so the
+  layout follows the chosen device. `check` warns about viewport breakpoints.
+- **The choice is recorded.** What is selected in the bar is saved in `mocks.json`; the user
+  can also say it in the chat. `choice <slug>` reads or sets it.
 - **A component library that grows.** Reusable pieces become components in
   `_kit/components/`, registered in `components.json` with where they are used.
 - **Screenshots.** `shots` captures every variant on desktop, tablet and mobile with your
@@ -25,7 +29,7 @@ The skill loads by itself before large features. In a project it creates:
 ```
 docs/mocks/
   index.html          list of mocks with thumbnails
-  mocks.json          lang, and each mock: file, title, date, status, decisions, variants
+  mocks.json          lang, and each mock: file, title, date, status, decisions, variants, options, choice
   _kit/               kit.js, versions.json, theme.css, components.json, components/, shell/
   _shots/             screenshots
   <slug>.html         one mock
@@ -39,14 +43,16 @@ node <plugin>/skills/mock-kit/scripts/mock-kit.mjs component OrderList --desc "O
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs new checkout --title "Checkout" --variants A,B --options "A:Coupons,Gift wrap;B:Gift wrap,Express"
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs index      # head blocks, index.html, component use
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs check      # exit 1 on problems
-node <plugin>/skills/mock-kit/scripts/mock-kit.mjs serve      # http://127.0.0.1:8765/
+node <plugin>/skills/mock-kit/scripts/mock-kit.mjs serve      # http://127.0.0.1:8765/ lists every mock
+node <plugin>/skills/mock-kit/scripts/mock-kit.mjs choice checkout                         # what to implement
+node <plugin>/skills/mock-kit/scripts/mock-kit.mjs choice checkout --variant B --options "Express"
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs shots checkout
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs shots checkout --variants B --options "Express"
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs status checkout aprovada
 ```
 
 Shell components: `MockBar`, `MockFrame`, `MockVariant`, `MockOption`, `MockToast`, `MockModal`,
-`MockState`, `MockStepper`, `MockIcon`. Mock texts are pt-PT by default (`init --lang en-US`
+`MockStepper`, `MockIcon`. Mock texts are pt-PT by default (`init --lang en-US`
 for English). The decisions are written in Claude's message, not in the mock. Set `MOCK_KIT_BROWSER` if your Chrome, Edge or Chromium is not in the usual place.
 
 Design: `docs/superpowers/specs/2026-11-13-mock-kit-design.md`.

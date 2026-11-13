@@ -43,12 +43,16 @@ Versions live in `_kit/versions.json`; the theme in `_kit/theme.css`.
    - variants (A, B, C...) when there is a choice of approach, and per-variant options (X, Y,
      Z...) for independent pieces that can be built or left out (`references/variants.md`):
      whether to add them depends on what the user asked, case by case;
-   - the bar always offers desktop, tablet and mobile: the mock must work on all three.
+   - layout and responsive behaviour planned for each screen: the bar always offers desktop,
+     tablet and mobile and the mock must be right on all three. The frame is a container, so
+     use container variants (`@md:`, `@3xl:`, `@5xl:`), never viewport ones (`md:`), which
+     follow the browser window instead of the chosen device (`references/layout.md`).
 5. **Index.** `node "$MOCK" index` (head blocks, `index.html`, which mock uses which component),
    then `node "$MOCK" check`.
 6. **Verify in the browser.** Serve the folder: add the entry `serve` prints to
    `.claude/launch.json` and open it in the browser pane (or run `node "$MOCK" serve` in the
-   background and open `http://127.0.0.1:8765/<slug>.html`). Go through
+   background). The root `http://127.0.0.1:8765/` lists every mock in the folder; a mock is at
+   `/<slug>.html`. Go through
    `references/mock-checklist.md`: main paths clicked, console without errors, desktop, tablet
    and mobile, every variant and option. Fix and repeat until it passes.
 7. **Screenshots.** `node "$MOCK" shots <slug>` writes desktop, tablet and mobile shots of
@@ -62,6 +66,18 @@ Versions live in `_kit/versions.json`; the theme in `_kit/theme.css`.
 9. **Iterate** with the user until they say yes. Then `node "$MOCK" status <slug> aprovada`.
    After the feature is built, `node "$MOCK" status <slug> implementada`.
 
+## Choice: which variant and options to implement
+
+The user can say in the chat which variant and options to build ("B with Y"). Record it:
+`node "$MOCK" choice <slug> --variant B --options "Y"` (`--options ""` for none).
+
+When they do not say it, the choice is what is selected in the mock: the bar records every
+change of variant or option in `mocks.json` while the page is served. Read it with
+`node "$MOCK" choice <slug>` (`{"variant":"B","options":["Y"],"source":"mock"}`; `"default"`
+when nothing was ever selected: the first variant with its options). Before implementing, say
+it in the chat, for example: "Vou implementar o que está selecionado na mock: variante B com
+Y. Se preferires outra combinação, diz-me." Then build exactly that combination.
+
 ## Rules
 
 - Never `alert()`, `confirm()` or `prompt()`: use `<mock-modal>` and `toast()`.
@@ -73,6 +89,8 @@ Versions live in `_kit/versions.json`; the theme in `_kit/theme.css`.
   UI guide (for example `docs/ui/`) when there is one.
 - Page and frame are always white. Never add a dark mode to a mock.
 - No decision list inside the mock: what the mock decides is written in your message.
+- The simulated state is in the bar ("Estado", next to the screens); never add a state panel
+  to the page.
 - In HTML files, components are written in kebab-case with a closing tag
   (`<order-list></order-list>`), never self-closing.
 - Cleaning up: when the user asks to delete mocks, delete the files they named, then

@@ -39,6 +39,8 @@ test("the skill keeps mocks interactive, white and shown with screenshots", () =
     assert.match(text, /desktop, tablet and mobile/)
     assert.match(text, /--options/)
     assert.doesNotMatch(text, /mock-rules/)
+    assert.match(text, /choice <slug>/)
+    assert.match(text, /@md:/)
 })
 
 test("versions are pinned to exact versions in one file", () => {
@@ -49,5 +51,10 @@ test("versions are pinned to exact versions in one file", () => {
     for (const file of ["kit.js"].map((name) => join(skillDir, "assets", "kit", name)).concat(readdirSync(join(skillDir, "assets", "kit", "shell")).map((name) => join(skillDir, "assets", "kit", "shell", name)))) {
         assert.doesNotMatch(readFileSync(file, "utf8"), /cdn\.jsdelivr|unpkg\.com/, `${file} must not hard-code a CDN URL`)
     }
-    for (const name of ["MockBar", "MockFrame", "MockOption", "MockVariant", "MockToast", "MockModal", "MockState", "MockStepper", "MockIcon"]) assert.ok(shell.includes(`${name}.js`), name)
+    assert.ok(!shell.includes("MockState.js"), "the simulated state lives in the bar")
+    const bar = readFileSync(join(skillDir, "assets", "kit", "shell", "MockBar.js"), "utf8")
+    assert.ok(bar.indexOf("in DEVICES") < bar.indexOf("in mock.variants"), "variants come after the device buttons")
+    assert.match(bar, /mock.t.stateShort/)
+    assert.match(readFileSync(join(skillDir, "assets", "kit", "shell", "MockFrame.js"), "utf8"), /@container/)
+    for (const name of ["MockBar", "MockFrame", "MockOption", "MockVariant", "MockToast", "MockModal", "MockStepper", "MockIcon"]) assert.ok(shell.includes(`${name}.js`), name)
 })

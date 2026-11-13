@@ -16,6 +16,10 @@ Go through this in the browser, on the served page, before the user sees anythin
 - [ ] Every option works on and off, alone and together, in each variant that has it.
 - [ ] Desktop, tablet and mobile all work: nothing overflows the frame, nothing important is
       cut, touch targets are large enough on tablet and mobile.
+- [ ] The layout changes where it should between the three (columns stack, navigation
+      collapses, tables become lists), with container variants (`@md:`), not `md:`
+      (`references/layout.md`). `check` warns about viewport breakpoints.
+- [ ] "Estado" in the bar shows the simulated state; the page has no state panel.
 - [ ] Texts are realistic and in the project's language; no "lorem ipsum", no "Item 1".
 - [ ] The look follows the project: theme colours, font and radius, and its UI guide if any.
 - [ ] Page and frame are white.
