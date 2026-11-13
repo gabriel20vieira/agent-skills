@@ -8,6 +8,7 @@
 //   node mock-kit.mjs index | check
 //   node mock-kit.mjs used <slug>
 //   node mock-kit.mjs status <slug> proposta|aprovada|implementada
+//   node mock-kit.mjs choice <slug> [--variant B --options "Y,Z"]   (no flags: print the choice)
 //   node mock-kit.mjs serve [--port 8765]
 //   node mock-kit.mjs shots <slug> [--variants A] [--options "X,Y"] [--browser path]
 //
@@ -15,11 +16,11 @@
 import { execFileSync } from "node:child_process"
 import { resolve } from "node:path"
 import { fileURLToPath } from "node:url"
-import { addComponent, buildIndex, checkKit, init, newMock, parseOptions, setStatus, used, writeTheme } from "./kit.mjs"
+import { addComponent, buildIndex, checkKit, getChoice, init, newMock, parseOptions, renderIndex, setChoice, setStatus, used, writeTheme } from "./kit.mjs"
 import { launchEntry, startServer } from "./serve.mjs"
 import { findBrowser, takeShots } from "./shots.mjs"
 
-const USAGE = "Usage: mock-kit.mjs init | theme | new <slug> --title \"...\" | component <Name> --desc \"...\" | index | check | used <slug> | status <slug> <status> | serve | shots <slug>"
+const USAGE = "Usage: mock-kit.mjs init | theme | new <slug> --title \"...\" | component <Name> --desc \"...\" | index | check | used <slug> | status <slug> <status> | choice <slug> [--variant B --options \"Y,Z\"] | serve | shots <slug>"
 const FLAGS = new Set(["update-shell"])
 
 export function parseArgs(argv) {
@@ -107,9 +108,22 @@ async function main(argv) {
             console.log(`${mock.file}: ${mock.status}`)
             return 0
         }
+        case "choice": {
+            const list = (value) => value.split(",").map((item) => item.trim()).filter(Boolean)
+            const choice = options.variant
+                ? setChoice({ ...ctx, slug: first, variant: options.variant, options: list(options.options ?? ""), source: "chat" })
+                : getChoice({ ...ctx, slug: first })
+            console.log(JSON.stringify(choice))
+            return 0
+        }
         case "serve": {
             const port = Number(options.port ?? 8765)
-            const { url } = await startServer({ root: resolve(root, dir), port })
+            const saveChoice = ({ file, variant, options: chosen }) => {
+                if (typeof file !== "string" || !/^[a-z0-9][a-z0-9-]*\.html$/.test(file)) throw new Error("Invalid file")
+                if (!Array.isArray(chosen) || !chosen.every((item) => typeof item === "string")) throw new Error("Invalid options")
+                return setChoice({ ...ctx, slug: file.replace(/\.html$/, ""), variant, options: chosen })
+            }
+            const { url } = await startServer({ root: resolve(root, dir), port, renderIndex: () => renderIndex(ctx), saveChoice })
             console.log(`Serving ${resolve(root, dir)} at ${url}`)
             console.log("For .claude/launch.json:")
             console.log(JSON.stringify(launchEntry({ script: fileURLToPath(import.meta.url), dir, port }), null, 4))

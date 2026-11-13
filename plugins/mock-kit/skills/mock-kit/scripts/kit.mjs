@@ -14,6 +14,9 @@ export const STATUSES = ["proposta", "aprovada", "implementada"]
 const SLUG = /^[a-z0-9][a-z0-9-]*$/
 const COMPONENT = /^[A-Z][A-Za-z0-9]*$/
 const INTERACTION = /(@click|@submit|@input|@change|@keydown|@keyup|v-on:|v-model)/
+// Viewport breakpoints (md:flex) follow the browser window, not the device frame: mocks use the
+// frame's container variants (@md:flex) instead.
+const VIEWPORT_BREAKPOINT = /(?<![@\w-])(?:sm|md|lg|xl|2xl):[\w[\]-]+/g
 
 const TEXT = {
     "pt-PT": {
@@ -31,6 +34,8 @@ const TEXT = {
         decisions: "decisões",
         usedBy: "Usado em",
         unused: "sem uso",
+        unregistered: "não registada",
+        choice: "escolha",
         status: { proposta: "proposta", aprovada: "aprovada", implementada: "implementada" },
     },
     "en-US": {
@@ -48,6 +53,8 @@ const TEXT = {
         decisions: "decisions",
         usedBy: "Used in",
         unused: "unused",
+        unregistered: "unregistered",
+        choice: "choice",
         status: { proposta: "proposal", aprovada: "approved", implementada: "implemented" },
     },
 }
@@ -236,16 +243,20 @@ export function usedComponents(html, names) {
     }).sort()
 }
 
-function renderIndexHtml({ registry, components, shotsDir }) {
+const choiceLabel = (choice) => [choice.variant, ...choice.options].join(" + ")
+
+function renderIndexHtml({ registry, components, shotsDir, loose = [] }) {
     const t = texts(registry.lang)
     const mockRows = registry.mocks.map((mock) => {
         const slug = mock.file.replace(/\.html$/, "")
         const shot = `_shots/${slug}-${(mock.variants ?? ["A"])[0]}-desktop.png`
         const thumb = existsSync(join(shotsDir, `${slug}-${(mock.variants ?? ["A"])[0]}-desktop.png`)) ? `<img src="${escapeHtml(shot)}" alt="">` : ""
+        const choice = mock.choice ? ` · ${t.choice}: ${escapeHtml(choiceLabel(mock.choice))}` : ""
         return `<li><a class="card" href="${escapeHtml(mock.file)}">${thumb}<strong>${escapeHtml(mock.title)}</strong>`
             + `<span class="meta">${escapeHtml(mock.date ?? "")} · <span class="status ${escapeHtml(mock.status)}">${escapeHtml(t.status[mock.status] ?? mock.status)}</span>`
-            + ` · ${(mock.decisions ?? []).length} ${t.decisions} · ${(mock.variants ?? []).map(escapeHtml).join(" / ")}</span></a></li>`
-    })
+            + ` · ${(mock.decisions ?? []).length} ${t.decisions} · ${(mock.variants ?? []).map(escapeHtml).join(" / ")}${choice}</span></a></li>`
+    }).concat(loose.map(({ file, title }) => `<li><a class="card" href="${escapeHtml(file)}"><strong>${escapeHtml(title)}</strong>`
+        + `<span class="meta">${escapeHtml(file)} · <span class="status">${t.unregistered}</span></span></a></li>`))
     const componentRows = components.map((entry) => `<tr><td><code>${escapeHtml(entry.name)}</code>${entry.unused ? ` <span class="status">${t.unused}</span>` : ""}</td>`
         + `<td>${escapeHtml(entry.description ?? "")}</td><td>${(entry.usedBy ?? []).map((file) => `<a href="${escapeHtml(file.startsWith("components/") ? `_kit/${file}` : file)}">${escapeHtml(file)}</a>`).join(", ")}</td></tr>`)
     return `<!doctype html>
@@ -308,8 +319,14 @@ function analyse({ root, dir }) {
         const rel = `components/${relative(join(p.kit, "components"), file).replace(/\\/g, "/")}`
         if (rel.endsWith(".js") && !registeredComponents.has(rel)) warnings.push(`unregistered component file: ${rel}`)
     }
-    const htmlFiles = existsSync(p.base) ? readdirSync(p.base).filter((file) => file.endsWith(".html") && file !== "index.html") : []
-    for (const file of htmlFiles) if (!seenMocks.has(file)) warnings.push(`unregistered mock: ${file}`)
+    const htmlFiles = existsSync(p.base) ? readdirSync(p.base).filter((file) => file.endsWith(".html") && file !== "index.html").sort() : []
+    const loose = []
+    for (const file of htmlFiles) {
+        if (seenMocks.has(file)) continue
+        warnings.push(`unregistered mock: ${file}`)
+        const title = readFileSync(join(p.base, file), "utf8").match(/<title>([^<]*)<\/title>/i)?.[1]?.replace(/ · Mock$/, "").trim()
+        loose.push({ file, title: title || file })
+    }
 
     const usedBy = new Map(components.map((entry) => [entry.name, []]))
     for (const mock of registry.mocks) {
@@ -321,6 +338,9 @@ function analyse({ root, dir }) {
         const html = readFileSync(path, "utf8")
         const body = html.slice(html.search(/<body/i))
         if (!INTERACTION.test(body)) problems.push(`no interaction in ${mock.file} (mocks must be interactive)`)
+        if (/<mock-state[\s>/]/i.test(body)) problems.push(`mock-state in ${mock.file}: removed, the simulated state is in the bar (Estado)`)
+        const viewport = [...new Set([...body.matchAll(/class="([^"]*)"/g)].flatMap((match) => match[1].match(VIEWPORT_BREAKPOINT) ?? []))]
+        if (viewport.length) warnings.push(`viewport breakpoints in ${mock.file}: ${viewport.join(", ")} (use the frame's container variants, e.g. @md:)`)
         const next = withHead(html, head)
         if (next !== html) writes.set(path, next)
         for (const name of usedComponents(html, components.map((entry) => entry.name))) usedBy.get(name).push(mock.file)
@@ -339,9 +359,14 @@ function analyse({ root, dir }) {
     })
     for (const entry of nextComponents) if (entry.unused) warnings.push(`unused component: ${entry.name}`)
     if (JSON.stringify(nextComponents) !== JSON.stringify(components)) writes.set(p.components, JSON.stringify(nextComponents, null, 4) + "\n")
-    const indexHtml = renderIndexHtml({ registry, components: nextComponents, shotsDir: p.shots })
+    const indexHtml = renderIndexHtml({ registry, components: nextComponents, shotsDir: p.shots, loose })
     if (!existsSync(p.index) || readFileSync(p.index, "utf8") !== indexHtml) writes.set(p.index, indexHtml)
-    return { problems, warnings, writes, registry }
+    return { problems, warnings, writes, registry, indexHtml }
+}
+
+/** The index page as it is now (every mock in the folder), without writing anything. Served at /. */
+export function renderIndex({ root, dir }) {
+    return analyse({ root, dir }).indexHtml
 }
 
 /** Regenerates index.html, every mock's head block and the components' usedBy. */
@@ -376,6 +401,32 @@ export function used({ root, dir, slug }) {
     const mock = mockEntry({ root, dir, slug })
     const names = readJson(p.components, []).map((entry) => entry.name)
     return usedComponents(readFileSync(join(p.base, mock.file), "utf8"), names)
+}
+
+/** The variant and options to implement: the one recorded (from the mock bar or from the chat),
+ * or, when nothing was recorded, the first variant with all its options. */
+export function getChoice({ root, dir, slug }) {
+    const mock = mockEntry({ root, dir, slug })
+    if (mock.choice) return { variant: mock.choice.variant, options: [...mock.choice.options], source: mock.choice.source ?? "mock" }
+    const variant = (mock.variants ?? ["A"])[0]
+    return { variant, options: [...(mock.options?.[variant] ?? [])], source: "default" }
+}
+
+/** Records the chosen variant and options. source: "mock" (the bar) or "chat" (the user said it). */
+export function setChoice({ root, dir, slug, variant, options = [], source = "mock" }) {
+    const p = paths(root, dir)
+    const registry = readJson(p.mocks, { lang: "pt-PT", mocks: [] })
+    const mock = registry.mocks.find((entry) => entry.file === `${slug}.html`)
+    if (!mock) throw new Error(`Mock ${slug}.html not found in mocks.json`)
+    const variants = mock.variants ?? ["A"]
+    if (!variants.includes(variant)) throw new Error(`Unknown variant "${variant}": use ${variants.join(", ")}`)
+    const known = mock.options?.[variant]
+    for (const option of options) {
+        if (known && !known.includes(option)) throw new Error(`Unknown option "${option}" for variant ${variant}: use ${known.join(", ") || "none"}`)
+    }
+    mock.choice = source === "mock" ? { variant, options: [...options] } : { variant, options: [...options], source }
+    writeJson(p.mocks, registry)
+    return getChoice({ root, dir, slug })
 }
 
 export function setStatus({ root, dir, slug, status }) {

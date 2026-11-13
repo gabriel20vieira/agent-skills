@@ -38,9 +38,57 @@ export function resolveRequest(root, rawUrl) {
     return target
 }
 
-/** Starts the server; resolves with { server, port, url }. */
-export function startServer({ root, port = 8765, host = "127.0.0.1" }) {
+const MAX_BODY = 16 * 1024
+
+function send(res, status, body, type = "text/plain; charset=utf-8") {
+    res.writeHead(status, { "content-type": type, "cache-control": "no-store" })
+    res.end(body)
+}
+
+/** POST /_kit/choice: the mock bar records the variant and options shown, through saveChoice. */
+function receiveChoice(req, res, saveChoice) {
+    let body = ""
+    let tooBig = false
+    req.on("data", (chunk) => {
+        if (tooBig) return
+        body += chunk
+        if (body.length > MAX_BODY) tooBig = true
+    })
+    req.on("end", () => {
+        if (tooBig) return send(res, 413, "Too large")
+        let choice
+        try {
+            choice = JSON.parse(body)
+        } catch {
+            return send(res, 400, "Invalid JSON")
+        }
+        try {
+            send(res, 200, JSON.stringify(saveChoice(choice)), TYPES[".json"])
+        } catch (error) {
+            send(res, 400, String(error?.message ?? error))
+        }
+    })
+}
+
+/**
+ * Starts the server; resolves with { server, port, url }.
+ * - renderIndex(): when given, / and /index.html are rendered on each request (always current).
+ * - saveChoice({ file, variant, options }): when given, POST /_kit/choice records the mock's choice.
+ */
+export function startServer({ root, port = 8765, host = "127.0.0.1", renderIndex = null, saveChoice = null }) {
     const server = createServer((req, res) => {
+        const path = (req.url ?? "/").split(/[?#]/)[0]
+        if (path === "/_kit/choice") {
+            if (!saveChoice || req.method !== "POST") return send(res, 405, "Method not allowed")
+            return receiveChoice(req, res, saveChoice)
+        }
+        if (renderIndex && (path === "/" || path === "/index.html")) {
+            try {
+                return send(res, 200, renderIndex(), TYPES[".html"])
+            } catch (error) {
+                return send(res, 500, String(error?.message ?? error))
+            }
+        }
         const file = resolveRequest(root, req.url)
         if (!file) {
             res.writeHead(403, { "content-type": "text/plain; charset=utf-8" })

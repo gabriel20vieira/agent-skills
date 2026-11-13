@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { after, test } from "node:test"
-import { addComponent, buildIndex, checkKit, HEAD_END, HEAD_START, init, newMock, parseOptions, setStatus, usedComponents } from "./kit.mjs"
+import { addComponent, buildIndex, checkKit, getChoice, HEAD_END, HEAD_START, init, newMock, parseOptions, renderIndex, setChoice, setStatus, usedComponents } from "./kit.mjs"
 
 const base = mkdtempSync(join(tmpdir(), "mock-kit-"))
 after(() => rmSync(base, { recursive: true, force: true }))
@@ -166,6 +166,45 @@ test("checkKit reports a missing file, a duplicate name, a mock with no interact
     assert.ok(result.problems.includes("duplicate component name: twin"), result.problems.join("\n"))
     assert.ok(result.problems.includes("no interaction in b.html (mocks must be interactive)"), result.problems.join("\n"))
     assert.ok(result.problems.includes("outdated head block in b.html (run index)"), result.problems.join("\n"))
+})
+
+test("getChoice falls back to the first variant with its options; setChoice records the choice", () => {
+    const root = project()
+    init({ root, dir })
+    newMock({ root, dir, slug: "pay", title: "Pay", variants: ["A", "B"], options: { A: ["X", "Y"], B: ["Y", "Z"] } })
+    assert.deepEqual(getChoice({ root, dir, slug: "pay" }), { variant: "A", options: ["X", "Y"], source: "default" })
+    setChoice({ root, dir, slug: "pay", variant: "B", options: ["Z"] })
+    assert.deepEqual(getChoice({ root, dir, slug: "pay" }), { variant: "B", options: ["Z"], source: "mock" })
+    assert.deepEqual(json(root, "mocks.json").mocks[0].choice, { variant: "B", options: ["Z"] })
+    setChoice({ root, dir, slug: "pay", variant: "A", options: [], source: "chat" })
+    assert.deepEqual(getChoice({ root, dir, slug: "pay" }), { variant: "A", options: [], source: "chat" })
+    assert.throws(() => setChoice({ root, dir, slug: "pay", variant: "C", options: [] }), /Unknown variant "C"/)
+    assert.throws(() => setChoice({ root, dir, slug: "pay", variant: "A", options: ["Z"] }), /Unknown option "Z" for variant A/)
+    assert.throws(() => setChoice({ root, dir, slug: "nope", variant: "A", options: [] }), /not found/)
+})
+
+test("renderIndex lists every mock, registered or not, with its choice", () => {
+    const root = project()
+    init({ root, dir })
+    newMock({ root, dir, slug: "pay", title: "Pay", variants: ["A", "B"], options: { B: ["Express"] } })
+    setChoice({ root, dir, slug: "pay", variant: "B", options: ["Express"] })
+    writeFileSync(join(root, dir, "loose.html"), "<html><head><title>Loose one</title></head><body><button @click=\"x\">x</button></body></html>")
+    const html = renderIndex({ root, dir })
+    assert.match(html, /href="pay\.html"/)
+    assert.match(html, /href="loose.html"/)
+    assert.match(html, /Loose one/)
+    assert.match(html, /B \+ Express/)
+})
+
+test("check refuses <mock-state> and warns about viewport breakpoints in a mock", () => {
+    const root = project()
+    init({ root, dir })
+    newMock({ root, dir, slug: "flow", title: "Flow" })
+    const path = join(root, dir, "flow.html")
+    writeFileSync(path, readFileSync(path, "utf8").replace("<mock-frame>", "<mock-frame>\n<div class=\"grid md:grid-cols-2 @md:flex\"></div>\n<mock-state></mock-state>"))
+    const result = checkKit({ root, dir })
+    assert.ok(result.problems.some((line) => /mock-state in flow\.html/.test(line)), result.problems.join("\n"))
+    assert.ok(result.warnings.some((line) => /viewport breakpoints in flow\.html: md:grid-cols-2$/.test(line.replace(/ \(.*$/, ""))), result.warnings.join("\n"))
 })
 
 test("setStatus moves a mock through proposta, aprovada and implementada", () => {

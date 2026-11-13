@@ -117,3 +117,21 @@ nativo: o agente traduz para tokens JSON.
 - **Decisões fora da mock.** `MockRules` («O que esta mock decide») sai do shell e do modelo.
   O agente escreve no texto as decisões, as variantes e as opções, com prós, contras e a
   recomendação. `mocks.json` pode guardar as decisões para registo.
+
+## 9. Adenda: escolha, responsive, índice e barra (2026-11-13, pedido do utilizador)
+
+- **Escolha.** O utilizador pode dizer no chat a variante e as opções a implementar
+  (`choice <slug> --variant B --options "Y"`, origem `chat`). Se não disser, vale o que está
+  selecionado na mock: a barra grava cada mudança em `mocks.json` (`choice`) através de
+  `POST /_kit/choice` do `serve`, e a página abre na escolha gravada. Sem nada gravado, vale a
+  primeira variante com as suas opções. O agente avisa no chat qual é a escolha antes de
+  implementar.
+- **Layout e responsive.** Cada mock planeia o layout para computador, tablet e telemóvel. O
+  frame é um container (`@container`); as mocks usam variantes de container (`@3xl:`, `@5xl:`),
+  que seguem o dispositivo escolhido, e não as de viewport (`md:`), que seguem a janela. O
+  `check` avisa quando encontra variantes de viewport. Guia em `references/layout.md`.
+- **Raiz.** `serve` gera `/` a cada pedido com todas as mocks da pasta, registadas ou não, e a
+  escolha de cada uma.
+- **Barra.** Título à esquerda; à direita os ecrãs (Computador | Tablet | Telemóvel | Estado),
+  depois as variantes, as opções e «Repor». O estado simulado abre no botão «Estado»;
+  `MockState` sai do shell e o `check` recusa `<mock-state>`.
