@@ -1,6 +1,8 @@
-// MockBar: the "MOCK" strip. Left: the title. Right: the simulated clock (optional), the screens
-// (desktop, tablet, mobile, always shown) with "State" (the simulated state as JSON), then the
-// variant tabs, the active variant's options and "Reset".
+// MockBar: the "MOCK" strip, in two rows.
+// Row 1: the title; on the right the simulated clock (optional), the screens (desktop, tablet,
+// mobile, always shown) with "State" (the simulated state as a JSON tree with search and
+// collapsible objects and arrays), and "Reset".
+// Row 2 (when there are any): the variant tabs and the active variant's options, on the right.
 import { computed, defineComponent } from "vue"
 import { DEVICES, useMock } from "../kit.js"
 
@@ -21,8 +23,7 @@ export default defineComponent({
         const mock = useMock()
         const hasVariants = computed(() => mock.variants.length > 1)
         const options = computed(() => mock.optionsOf[mock.variant] ?? [])
-        const json = computed(() => JSON.stringify(mock.state, null, 2))
-        return { mock, hasVariants, options, json, shift, DEVICES, DEVICE_ICONS }
+        return { mock, hasVariants, options, shift, DEVICES, DEVICE_ICONS }
     },
     template: `
         <header class="sticky top-0 z-40 border-b border-amber-200 bg-amber-50/95 backdrop-blur" @keydown.esc="mock.stateOpen = false">
@@ -52,9 +53,13 @@ export default defineComponent({
                                     <button type="button" class="rounded-md p-1 text-slate-500 hover:text-slate-900" :aria-label="mock.t.close" @click="mock.stateOpen = false"><mock-icon name="x" :size="14"></mock-icon></button>
                                 </div>
                             </div>
-                            <pre class="max-h-[60vh] overflow-auto px-3 py-2 text-xs text-slate-700">{{ json }}</pre>
+                            <mock-json :value="mock.state"></mock-json>
                         </div>
                     </div>
+                    <button type="button" class="flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100"
+                        @click="mock.reset()"><mock-icon name="rotate-ccw" :size="14"></mock-icon>{{ mock.t.reset }}</button>
+                </div>
+                <div v-if="hasVariants || options.length" class="flex basis-full flex-wrap items-center justify-end gap-2">
                     <nav v-if="hasVariants" class="flex items-center gap-1" :aria-label="mock.t.variant">
                         <button v-for="name in mock.variants" :key="name" type="button"
                             class="rounded-md px-2.5 py-1 text-xs font-semibold transition"
@@ -69,8 +74,6 @@ export default defineComponent({
                             <mock-icon :name="mock.enabled[option.id] ? 'check' : 'plus'" :size="12"></mock-icon>{{ option.label }}
                         </button>
                     </div>
-                    <button type="button" class="flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100"
-                        @click="mock.reset()"><mock-icon name="rotate-ccw" :size="14"></mock-icon>{{ mock.t.reset }}</button>
                 </div>
             </div>
         </header>

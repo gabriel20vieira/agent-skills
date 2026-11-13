@@ -132,6 +132,11 @@ nativo: o agente traduz para tokens JSON.
   `check` avisa quando encontra variantes de viewport. Guia em `references/layout.md`.
 - **Raiz.** `serve` gera `/` a cada pedido com todas as mocks da pasta, registadas ou não, e a
   escolha de cada uma.
-- **Barra.** Título à esquerda; à direita os ecrãs (Computador | Tablet | Telemóvel | Estado),
-  depois as variantes, as opções e «Repor». O estado simulado abre no botão «Estado»;
+- **Barra.** Duas linhas. Na primeira, o título à esquerda e, à direita, os ecrãs (Computador |
+  Tablet | Telemóvel | Estado) e «Repor». Na segunda, à direita, as variantes e as opções da
+  variante ativa. O estado simulado abre no botão «Estado»;
   `MockState` sai do shell e o `check` recusa `<mock-state>`.
+- **Estado em árvore.** O painel «Estado» mostra o JSON como árvore (`MockJson`): pesquisa em
+  chaves e valores (mostra só os resultados e os pais, com destaque), objetos e arrays que
+  encolhem e expandem, e «Expandir tudo» / «Encolher tudo». A lógica está em
+  `shell/jsonTree.js`, testada em Node.

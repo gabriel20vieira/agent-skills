@@ -89,7 +89,8 @@ Y. Se preferires outra combinação, diz-me." Then build exactly that combinatio
   UI guide (for example `docs/ui/`) when there is one.
 - Page and frame are always white. Never add a dark mode to a mock.
 - No decision list inside the mock: what the mock decides is written in your message.
-- The simulated state is in the bar ("Estado", next to the screens); never add a state panel
+- The simulated state is in the bar ("Estado", next to the screens: a JSON tree with search
+  and collapsible objects and arrays); never add a state panel
   to the page.
 - In HTML files, components are written in kebab-case with a closing tag
   (`<order-list></order-list>`), never self-closing.

@@ -2,10 +2,11 @@
 import MockBar from "./MockBar.js"
 import MockFrame from "./MockFrame.js"
 import MockIcon from "./MockIcon.js"
+import MockJson from "./MockJson.js"
 import MockModal from "./MockModal.js"
 import MockOption from "./MockOption.js"
 import MockStepper from "./MockStepper.js"
 import MockToast from "./MockToast.js"
 import MockVariant from "./MockVariant.js"
 
-export default { MockBar, MockFrame, MockIcon, MockModal, MockOption, MockStepper, MockToast, MockVariant }
+export default { MockBar, MockFrame, MockIcon, MockJson, MockModal, MockOption, MockStepper, MockToast, MockVariant }
