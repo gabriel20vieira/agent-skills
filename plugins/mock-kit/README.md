@@ -10,7 +10,8 @@ those mocks fast and consistent:
   (`--from-css`) or your app's tokens (`--from-tokens`).
 - **Always interactive.** The bar's first row shows desktop, tablet and mobile with "State" (the
   simulated state as a searchable, collapsible JSON tree) and "Reset"; the second row shows
-  variants A/B/C and per-variant options that switch on and off (A with X and Y, B with Y and Z). Modals and toasts. `check` fails on a mock with nothing to click.
+  variants A/B/C with the selected variant's options next to it (A with X and Y, B with Y and Z,
+  each with its own on/off state), and "Where": where each option acts, with "Go" to get there. Modals and toasts. `check` fails on a mock with nothing to click.
 - **Responsive.** The frame is a container: mocks use container variants (`@3xl:`), so the
   layout follows the chosen device. `check` warns about viewport breakpoints.
 - **The choice is recorded.** What is selected in the bar is saved in `mocks.json`; the user

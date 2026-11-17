@@ -42,7 +42,9 @@ Versions live in `_kit/versions.json`; the theme in `_kit/theme.css`.
      states. A mock that cannot be clicked is not a mock (`check` fails without interactions);
    - variants (A, B, C...) when there is a choice of approach, and per-variant options (X, Y,
      Z...) for independent pieces that can be built or left out (`references/variants.md`):
-     whether to add them depends on what the user asked, case by case;
+     whether to add them depends on what the user asked, case by case. Every option says
+     where it acts (`where: "Page > Section > Element"`) and, when that is not the first
+     screen, how to get there (`go`), so the bar's "Onde" panel can take the user to it;
    - layout and responsive behaviour planned for each screen: the bar always offers desktop,
      tablet and mobile and the mock must be right on all three. The frame is a container, so
      use container variants (`@md:`, `@3xl:`, `@5xl:`), never viewport ones (`md:`), which

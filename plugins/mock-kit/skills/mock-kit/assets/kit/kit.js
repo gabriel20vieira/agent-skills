@@ -2,6 +2,7 @@
 // Versions of Vue, Tailwind and Lucide live in versions.json and reach the page through the
 // head block that `mock-kit.mjs index` writes into every mock.
 import { createApp, inject, reactive, watch } from "vue"
+import { applyChoice, chosenOptions, initialEnabled, normaliseOptions } from "./options.js"
 import shell from "./shell/index.js"
 
 export const STRINGS = {
@@ -26,6 +27,12 @@ export const STRINGS = {
         keys: "chaves",
         items: "itens",
         clock: "Hora simulada",
+        where: "Onde",
+        whereTitle: "Onde atuam as opções da variante",
+        whereHere: "neste ecrã",
+        whereGo: "Ir",
+        whereNone: "Local não indicado",
+        whereWent: "Opção",
     },
     "en-US": {
         mock: "MOCK",
@@ -48,17 +55,18 @@ export const STRINGS = {
         keys: "keys",
         items: "items",
         clock: "Simulated time",
+        where: "Where",
+        whereTitle: "Where the options act in variant",
+        whereHere: "on this screen",
+        whereGo: "Go",
+        whereNone: "No place given",
+        whereWent: "Option",
     },
 }
 
 const MOCK = Symbol("mock")
 
 export const DEVICES = ["desktop", "tablet", "mobile"]
-
-/** Options of one variant as [{ id, label, default }]; plain strings are on by default. */
-function normaliseOptions(list = []) {
-    return list.map((item) => (typeof item === "string" ? { id: item, label: item, default: true } : { label: item.id, default: true, ...item }))
-}
 
 /** Opens on the recorded choice (mocks.json) and records each change through the mock-kit server.
  * Skipped for screenshots, for URLs that force a variant or options, and outside http(s). */
@@ -82,7 +90,7 @@ function rememberChoice(mock, params) {
             const choice = registry?.mocks?.find((entry) => entry.file === mock.file)?.choice
             if (choice && mock.variants.includes(choice.variant)) {
                 mock.variant = choice.variant
-                for (const option of mock.optionsOf[choice.variant] ?? []) mock.enabled[option.id] = choice.options.includes(option.id)
+                applyChoice(mock.enabled, mock.optionsOf, choice)
             }
         })
         .catch(() => {})
@@ -97,9 +105,11 @@ export function useMock() {
 /**
  * Mounts the mock on #app.
  * - variants: ["A", "B"]; the first is active unless ?variant= says otherwise.
- * - options: { A: ["X", "Y"], B: ["Y", { id: "Z", label: "Z", default: false }] }: independent
- *   on/off choices per variant, shown in MockBar; use option("X") or <mock-option name="X">.
- *   ?options=X,Y turns exactly those on (for screenshots).
+ * - options: { A: ["X", { id: "Y", where: "Orders > Detail > Payment", go: (state) => { state.page = "detail" } }],
+ *   B: [{ id: "Y", default: false, where: "Orders > List" }] }: independent on/off choices per
+ *   variant, each variant with its own state, shown next to the selected variant in MockBar; use
+ *   option("X") or <mock-option name="X">. where says where the option acts (the bar's "Where"
+ *   panel lists it); go takes the mock there. ?options=X,Y turns exactly those on (screenshots).
  * - state: () => ({ ... }); available as `state` in templates, restored by "Reset".
  * - components: the project's components used by this mock.
  * - clock: "09:00" to start the simulated clock shown in MockBar.
@@ -118,7 +128,8 @@ export function createMock(config = {}) {
         shot: params.has("shot"),
         clock,
         file: decodeURIComponent(location.pathname.split("/").pop() || ""),
-        stateOpen: false,
+        panel: null,
+        here: {},
         state: initial(),
         toasts: [],
         t: STRINGS[lang],
@@ -126,14 +137,21 @@ export function createMock(config = {}) {
     })
     mock.optionsOf = Object.fromEntries(variants.map((name) => [name, normaliseOptions(options[name])]))
     const forced = params.has("options") ? new Set(params.get("options").split(",").filter(Boolean)) : null
-    mock.enabled = {}
-    for (const option of Object.values(mock.optionsOf).flat()) {
-        mock.enabled[option.id] = forced ? forced.has(option.id) : (mock.enabled[option.id] ?? option.default)
-    }
+    mock.enabled = initialEnabled(mock.optionsOf, forced)
     /** Whether an option is on for the active variant. */
-    mock.option = (id) => mock.optionsOf[mock.variant]?.some((option) => option.id === id) && Boolean(mock.enabled[id])
+    mock.option = (id) => Boolean(mock.enabled[mock.variant]?.[id])
+    /** Turns an option of the active variant on or off. */
+    mock.toggleOption = (id) => {
+        if (id in (mock.enabled[mock.variant] ?? {})) mock.enabled[mock.variant][id] = !mock.enabled[mock.variant][id]
+    }
     /** The options on for the active variant, in their declared order. */
-    mock.chosenOptions = () => (mock.optionsOf[mock.variant] ?? []).filter((option) => mock.enabled[option.id]).map((option) => option.id)
+    mock.chosenOptions = () => chosenOptions(mock.optionsOf, mock.enabled, mock.variant)
+    /** Takes the mock to where an option acts (its go), and says so. */
+    mock.goTo = (option) => {
+        option.go?.(mock.state, mock)
+        mock.panel = null
+        mock.toast(`${mock.t.whereWent} ${option.label}: ${option.where.join(" › ")}`)
+    }
     rememberChoice(mock, params)
     let nextToast = 1
     mock.toast = (message, tone = "info") => {

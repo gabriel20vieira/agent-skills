@@ -56,6 +56,8 @@ test("versions are pinned to exact versions in one file", () => {
     assert.ok(bar.indexOf("in DEVICES") < bar.indexOf("in mock.variants"), "variants come after the device buttons")
     assert.ok(bar.indexOf("rotate-ccw") < bar.indexOf("basis-full") && bar.indexOf("basis-full") < bar.indexOf("in mock.variants"), "Reset stays in the screens row; variants get their own row")
     assert.match(bar, /mock.t.stateShort/)
+    assert.match(bar, /mock\.t\.where/, "a Where panel says where each option acts")
+    assert.match(bar, /v-if="name === mock\.variant && options\.length"/, "options appear only next to the selected variant")
     assert.match(bar, /<mock-json :value="mock.state"><\/mock-json>/, "the state is a searchable, collapsible JSON tree")
     assert.match(readFileSync(join(skillDir, "assets", "kit", "shell", "MockFrame.js"), "utf8"), /@container/)
     for (const name of ["MockBar", "MockFrame", "MockOption", "MockVariant", "MockToast", "MockModal", "MockJson", "MockStepper", "MockIcon"]) assert.ok(shell.includes(`${name}.js`), name)

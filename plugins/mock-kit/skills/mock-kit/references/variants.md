@@ -45,8 +45,33 @@ node mock-kit.mjs new checkout --title "Checkout" --variants A,B --options "A:Cu
 </mock-option>
 ```
 
-or `v-if="option('Cupões')"` in any template. In `createMock`, an option can start off:
-`options: { A: ["Cupões", { id: "Embrulho", default: false }] }`.
+or `v-if="option('Cupões')"` in any template.
+
+### Where each option acts
+
+An option often acts on a screen the user is not looking at. Every option says where it acts,
+and how to get there when that is not the first screen. `new` writes `where` with the mock's
+title; replace it with the real path:
+
+```js
+options: {
+    A: [
+        { id: "Cupões", where: "Checkout > Pagamento > Resumo", go: (state) => { state.step = "payment" } },
+        { id: "Embrulho", default: false, where: "Checkout > Carrinho > Linha do produto" },
+    ],
+    B: [{ id: "Embrulho", where: "Checkout > Entrega > Opções" }],
+}
+```
+
+- `where`: `"Page > Section > Element"`, as the user would find it. The bar's "Onde" panel
+  shows it for each option of the selected variant, marks "neste ecrã" when its
+  `<mock-option>` is on screen, and offers "Ir" when there is a `go`.
+- `go(state, mock)`: changes the simulated state to that screen (page, tab, step, open
+  dialog). Give one whenever the option is not on the first screen.
+- `default: false` starts the option off.
+- Each variant keeps its own on/off state, even for an option with the same name, and the bar
+  shows only the selected variant's options, next to it.
+- `check` warns about an option without `where`.
 
 - The mock must work with every option on and off: no gaps, no broken layout.
 - In your message, list each variant's options with what each adds and costs, and which you
