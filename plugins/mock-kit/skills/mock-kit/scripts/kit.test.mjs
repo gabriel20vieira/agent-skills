@@ -48,6 +48,7 @@ test("init --update-shell refreshes kit.js and the shell, never components or ve
     assert.deepEqual(result.removed, ["shell/MockRules.js"])
     assert.match(read(root, "_kit/kit.js"), /createMock/)
     assert.match(read(root, "_kit/shell/MockBar.js"), /MockBar/)
+    assert.match(read(root, "_kit/options.js"), /initialEnabled/, "runtime modules next to kit.js are refreshed too")
     assert.equal(read(root, "_kit/versions.json"), "{\"vue\":\"pinned\"}\n")
 })
 
@@ -74,7 +75,7 @@ test("newMock writes an interactive mock with the head block and registers it", 
     assert.match(html, /<mock-variant name="A">/)
     assert.match(html, /<mock-variant name="B">/)
     assert.doesNotMatch(html, /Guest checkout|mock-rules/, "decisions belong in the agent's text, not in the mock")
-    assert.match(html, /options: \{"A":\["Coupons","Gift wrap"\],"B":\["Gift wrap","Express"\]\}/)
+    assert.match(html, /options: \{"A":\[\{"id":"Coupons","where":"Checkout"\},\{"id":"Gift wrap","where":"Checkout"\}\],"B":\[\{"id":"Gift wrap","where":"Checkout"\},\{"id":"Express","where":"Checkout"\}\]\}/)
     assert.match(html, /<mock-option name="Coupons">/)
     assert.match(html, /@click=/)
     assert.deepEqual(json(root, "mocks.json").mocks, [{ file: "checkout.html", title: "Checkout", date: "2026-11-13", status: "proposta", decisions: ["Pay at the end", "Guest checkout"], variants: ["A", "B"], options: { A: ["Coupons", "Gift wrap"], B: ["Gift wrap", "Express"] } }])
@@ -205,6 +206,16 @@ test("check refuses <mock-state> and warns about viewport breakpoints in a mock"
     const result = checkKit({ root, dir })
     assert.ok(result.problems.some((line) => /mock-state in flow\.html/.test(line)), result.problems.join("\n"))
     assert.ok(result.warnings.some((line) => /viewport breakpoints in flow\.html: md:grid-cols-2$/.test(line.replace(/ \(.*$/, ""))), result.warnings.join("\n"))
+})
+
+test("check warns about an option without where (the user cannot find where it acts)", () => {
+    const root = project()
+    init({ root, dir })
+    newMock({ root, dir, slug: "pay", title: "Pay", variants: ["A"], options: { A: ["Coupons", "Wrap"] } })
+    assert.deepEqual(checkKit({ root, dir }).warnings, [])
+    const path = join(root, dir, "pay.html")
+    writeFileSync(path, readFileSync(path, "utf8").replace(`{"id":"Wrap","where":"Pay"}`, `"Wrap"`))
+    assert.deepEqual(checkKit({ root, dir }).warnings, ["option without where in pay.html: Wrap (say where it acts: \"Page > Section\")"])
 })
 
 test("setStatus moves a mock through proposta, aprovada and implementada", () => {

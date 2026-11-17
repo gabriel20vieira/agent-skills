@@ -14,6 +14,8 @@ Go through this in the browser, on the served page, before the user sees anythin
 - [ ] "Reset" (in the bar) restores the initial state.
 - [ ] Every variant works on its own (switch with the bar tabs).
 - [ ] Every option works on and off, alone and together, in each variant that has it.
+- [ ] Every option has `where` ("Page > Section > Element") and, when it is not on the first
+      screen, a `go` that takes the mock there: open "Onde" in the bar and press "Ir" on each.
 - [ ] Desktop, tablet and mobile all work: nothing overflows the frame, nothing important is
       cut, touch targets are large enough on tablet and mobile.
 - [ ] The layout changes where it should between the three (columns stack, navigation

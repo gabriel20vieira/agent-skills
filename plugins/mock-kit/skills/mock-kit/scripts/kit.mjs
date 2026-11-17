@@ -77,6 +77,7 @@ const readJson = (path, fallback) => (existsSync(path) ? JSON.parse(readFileSync
 const writeJson = (path, value) => writeFileSync(path, JSON.stringify(value, null, 4) + "\n")
 const kebab = (name) => name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
 const escapeHtml = (text) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 const scriptJson = (value) => JSON.stringify(value).replace(/</g, "\\u003c")
 
 function listFiles(dir) {
@@ -118,7 +119,7 @@ export function init({ root, dir, lang = "pt-PT", fromCss, fromTokens, updateShe
     for (const source of listFiles(ASSETS)) {
         const rel = relative(ASSETS, source)
         const target = join(p.kit, rel)
-        const isShell = rel.startsWith("shell") || rel === "kit.js"
+        const isShell = rel.startsWith("shell") || rel === "kit.js" || rel === "options.js"
         if (existsSync(target) && !(isShell && updateShell)) {
             kept.push(rel)
             continue
@@ -211,7 +212,7 @@ export function newMock({ root, dir, slug, title, variants = ["A"], options = {}
         .replaceAll("__TITLE__", escapeHtml(title))
         .replace("__VARIANTS__", () => blocks.join("\n"))
         .replace("__VARIANT_LIST__", () => scriptJson(variants))
-        .replace("__OPTIONS__", () => scriptJson(options))
+        .replace("__OPTIONS__", () => scriptJson(Object.fromEntries(Object.entries(options).map(([variant, ids]) => [variant, ids.map((id) => ({ id, where: title }))]))))
     writeFileSync(join(p.base, file), html)
     registry.mocks.push({ file, title, date, status: "proposta", decisions, variants, options })
     writeJson(p.mocks, registry)
@@ -338,6 +339,9 @@ function analyse({ root, dir }) {
         const html = readFileSync(path, "utf8")
         const body = html.slice(html.search(/<body/i))
         if (!INTERACTION.test(body)) problems.push(`no interaction in ${mock.file} (mocks must be interactive)`)
+        const optionIds = [...new Set(Object.values(mock.options ?? {}).flat())]
+        const unplaced = optionIds.filter((id) => !new RegExp(`\\{[^{}]*"?id"?\\s*:\\s*"${escapeRegExp(id)}"[^{}]*\\bwhere\\b`).test(html))
+        if (unplaced.length) warnings.push(`option without where in ${mock.file}: ${unplaced.join(", ")} (say where it acts: "Page > Section")`)
         if (/<mock-state[\s>/]/i.test(body)) problems.push(`mock-state in ${mock.file}: removed, the simulated state is in the bar (Estado)`)
         const viewport = [...new Set([...body.matchAll(/class="([^"]*)"/g)].flatMap((match) => match[1].match(VIEWPORT_BREAKPOINT) ?? []))]
         if (viewport.length) warnings.push(`viewport breakpoints in ${mock.file}: ${viewport.join(", ")} (use the frame's container variants, e.g. @md:)`)

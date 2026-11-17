@@ -140,3 +140,15 @@ nativo: o agente traduz para tokens JSON.
   chaves e valores (mostra só os resultados e os pais, com destaque), objetos e arrays que
   encolhem e expandem, e «Expandir tudo» / «Encolher tudo». A lógica está em
   `shell/jsonTree.js`, testada em Node.
+
+## 10. Adenda: onde atuam as opções e opções presas à variante (2026-11-17, pedido do utilizador)
+
+- **Problema.** Uma opção pode atuar num ecrã onde o utilizador não está; ao ligá-la, nada
+  muda à vista.
+- **Onde.** Cada opção declara `where: "Página > Secção > Elemento"` e, quando não está no
+  primeiro ecrã, `go(state, mock)`, que leva a mock até lá. A barra tem o botão «Onde», que lista
+  as opções da variante ativa com o caminho, a marca «neste ecrã» (quando o `<mock-option>` está
+  montado) e «Ir». O `new` escreve `where` com o título da mock; o `check` avisa quando falta.
+- **Opções presas à variante.** As opções aparecem só junto da variante selecionada, e cada
+  variante guarda o seu estado ligado/desligado, mesmo com nomes iguais. A lógica está em
+  `_kit/options.js`, testada em Node, e o `init --update-shell` atualiza-o.
