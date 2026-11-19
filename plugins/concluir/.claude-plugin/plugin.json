@@ -1,0 +1,8 @@
+{
+    "name": "concluir",
+    "version": "0.1.0",
+    "description": "Closes the cycle of the parallel sessions (forks) started from a coordinator session: checks with the user what is done, reviews, merges into the integration branch, runs the full suite until green, atomic commits, push, PR to the base branch, and cleans up forks, worktrees and branches.",
+    "author": { "name": "Gabriel Vieira", "email": "gabriel20vieira@hotmail.com" },
+    "license": "MIT",
+    "keywords": ["git", "worktrees", "forks", "merge", "pull-request"]
+}
