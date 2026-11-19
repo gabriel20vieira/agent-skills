@@ -1,6 +1,6 @@
 # Visão geral do repo
 
-> Como o repo está organizado: um marketplace com quatro plugins (web-foundation, dev-crew, docs-keeper, mock-kit), o que cada um traz e onde vive.
+> Como o repo está organizado: um marketplace com cinco plugins (web-foundation, dev-crew, docs-keeper, mock-kit, concluir), o que cada um traz e onde vive.
 
 Updated: 2026-11-19
 Sources: .claude-plugin/, skills/, templates/, modules/, plugins/
@@ -32,7 +32,7 @@ O nome não pode ser `agent-skills`, que está reservado para os marketplaces da
 
 ## Como as peças se ligam
 
-- `docs/settings.md` guarda as preferências de trabalho; as skills dos três plugins leem-no e
+- `docs/settings.md` guarda as preferências de trabalho; as skills dos plugins leem-no e
   perguntam uma vez o que estiver vazio.
 - O scribe da dev-crew segue o layout do docs-keeper quando este está instalado.
 - O índice de `docs/` no `CLAUDE.md` é escrito por `docs-index.mjs index`, nunca à mão.
