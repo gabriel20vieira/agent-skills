@@ -4,7 +4,7 @@
         "name": "Gabriel Vieira"
     },
     "metadata": {
-        "description": "Claude Code plugins: a Nuxt 4 website foundation, a crew of subagents, a docs keeper and a mock kit."
+        "description": "Claude Code plugins: a Nuxt 4 website foundation, a crew of subagents, a docs keeper, a mock kit and a fork closer."
     },
     "plugins": [
         {
@@ -26,6 +26,11 @@
             "name": "mock-kit",
             "source": "./plugins/mock-kit",
             "description": "Interactive mocks before big features: Vue 3 + Tailwind by CDN with no build, always white and styled like the project, a growing component library, browser checks and screenshots."
+        },
+        {
+            "name": "concluir",
+            "source": "./plugins/concluir",
+            "description": "Closes the cycle of parallel sessions (forks): checks with the user what is done, reviews, merges, runs the full suite until green, atomic commits, push, PR, and cleans up forks, worktrees and branches."
         }
     ]
 }
