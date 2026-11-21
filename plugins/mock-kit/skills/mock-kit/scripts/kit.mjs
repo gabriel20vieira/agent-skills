@@ -11,8 +11,8 @@ export const TEMPLATES = resolve(here, "../templates")
 export const HEAD_START = "<!-- mock-kit:head:start -->"
 export const HEAD_END = "<!-- mock-kit:head:end -->"
 export const STATUSES = ["proposta", "aprovada", "implementada", "arquivada"]
-// Index tabs: proposals and approved mocks are active; implemented and archived ones have their own tab.
-export const TABS = { ativas: ["proposta", "aprovada"], implementadas: ["implementada"], arquivadas: ["arquivada"] }
+// Index tabs: Propostas (proposals and approved mocks, the active ones) and Implementadas (implemented and archived, the closed ones).
+export const TABS = { propostas: ["proposta", "aprovada"], implementadas: ["implementada", "arquivada"] }
 const SLUG = /^[a-z0-9][a-z0-9-]*$/
 const COMPONENT = /^[A-Z][A-Za-z0-9]*$/
 const INTERACTION = /(@click|@submit|@input|@change|@keydown|@keyup|v-on:|v-model)/
@@ -39,7 +39,7 @@ const TEXT = {
         unregistered: "não registada",
         choice: "escolha",
         status: { proposta: "proposta", aprovada: "aprovada", implementada: "implementada", arquivada: "arquivada" },
-        tabs: { ativas: "Ativas", implementadas: "Implementadas", arquivadas: "Arquivadas" },
+        tabs: { propostas: "Propostas", implementadas: "Implementadas" },
         emptyTab: "Nenhuma mock aqui.",
     },
     "en-US": {
@@ -60,7 +60,7 @@ const TEXT = {
         unregistered: "unregistered",
         choice: "choice",
         status: { proposta: "proposal", aprovada: "approved", implementada: "implemented", arquivada: "archived" },
-        tabs: { ativas: "Active", implementadas: "Implemented", arquivadas: "Archived" },
+        tabs: { propostas: "Proposals", implementadas: "Implemented" },
         emptyTab: "No mocks here.",
     },
 }
@@ -268,11 +268,11 @@ function renderIndexHtml({ registry, components, shotsDir, loose = [] }) {
     // Unregistered mocks have no status yet: they count as active.
     const rows = Object.fromEntries(Object.entries(TABS).map(([tab, statuses]) => [tab, [
         ...registry.mocks.filter((mock) => statuses.includes(mock.status)).map(card),
-        ...(tab === "ativas" ? looseCards : []),
+        ...(tab === "propostas" ? looseCards : []),
     ]]))
     const tabButtons = Object.keys(TABS).map((tab, at) => `<button type="button" role="tab" id="tab-${tab}" aria-controls="${tab}" aria-selected="${at === 0}">${t.tabs[tab]} <span class="count">${rows[tab].length}</span></button>`).join("\n")
     const tabSections = Object.keys(TABS).map((tab, at) => `<section id="${tab}" role="tabpanel" aria-labelledby="tab-${tab}" data-tab="${tab}"${at ? " hidden" : ""}>\n`
-        + (rows[tab].length ? `<ul>\n${rows[tab].join("\n")}\n</ul>` : `<p class="meta">${tab === "ativas" && !registry.mocks.length ? t.none : t.emptyTab}</p>`) + "\n</section>").join("\n")
+        + (rows[tab].length ? `<ul>\n${rows[tab].join("\n")}\n</ul>` : `<p class="meta">${tab === "propostas" && !registry.mocks.length ? t.none : t.emptyTab}</p>`) + "\n</section>").join("\n")
     const componentRows = components.map((entry) => `<tr><td><code>${escapeHtml(entry.name)}</code>${entry.unused ? ` <span class="status">${t.unused}</span>` : ""}</td>`
         + `<td>${escapeHtml(entry.description ?? "")}</td><td>${(entry.usedBy ?? []).map((file) => `<a href="${escapeHtml(file.startsWith("components/") ? `_kit/${file}` : file)}">${escapeHtml(file)}</a>`).join(", ")}</td></tr>`)
     return `<!doctype html>
@@ -310,7 +310,7 @@ ${tabSections}
 ${componentRows.length ? `<table>\n${componentRows.join("\n")}\n</table>` : `<p class="meta">${t.noComponents}</p>`}
 </main>
 <script>
-// Tabs: the hash (#arquivadas) opens a tab directly.
+// Tabs: the hash (#implementadas) opens a tab directly.
 const tabs = [...document.querySelectorAll("[role=tab]")]
 function show(id) {
     for (const tab of tabs) {

@@ -230,7 +230,7 @@ test("setStatus moves a mock through proposta, aprovada, implementada and arquiv
     assert.throws(() => setStatus({ root, dir, slug: "nope", status: "aprovada" }), /not found/)
 })
 
-test("the index splits mocks into Ativas, Implementadas and Arquivadas tabs", () => {
+test("the index has two tabs: Propostas (the active ones) and Implementadas", () => {
     const root = project()
     init({ root, dir })
     for (const slug of ["new-one", "approved", "built", "old"]) newMock({ root, dir, slug, title: slug })
@@ -240,10 +240,11 @@ test("the index splits mocks into Ativas, Implementadas and Arquivadas tabs", ()
     const html = renderIndex({ root, dir })
     const tab = (name) => html.match(new RegExp(`<section[^>]*data-tab="${name}"[^>]*>([\\s\\S]*?)</section>`))?.[1] ?? ""
     const links = (name) => [...tab(name).matchAll(/href="([\w-]+)\.html"/g)].map((match) => match[1])
-    assert.deepEqual(links("ativas"), ["new-one", "approved"])
-    assert.deepEqual(links("implementadas"), ["built"])
-    assert.deepEqual(links("arquivadas"), ["old"])
-    assert.match(html, /Ativas <span[^>]*>2<\/span>/)
-    assert.match(html, /Arquivadas <span[^>]*>1<\/span>/)
-    assert.match(html, /<section[^>]*data-tab="arquivadas"[^>]*hidden/, "Arquivadas is not shown until its tab is chosen")
+    assert.deepEqual(links("propostas"), ["new-one", "approved"])
+    assert.deepEqual(links("implementadas"), ["built", "old"], "archived mocks are closed too: they go with the implemented ones")
+    assert.equal([...html.matchAll(/role="tab"/g)].length, 2)
+    assert.doesNotMatch(html, /Ativas|Arquivadas/)
+    assert.match(html, /Propostas <span[^>]*>2<\/span>/)
+    assert.match(html, /Implementadas <span[^>]*>2<\/span>/)
+    assert.match(html, /<section[^>]*data-tab="implementadas"[^>]*hidden/, "Implementadas is not shown until its tab is chosen")
 })

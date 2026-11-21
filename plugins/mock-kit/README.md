@@ -29,7 +29,7 @@ The skill loads by itself before large features. In a project it creates:
 
 ```
 docs/mocks/
-  index.html          mocks with thumbnails in tabs: Ativas, Implementadas, Arquivadas
+  index.html          mocks with thumbnails in two tabs: Propostas (active) and Implementadas (implemented or archived)
   mocks.json          lang, and each mock: file, title, date, status, decisions, variants, options, choice
   _kit/               kit.js, versions.json, theme.css, components.json, components/, shell/
   _shots/             screenshots

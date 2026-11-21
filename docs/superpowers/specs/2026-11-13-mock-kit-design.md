@@ -160,3 +160,6 @@ nativo: o agente traduz para tokens JSON.
 - **Índice em separadores.** «Ativas» (proposta e aprovada, e as mocks ainda por registar),
   «Implementadas» e «Arquivadas», cada um com a contagem. As arquivadas só aparecem no seu
   separador; `/#arquivadas` abre-o diretamente.
+- **Revisão (2026-11-21).** Ficam só dois separadores: «Propostas» (as ativas: proposta,
+  aprovada e as por registar) e «Implementadas» (implementada e arquivada, as fechadas;
+  `/#implementadas`). O estado `arquivada` mantém-se e distingue-se pela etiqueta.
