@@ -7,7 +7,7 @@
 //   node mock-kit.mjs component <Name> --desc "..."
 //   node mock-kit.mjs index | check
 //   node mock-kit.mjs used <slug>
-//   node mock-kit.mjs status <slug> proposta|aprovada|implementada
+//   node mock-kit.mjs status <slug> proposta|aprovada|implementada|arquivada
 //   node mock-kit.mjs choice <slug> [--variant B --options "Y,Z"]   (no flags: print the choice)
 //   node mock-kit.mjs serve [--port 8765]
 //   node mock-kit.mjs shots <slug> [--variants A] [--options "X,Y"] [--browser path]
