@@ -29,7 +29,7 @@ The skill loads by itself before large features. In a project it creates:
 
 ```
 docs/mocks/
-  index.html          list of mocks with thumbnails
+  index.html          mocks with thumbnails in tabs: Ativas, Implementadas, Arquivadas
   mocks.json          lang, and each mock: file, title, date, status, decisions, variants, options, choice
   _kit/               kit.js, versions.json, theme.css, components.json, components/, shell/
   _shots/             screenshots
@@ -49,7 +49,7 @@ node <plugin>/skills/mock-kit/scripts/mock-kit.mjs choice checkout              
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs choice checkout --variant B --options "Express"
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs shots checkout
 node <plugin>/skills/mock-kit/scripts/mock-kit.mjs shots checkout --variants B --options "Express"
-node <plugin>/skills/mock-kit/scripts/mock-kit.mjs status checkout aprovada
+node <plugin>/skills/mock-kit/scripts/mock-kit.mjs status checkout aprovada    # proposta > aprovada > implementada | arquivada
 ```
 
 Shell components: `MockBar`, `MockFrame`, `MockVariant`, `MockOption`, `MockToast`, `MockModal`, `MockJson`,

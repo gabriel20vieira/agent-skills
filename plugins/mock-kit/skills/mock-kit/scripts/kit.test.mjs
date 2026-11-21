@@ -218,12 +218,32 @@ test("check warns about an option without where (the user cannot find where it a
     assert.deepEqual(checkKit({ root, dir }).warnings, ["option without where in pay.html: Wrap (say where it acts: \"Page > Section\")"])
 })
 
-test("setStatus moves a mock through proposta, aprovada and implementada", () => {
+test("setStatus moves a mock through proposta, aprovada, implementada and arquivada", () => {
     const root = project()
     init({ root, dir })
     newMock({ root, dir, slug: "flow", title: "Flow" })
     setStatus({ root, dir, slug: "flow", status: "aprovada" })
     assert.equal(json(root, "mocks.json").mocks[0].status, "aprovada")
+    setStatus({ root, dir, slug: "flow", status: "arquivada" })
+    assert.equal(json(root, "mocks.json").mocks[0].status, "arquivada")
     assert.throws(() => setStatus({ root, dir, slug: "flow", status: "done" }), /Invalid status/)
     assert.throws(() => setStatus({ root, dir, slug: "nope", status: "aprovada" }), /not found/)
+})
+
+test("the index splits mocks into Ativas, Implementadas and Arquivadas tabs", () => {
+    const root = project()
+    init({ root, dir })
+    for (const slug of ["new-one", "approved", "built", "old"]) newMock({ root, dir, slug, title: slug })
+    setStatus({ root, dir, slug: "approved", status: "aprovada" })
+    setStatus({ root, dir, slug: "built", status: "implementada" })
+    setStatus({ root, dir, slug: "old", status: "arquivada" })
+    const html = renderIndex({ root, dir })
+    const tab = (name) => html.match(new RegExp(`<section[^>]*data-tab="${name}"[^>]*>([\\s\\S]*?)</section>`))?.[1] ?? ""
+    const links = (name) => [...tab(name).matchAll(/href="([\w-]+)\.html"/g)].map((match) => match[1])
+    assert.deepEqual(links("ativas"), ["new-one", "approved"])
+    assert.deepEqual(links("implementadas"), ["built"])
+    assert.deepEqual(links("arquivadas"), ["old"])
+    assert.match(html, /Ativas <span[^>]*>2<\/span>/)
+    assert.match(html, /Arquivadas <span[^>]*>1<\/span>/)
+    assert.match(html, /<section[^>]*data-tab="arquivadas"[^>]*hidden/, "Arquivadas is not shown until its tab is chosen")
 })

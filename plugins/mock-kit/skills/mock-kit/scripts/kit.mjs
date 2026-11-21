@@ -10,7 +10,9 @@ export const ASSETS = resolve(here, "../assets/kit")
 export const TEMPLATES = resolve(here, "../templates")
 export const HEAD_START = "<!-- mock-kit:head:start -->"
 export const HEAD_END = "<!-- mock-kit:head:end -->"
-export const STATUSES = ["proposta", "aprovada", "implementada"]
+export const STATUSES = ["proposta", "aprovada", "implementada", "arquivada"]
+// Index tabs: proposals and approved mocks are active; implemented and archived ones have their own tab.
+export const TABS = { ativas: ["proposta", "aprovada"], implementadas: ["implementada"], arquivadas: ["arquivada"] }
 const SLUG = /^[a-z0-9][a-z0-9-]*$/
 const COMPONENT = /^[A-Z][A-Za-z0-9]*$/
 const INTERACTION = /(@click|@submit|@input|@change|@keydown|@keyup|v-on:|v-model)/
@@ -36,7 +38,9 @@ const TEXT = {
         unused: "sem uso",
         unregistered: "não registada",
         choice: "escolha",
-        status: { proposta: "proposta", aprovada: "aprovada", implementada: "implementada" },
+        status: { proposta: "proposta", aprovada: "aprovada", implementada: "implementada", arquivada: "arquivada" },
+        tabs: { ativas: "Ativas", implementadas: "Implementadas", arquivadas: "Arquivadas" },
+        emptyTab: "Nenhuma mock aqui.",
     },
     "en-US": {
         variant: "Variant",
@@ -55,7 +59,9 @@ const TEXT = {
         unused: "unused",
         unregistered: "unregistered",
         choice: "choice",
-        status: { proposta: "proposal", aprovada: "approved", implementada: "implemented" },
+        status: { proposta: "proposal", aprovada: "approved", implementada: "implemented", arquivada: "archived" },
+        tabs: { ativas: "Active", implementadas: "Implemented", arquivadas: "Archived" },
+        emptyTab: "No mocks here.",
     },
 }
 
@@ -248,7 +254,7 @@ const choiceLabel = (choice) => [choice.variant, ...choice.options].join(" + ")
 
 function renderIndexHtml({ registry, components, shotsDir, loose = [] }) {
     const t = texts(registry.lang)
-    const mockRows = registry.mocks.map((mock) => {
+    const card = (mock) => {
         const slug = mock.file.replace(/\.html$/, "")
         const shot = `_shots/${slug}-${(mock.variants ?? ["A"])[0]}-desktop.png`
         const thumb = existsSync(join(shotsDir, `${slug}-${(mock.variants ?? ["A"])[0]}-desktop.png`)) ? `<img src="${escapeHtml(shot)}" alt="">` : ""
@@ -256,8 +262,17 @@ function renderIndexHtml({ registry, components, shotsDir, loose = [] }) {
         return `<li><a class="card" href="${escapeHtml(mock.file)}">${thumb}<strong>${escapeHtml(mock.title)}</strong>`
             + `<span class="meta">${escapeHtml(mock.date ?? "")} · <span class="status ${escapeHtml(mock.status)}">${escapeHtml(t.status[mock.status] ?? mock.status)}</span>`
             + ` · ${(mock.decisions ?? []).length} ${t.decisions} · ${(mock.variants ?? []).map(escapeHtml).join(" / ")}${choice}</span></a></li>`
-    }).concat(loose.map(({ file, title }) => `<li><a class="card" href="${escapeHtml(file)}"><strong>${escapeHtml(title)}</strong>`
-        + `<span class="meta">${escapeHtml(file)} · <span class="status">${t.unregistered}</span></span></a></li>`))
+    }
+    const looseCards = loose.map(({ file, title }) => `<li><a class="card" href="${escapeHtml(file)}"><strong>${escapeHtml(title)}</strong>`
+        + `<span class="meta">${escapeHtml(file)} · <span class="status">${t.unregistered}</span></span></a></li>`)
+    // Unregistered mocks have no status yet: they count as active.
+    const rows = Object.fromEntries(Object.entries(TABS).map(([tab, statuses]) => [tab, [
+        ...registry.mocks.filter((mock) => statuses.includes(mock.status)).map(card),
+        ...(tab === "ativas" ? looseCards : []),
+    ]]))
+    const tabButtons = Object.keys(TABS).map((tab, at) => `<button type="button" role="tab" id="tab-${tab}" aria-controls="${tab}" aria-selected="${at === 0}">${t.tabs[tab]} <span class="count">${rows[tab].length}</span></button>`).join("\n")
+    const tabSections = Object.keys(TABS).map((tab, at) => `<section id="${tab}" role="tabpanel" aria-labelledby="tab-${tab}" data-tab="${tab}"${at ? " hidden" : ""}>\n`
+        + (rows[tab].length ? `<ul>\n${rows[tab].join("\n")}\n</ul>` : `<p class="meta">${tab === "ativas" && !registry.mocks.length ? t.none : t.emptyTab}</p>`) + "\n</section>").join("\n")
     const componentRows = components.map((entry) => `<tr><td><code>${escapeHtml(entry.name)}</code>${entry.unused ? ` <span class="status">${t.unused}</span>` : ""}</td>`
         + `<td>${escapeHtml(entry.description ?? "")}</td><td>${(entry.usedBy ?? []).map((file) => `<a href="${escapeHtml(file.startsWith("components/") ? `_kit/${file}` : file)}">${escapeHtml(file)}</a>`).join(", ")}</td></tr>`)
     return `<!doctype html>
@@ -275,7 +290,11 @@ ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-colum
 .card { display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; color: inherit; text-decoration: none; }
 .card:hover { border-color: #94a3b8; } .card img { width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; }
 .meta { color: #64748b; font-size: 13px; } .status { padding: 1px 6px; border-radius: 999px; background: #f1f5f9; font-size: 12px; }
-.status.aprovada { background: #dcfce7; } .status.implementada { background: #dbeafe; }
+.status.aprovada { background: #dcfce7; } .status.implementada { background: #dbeafe; } .status.arquivada { background: #f1f5f9; color: #64748b; }
+[role=tablist] { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 16px; padding: 4px; width: fit-content; max-width: 100%; border-radius: 10px; background: #f1f5f9; }
+[role=tab] { border: 0; border-radius: 8px; padding: 6px 12px; background: none; color: #475569; font: inherit; font-size: 14px; cursor: pointer; }
+[role=tab][aria-selected=true] { background: #fff; color: #0f172a; font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.count { margin-left: 4px; color: #64748b; font-size: 12px; font-weight: 400; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; } td { padding: 8px; border-top: 1px solid #e2e8f0; vertical-align: top; }
 </style>
 </head>
@@ -283,10 +302,26 @@ table { width: 100%; border-collapse: collapse; font-size: 14px; } td { padding:
 <main>
 <h1>${t.title}</h1>
 <h2>${t.mocks}</h2>
-${mockRows.length ? `<ul>\n${mockRows.join("\n")}\n</ul>` : `<p class="meta">${t.none}</p>`}
+<div role="tablist" aria-label="${t.mocks}">
+${tabButtons}
+</div>
+${tabSections}
 <h2>${t.components}</h2>
 ${componentRows.length ? `<table>\n${componentRows.join("\n")}\n</table>` : `<p class="meta">${t.noComponents}</p>`}
 </main>
+<script>
+// Tabs: the hash (#arquivadas) opens a tab directly.
+const tabs = [...document.querySelectorAll("[role=tab]")]
+function show(id) {
+    for (const tab of tabs) {
+        const on = tab.getAttribute("aria-controls") === id
+        tab.setAttribute("aria-selected", String(on))
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !on
+    }
+}
+for (const tab of tabs) tab.addEventListener("click", () => { show(tab.getAttribute("aria-controls")); history.replaceState(null, "", "#" + tab.getAttribute("aria-controls")) })
+if (tabs.some((tab) => "#" + tab.getAttribute("aria-controls") === location.hash)) show(location.hash.slice(1))
+</script>
 </body>
 </html>
 `

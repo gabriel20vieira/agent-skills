@@ -152,3 +152,11 @@ nativo: o agente traduz para tokens JSON.
 - **Opções presas à variante.** As opções aparecem só junto da variante selecionada, e cada
   variante guarda o seu estado ligado/desligado, mesmo com nomes iguais. A lógica está em
   `_kit/options.js`, testada em Node, e o `init --update-shell` atualiza-o.
+
+## 11. Adenda: estado arquivada e separadores no índice (2026-11-21, pedido do utilizador)
+
+- **Estados.** `proposta` > `aprovada` > `implementada` ou `arquivada` (`status <slug> arquivada`).
+  Arquivar guarda o ficheiro e tira-o da vista; apagar continua a ser só quando o utilizador pede.
+- **Índice em separadores.** «Ativas» (proposta e aprovada, e as mocks ainda por registar),
+  «Implementadas» e «Arquivadas», cada um com a contagem. As arquivadas só aparecem no seu
+  separador; `/#arquivadas` abre-o diretamente.
