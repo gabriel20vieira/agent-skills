@@ -69,9 +69,9 @@ Versions live in `_kit/versions.json`; the theme in `_kit/theme.css`.
    After the feature is built, `node "$MOCK" status <slug> implementada`. A mock that is
    dropped or replaced: `status <slug> arquivada`.
 
-Statuses: `proposta` > `aprovada` > `implementada` or `arquivada`. The index (`/`) has three
-tabs: **Ativas** (proposta and aprovada), **Implementadas** and **Arquivadas**; archived mocks
-show only in Arquivadas (`/#arquivadas` opens it).
+Statuses: `proposta` > `aprovada` > `implementada` or `arquivada`. The index (`/`) has two
+tabs: **Propostas**, the active ones (proposta and aprovada), and **Implementadas**, the closed
+ones (implementada and arquivada; `/#implementadas` opens it).
 
 ## Choice: which variant and options to implement
 
@@ -102,7 +102,7 @@ Y. Se preferires outra combinação, diz-me." Then build exactly that combinatio
 - In HTML files, components are written in kebab-case with a closing tag
   (`<order-list></order-list>`), never self-closing.
 - Cleaning up: a mock the user no longer wants in view is archived (`status <slug> arquivada`),
-  which keeps the file and moves it to the Arquivadas tab. When the user asks to delete mocks,
+  which keeps the file and moves it out of Propostas into Implementadas. When the user asks to delete mocks,
   delete the files they named, then
   `node "$MOCK" index` so `mocks.json`, `index.html` and the components' use stay right.
   Components without use are kept and marked `unused`; delete one only when the user asks.
